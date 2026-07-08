@@ -6,8 +6,10 @@ description: >
   orders, list and cancel orders. Use when the user mentions Robinhood, RH
   wallet, RH crypto, buy/sell on Robinhood, Robinhood holdings, BTC-USD on
   Robinhood, or similar. This is separate from Bankr's onchain wallet: always
-  say "Robinhood Crypto (US)" when acting. Requires RH_WALLET_API_URL,
-  RH_API_KEY, and RH_PRIVATE_KEY_BASE64 in Bankr Agent tool environment.
+  say "Robinhood Crypto (US)" when acting. Requires RH_API_KEY and
+  RH_PRIVATE_KEY_BASE64 in Bankr Agent tool environment. Uses hosted gateway
+  https://rh-wallet-production.up.railway.app and public gateway secret from
+  references/hosted-config.md unless overridden.
 tags: [robinhood, crypto, trading, wallet, bankr, usd]
 visibility: public
 metadata:
@@ -25,6 +27,7 @@ Trade and inspect a **Robinhood Crypto** account through a **stateless RH Wallet
 > **US only.** Robinhood Crypto Trading API is available to US customers and is subject to the Robinhood Crypto Customer Agreement.
 
 For setup see [references/setup.md](references/setup.md).  
+Hosted URL + public gateway secret: [references/hosted-config.md](references/hosted-config.md).  
 For safety see [references/trading-safety.md](references/trading-safety.md).  
 For endpoints see [references/api-reference.md](references/api-reference.md).
 
@@ -32,14 +35,16 @@ For endpoints see [references/api-reference.md](references/api-reference.md).
 
 Set these in **Bankr → gear → Agent tool environment** (not x402):
 
-| Variable | What |
-|----------|------|
-| `RH_WALLET_API_URL` | Public gateway URL, no trailing slash (e.g. `https://rh-wallet.up.railway.app`) |
-| `RH_API_KEY` | Robinhood API key (`rh-api-...`) from crypto settings |
-| `RH_PRIVATE_KEY_BASE64` | Ed25519 private key from `scripts/generate_rh_keypair.py` |
-| `RH_GATEWAY_SECRET` | Optional — only if the host set `GATEWAY_SHARED_SECRET` on Railway |
+| Variable | Required? | What |
+|----------|-----------|------|
+| `RH_API_KEY` | **Yes** | Robinhood API key (`rh-api-...`) from crypto settings |
+| `RH_PRIVATE_KEY_BASE64` | **Yes** | Ed25519 private key from `scripts/generate_rh_keypair.py` |
+| `RH_GATEWAY_SECRET` | No | Defaults to public value in [hosted-config.md](references/hosted-config.md) |
+| `RH_WALLET_API_URL` | No | Defaults to `https://rh-wallet-production.up.railway.app` |
+| `RH_MAX_ORDER_USD` | No | Your personal cap (≤ host `MAX_ORDER_USD`) |
+| `RH_REQUIRE_CONFIRMATION` | No | `true` to always require confirm |
 
-If any required var is missing, walk the user through [references/setup.md](references/setup.md). **Never** ask them to paste private keys into chat — only into Bankr env settings.
+If `RH_API_KEY` or `RH_PRIVATE_KEY_BASE64` is missing, walk the user through [references/setup.md](references/setup.md). **Never** ask them to paste private keys into chat.
 
 ## Agent rules
 
@@ -47,13 +52,17 @@ If any required var is missing, walk the user through [references/setup.md](refe
 2. **Estimate before buy.** Call `/v1/estimate` before placing orders.
 3. **Confirm size.** Send `"confirm": true` only after the user clearly agrees.
 4. **Prefer USD for buys** (`quote_amount`). Prefer `asset_quantity` for sells.
-5. **Never echo secrets.** Do not print `RH_PRIVATE_KEY_BASE64`, `RH_API_KEY`, or `RH_GATEWAY_SECRET`.
+5. **Never echo private credentials.** Do not print `RH_PRIVATE_KEY_BASE64` or `RH_API_KEY`. The hosted gateway secret is public (see hosted-config.md).
 6. **Respect max size.** Gateway rejects orders above `MAX_ORDER_USD` (default $50).
 7. **Symbols** are uppercase pairs like `BTC-USD`.
 
 ## Base curl helper
 
 ```bash
+# Hosted gateway (default) — see references/hosted-config.md
+RH_WALLET_API_URL="${RH_WALLET_API_URL:-https://rh-wallet-production.up.railway.app}"
+RH_GATEWAY_SECRET="${RH_GATEWAY_SECRET:-uniqueissomethingimtesting}"
+
 rh() {
   local method="$1"; shift
   local path="$1"; shift
@@ -86,7 +95,7 @@ Always pipe JSON through `jq` when available.
 ### Health / connectivity
 
 ```bash
-curl -sS "${RH_WALLET_API_URL}/health" | jq
+curl -sS "${RH_WALLET_API_URL:-https://rh-wallet-production.up.railway.app}/health" | jq
 ```
 
 ### Account + buying power

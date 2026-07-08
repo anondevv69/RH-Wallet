@@ -11,11 +11,11 @@ Every `/v1/*` request sends Robinhood credentials via headers (from Bankr env):
 | `X-RH-API-Key` | `RH_API_KEY` |
 | `X-RH-Private-Key-Base64` | `RH_PRIVATE_KEY_BASE64` |
 
-If the host set `GATEWAY_SHARED_SECRET`, also send:
+Hosted gateway also requires a public shared secret (see [hosted-config.md](hosted-config.md)):
 
 | Header | Bankr env var |
 |--------|----------------|
-| `Authorization: Bearer ...` | `RH_GATEWAY_SECRET` |
+| `Authorization: Bearer ...` | `RH_GATEWAY_SECRET` (default in skill) |
 
 The gateway signs and proxies to Robinhood. **Keys are not stored.**
 
