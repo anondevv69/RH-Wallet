@@ -6,11 +6,11 @@ from typing import Literal, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 
-from app.auth import require_api_key
+from app.auth import get_auth_context
 from app.deps import get_client, raise_rh_error
 from app.rh_client import RobinhoodAPIError, RobinhoodClient
 
-router = APIRouter(prefix="/v1", dependencies=[Depends(require_api_key)])
+router = APIRouter(prefix="/v1", dependencies=[Depends(get_auth_context)])
 
 
 @router.get("/trading-pairs")

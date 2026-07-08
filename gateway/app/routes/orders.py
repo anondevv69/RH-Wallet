@@ -6,13 +6,13 @@ from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 
-from app.auth import require_api_key
+from app.auth import AuthContext, get_auth_context
 from app.config import Settings, get_settings
-from app.deps import estimate_order_usd, get_client, raise_rh_error
+from app.deps import estimate_order_usd, get_auth_settings, get_client, raise_rh_error
 from app.models import PlaceOrderRequest
 from app.rh_client import RobinhoodAPIError, RobinhoodClient
 
-router = APIRouter(prefix="/v1", dependencies=[Depends(require_api_key)])
+router = APIRouter(prefix="/v1", dependencies=[Depends(get_auth_context)])
 
 
 @router.get("/orders")
@@ -54,8 +54,10 @@ def get_order(
 def place_order(
     payload: PlaceOrderRequest,
     client: RobinhoodClient = Depends(get_client),
-    settings: Settings = Depends(get_settings),
+    auth_settings: tuple[AuthContext, Settings] = Depends(get_auth_settings),
 ) -> dict:
+    auth, settings = auth_settings
+    max_order_usd = auth.max_order_usd
     """Place a market order on Robinhood Crypto (v2).
 
     Safety:
@@ -81,17 +83,17 @@ def place_order(
         symbol=payload.symbol,
         client=client,
     )
-    if usd is not None and usd > settings.max_order_usd:
+    if usd is not None and usd > max_order_usd:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail={
                 "error": "order_too_large",
                 "message": (
                     f"Estimated order ${usd:.2f} exceeds MAX_ORDER_USD="
-                    f"{settings.max_order_usd}."
+                    f"{max_order_usd}."
                 ),
                 "estimated_usd": usd,
-                "max_order_usd": settings.max_order_usd,
+                "max_order_usd": max_order_usd,
             },
         )
 

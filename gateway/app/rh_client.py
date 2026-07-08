@@ -8,12 +8,20 @@ from datetime import datetime, timezone
 from typing import Any, Optional
 from urllib.parse import urlencode
 
+from dataclasses import dataclass
+
 import httpx
 
-from app.config import Settings
 from app.signing import authorization_headers, serialize_body
 
 logger = logging.getLogger(__name__)
+
+
+@dataclass(frozen=True)
+class RHCredentials:
+    api_key: str
+    private_key_base64: str
+    base_url: str = "https://trading.robinhood.com"
 
 
 class RobinhoodAPIError(Exception):
@@ -31,13 +39,13 @@ class RobinhoodAPIError(Exception):
 class RobinhoodClient:
     """Thin signed proxy to https://trading.robinhood.com (API v2)."""
 
-    def __init__(self, settings: Settings, timeout: float = 15.0) -> None:
-        if not settings.has_rh_credentials():
+    def __init__(self, credentials: RHCredentials, timeout: float = 15.0) -> None:
+        if not credentials.api_key or not credentials.private_key_base64:
             raise ValueError(
                 "Robinhood credentials missing. Set RH_API_KEY and RH_PRIVATE_KEY_BASE64."
             )
-        self.settings = settings
-        self.base_url = settings.rh_base_url.rstrip("/")
+        self.credentials = credentials
+        self.base_url = credentials.base_url.rstrip("/")
         self._timeout = timeout
         self._account_number: Optional[str] = None
         self._client = httpx.Client(timeout=timeout)
@@ -71,8 +79,8 @@ class RobinhoodClient:
         body_str = serialize_body(body) if body else ""
         timestamp = int(datetime.now(tz=timezone.utc).timestamp())
         headers = authorization_headers(
-            self.settings.rh_api_key,
-            self.settings.rh_private_key_base64,
+            self.credentials.api_key,
+            self.credentials.private_key_base64,
             timestamp,
             path,
             method.upper(),
@@ -344,20 +352,3 @@ class RobinhoodClient:
             "raw": raw,
         }
 
-
-# Module-level helper used by FastAPI dependency injection
-_client: Optional[RobinhoodClient] = None
-
-
-def get_rh_client(settings: Settings) -> RobinhoodClient:
-    global _client
-    if _client is None:
-        _client = RobinhoodClient(settings)
-    return _client
-
-
-def reset_rh_client() -> None:
-    global _client
-    if _client is not None:
-        _client.close()
-        _client = None

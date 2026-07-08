@@ -30,14 +30,23 @@ For the full endpoint map see [references/api-reference.md](references/api-refer
 
 ## Prerequisites
 
-1. User has deployed the RH Wallet Gateway (this repo’s `gateway/`) with:
-   - `RH_API_KEY` / `RH_PRIVATE_KEY_BASE64` (Robinhood credentials)
-   - `RH_WALLET_API_KEY` (Bearer token for this skill)
-2. In **Bankr settings → Env Vars**, set:
-   - `RH_WALLET_API_URL` — base URL, no trailing slash (e.g. `https://rh-wallet.example.com`)
-   - `RH_WALLET_API_KEY` — same as the gateway’s `RH_WALLET_API_KEY`
+### Universal hosted gateway (recommended for Bankr / X)
 
-If either env var is missing, stop and walk the user through [references/setup.md](references/setup.md). Do **not** ask the user to paste Robinhood private keys into chat.
+If `RH_WALLET_API_URL` or `RH_WALLET_API_KEY` is missing:
+
+1. Tell the user to open **`{RH_WALLET_API_URL or "https://YOUR-GATEWAY-HOST"}/connect`** in a browser.
+2. They paste Robinhood API key + private key there (never in Bankr chat).
+3. They copy the issued URL + personal API key (`rhw_...`) into **Bankr → Agent tool environment**:
+   - `RH_WALLET_API_URL` — same public gateway URL for all users
+   - `RH_WALLET_API_KEY` — their personal key from `/connect`
+
+If the hosted gateway URL is known (e.g. after Railway deploy), use that in instructions.
+
+### Self-hosted (advanced)
+
+Operator runs the gateway with their own env vars. User sets the same `RH_WALLET_API_URL` + `RH_WALLET_API_KEY` the operator gives them.
+
+Do **not** ask users to paste Robinhood private keys into Bankr chat — only into `/connect` or their own gateway `.env`.
 
 ## Agent rules
 

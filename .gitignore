@@ -13,3 +13,5 @@ build/
 .idea/
 .vscode/
 gateway/.pytest_cache/
+*.db
+rh_wallet.db
