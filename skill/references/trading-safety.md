@@ -1,5 +1,12 @@
 # Trading safety
 
+## Privacy (public channels — X, group chats)
+
+- **Never post** Robinhood account numbers, `rh-api-...` keys, private keys, or full API JSON.
+- **Safe to share:** buying power, holdings (e.g. “0.02 ETH”), prices, order intent (“buy $10 SOL-USD”), order status without account metadata.
+- On **X/Twitter** or any automated public reply: treat all Robinhood account identifiers as **forbidden output**.
+- Gateway responses omit `account_number`; agents must not quote it from memory or older messages.
+
 ## Key custody
 
 Robinhood API keys live in **Bankr Agent tool environment**, not on the RH-Wallet host. The gateway signs requests in memory and does not store keys.

@@ -116,7 +116,9 @@ def test_stateless_account_ok(mock_client: MagicMock):
     with TestClient(app) as c:
         response = c.get("/v1/account", headers=RH_HEADERS)
         assert response.status_code == 200
-        assert response.json()["account_number"] == "ACC1"
+        body = response.json()
+        assert "account_number" not in body
+        assert body["status"] == "active"
 
     app.dependency_overrides.clear()
 
