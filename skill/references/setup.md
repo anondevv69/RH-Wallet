@@ -23,6 +23,8 @@ cp .env.example .env
 docker compose up --build -d
 ```
 
+**Or deploy to Railway** (for Bankr cloud / X): see [RAILWAY.md](../../RAILWAY.md).
+
 Confirm:
 
 ```bash
