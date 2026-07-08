@@ -41,6 +41,7 @@ def _auth_context(**overrides: Any) -> AuthContext:
         "rh_api_key": "rh-api-test",
         "rh_private_key_base64": PRIVATE_KEY,
         "max_order_usd": 50.0,
+        "require_confirmation": True,
         "mode": "legacy",
     }
     data.update(overrides)
@@ -185,6 +186,48 @@ def test_connect_when_enabled(client: TestClient):
         )
         assert response.status_code == 201
         assert response.json()["rh_wallet_api_key"].startswith("rhw_")
+
+
+def test_user_max_order_header_stricter_than_gateway(mock_client: MagicMock):
+    app.dependency_overrides.pop(get_auth_context, None)
+    settings = _settings(
+        MAX_ORDER_USD="100",
+        RH_WALLET_API_KEY="",
+        RH_API_KEY="",
+        RH_PRIVATE_KEY_BASE64="",
+    )
+    app.dependency_overrides[get_settings] = lambda: settings
+    app.dependency_overrides[get_client] = lambda: mock_client
+
+    headers = {**RH_HEADERS, "X-Max-Order-USD": "25"}
+
+    with TestClient(app) as c:
+        ok = c.post(
+            "/v1/orders",
+            headers=headers,
+            json={
+                "side": "buy",
+                "symbol": "BTC-USD",
+                "quote_amount": "30.00",
+                "confirm": True,
+            },
+        )
+        assert ok.status_code == 400
+        assert ok.json()["detail"]["error"] == "order_too_large"
+
+        small = c.post(
+            "/v1/orders",
+            headers=headers,
+            json={
+                "side": "buy",
+                "symbol": "BTC-USD",
+                "quote_amount": "10.00",
+                "confirm": True,
+            },
+        )
+        assert small.status_code == 201
+
+    app.dependency_overrides.clear()
 
 
 def test_place_order_requires_confirm(client: TestClient):

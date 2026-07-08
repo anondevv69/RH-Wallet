@@ -58,12 +58,20 @@ rh() {
   local method="$1"; shift
   local path="$1"; shift
   local auth_header=()
+  local user_headers=()
   if [ -n "${RH_GATEWAY_SECRET:-}" ]; then
     auth_header=(-H "Authorization: Bearer ${RH_GATEWAY_SECRET}")
+  fi
+  if [ -n "${RH_MAX_ORDER_USD:-}" ]; then
+    user_headers+=(-H "X-Max-Order-USD: ${RH_MAX_ORDER_USD}")
+  fi
+  if [ -n "${RH_REQUIRE_CONFIRMATION:-}" ]; then
+    user_headers+=(-H "X-Require-Confirmation: ${RH_REQUIRE_CONFIRMATION}")
   fi
   curl -sS -X "$method" \
     "${RH_WALLET_API_URL}${path}" \
     "${auth_header[@]}" \
+    "${user_headers[@]}" \
     -H "X-RH-API-Key: ${RH_API_KEY}" \
     -H "X-RH-Private-Key-Base64: ${RH_PRIVATE_KEY_BASE64}" \
     -H "Content-Type: application/json" \

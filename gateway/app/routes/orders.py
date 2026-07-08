@@ -61,10 +61,10 @@ def place_order(
     """Place a market order on Robinhood Crypto (v2).
 
     Safety:
-    - When REQUIRE_CONFIRMATION=true, ``confirm`` must be true.
-    - Orders above MAX_ORDER_USD are rejected.
+    - When confirmation is required, ``confirm`` must be true.
+    - Orders above effective MAX_ORDER_USD are rejected.
     """
-    if settings.require_confirmation and not payload.confirm:
+    if auth.require_confirmation and not payload.confirm:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail={
