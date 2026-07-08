@@ -6,21 +6,21 @@ from typing import Optional
 
 from fastapi import Depends, HTTPException, status
 
+from app.auth import AuthContext, get_auth_context
 from app.config import Settings, get_settings
-from app.rh_client import RobinhoodAPIError, RobinhoodClient, get_rh_client
+from app.rh_client import RobinhoodAPIError, RobinhoodClient, RHCredentials
 
 
-def get_client(settings: Settings = Depends(get_settings)) -> RobinhoodClient:
-    if not settings.has_rh_credentials():
-        raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail=(
-                "Robinhood credentials are not configured. "
-                "Set RH_API_KEY and RH_PRIVATE_KEY_BASE64."
-            ),
-        )
+def get_client(auth: AuthContext = Depends(get_auth_context)) -> RobinhoodClient:
+    settings = get_settings()
     try:
-        return get_rh_client(settings)
+        return RobinhoodClient(
+            RHCredentials(
+                api_key=auth.rh_api_key,
+                private_key_base64=auth.rh_private_key_base64,
+                base_url=settings.rh_base_url,
+            )
+        )
     except ValueError as exc:
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
@@ -28,9 +28,15 @@ def get_client(settings: Settings = Depends(get_settings)) -> RobinhoodClient:
         ) from exc
 
 
+def get_auth_settings(
+    auth: AuthContext = Depends(get_auth_context),
+    settings: Settings = Depends(get_settings),
+) -> tuple[AuthContext, Settings]:
+    return auth, settings
+
+
 def raise_rh_error(exc: RobinhoodAPIError) -> None:
     code = exc.status_code or status.HTTP_502_BAD_GATEWAY
-    # Don't leak unexpected 5xx codes as client errors
     if code < 400 or code > 599:
         code = status.HTTP_502_BAD_GATEWAY
     raise HTTPException(
@@ -50,18 +56,12 @@ def estimate_order_usd(
     symbol: str,
     client: RobinhoodClient,
 ) -> Optional[float]:
-    """Best-effort USD notional for the max-order guard.
-
-    Prefer quote_amount. For asset_quantity, use estimated ask (buy) or bid (sell).
-    Returns None if USD cannot be determined.
-    """
     if quote_amount is not None and str(quote_amount).strip() != "":
         return float(quote_amount)
 
     if asset_quantity is None:
         return None
 
-    # Use estimated price to convert asset qty → USD
     book_side = "ask" if side.lower() == "buy" else "bid"
     try:
         estimate = client.get_estimated_price(symbol, book_side, str(asset_quantity))
@@ -73,7 +73,6 @@ def estimate_order_usd(
         return None
 
     first = results[0]
-    # RH may return total_cost / price / estimated_price depending on version
     for key in ("total_amount", "total_cost", "price", "estimated_price"):
         value = first.get(key) if isinstance(first, dict) else None
         if value is not None:
@@ -82,7 +81,6 @@ def estimate_order_usd(
             except (TypeError, ValueError):
                 continue
 
-    # Fallback: price * quantity
     price = first.get("price") if isinstance(first, dict) else None
     if price is not None:
         try:

@@ -141,9 +141,15 @@ Includes a golden test against Robinhood’s documented Ed25519 sample signature
 - Robinhood timestamps are valid for ~30 seconds; keep host clocks accurate (NTP).
 - Rate limits: ~100 requests/min per RH account (burst ~300).
 
-### Railway env is not empty
+### Railway env (universal hosting)
 
-The host sets `RH_API_KEY`, `RH_PRIVATE_KEY_BASE64`, and `RH_WALLET_API_KEY` on Railway. Bankr users only set the public URL + gateway key in **Agent tool environment**. With the current MVP, one Railway deploy = one Robinhood account; per-user RH keys require the multi-tenant connect flow (Phase 2).
+**One Railway project serves many users.** Host sets:
+
+- `MASTER_ENCRYPTION_KEY`, `DATABASE_URL`, `PUBLIC_BASE_URL`
+
+Users connect at `/connect` and get a personal `rhw_...` API key. They do **not** put Robinhood keys in Railway.
+
+See [RAILWAY.md](RAILWAY.md). Legacy single-tenant (one RH account in Railway env) still works for solo use.
 
 ## Out of scope (MVP)
 

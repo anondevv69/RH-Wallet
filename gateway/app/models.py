@@ -61,3 +61,20 @@ class ErrorResponse(BaseModel):
     error: str
     detail: Optional[Any] = None
     status_code: Optional[int] = None
+
+
+class ConnectRequest(BaseModel):
+    rh_api_key: str = Field(..., description="Robinhood API key (rh-api-...)")
+    rh_private_key_base64: str = Field(..., description="Base64 Ed25519 private key")
+    label: Optional[str] = Field(default=None, description="Optional label for this connection")
+
+
+class ConnectResponse(BaseModel):
+    tenant_id: str
+    rh_wallet_api_url: str
+    rh_wallet_api_key: str
+    api_key_prefix: str
+    message: str = (
+        "Save rh_wallet_api_key now — it cannot be retrieved again. "
+        "Add rh_wallet_api_url and rh_wallet_api_key to Bankr Agent tool environment."
+    )

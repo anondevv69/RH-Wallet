@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from functools import lru_cache
-
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -23,8 +21,13 @@ class Settings(BaseSettings):
         default="https://trading.robinhood.com", alias="RH_BASE_URL"
     )
 
-    # Bearer token Bankr / agents use to call this gateway
+    # Bearer token Bankr / agents use to call this gateway (legacy single-tenant mode)
     rh_wallet_api_key: str = Field(default="", alias="RH_WALLET_API_KEY")
+
+    # Multi-tenant universal hosting
+    master_encryption_key: str = Field(default="", alias="MASTER_ENCRYPTION_KEY")
+    database_url: str = Field(default="", alias="DATABASE_URL")
+    public_base_url: str = Field(default="", alias="PUBLIC_BASE_URL")
 
     # Safety
     max_order_usd: float = Field(default=50.0, alias="MAX_ORDER_USD")
@@ -40,7 +43,17 @@ class Settings(BaseSettings):
     def has_gateway_auth(self) -> bool:
         return bool(self.rh_wallet_api_key)
 
+    def has_master_key(self) -> bool:
+        return bool(self.master_encryption_key)
 
-@lru_cache
+    def is_multi_tenant(self) -> bool:
+        return self.has_master_key()
+
+    def effective_public_url(self, request_base_url: str = "") -> str:
+        if self.public_base_url:
+            return self.public_base_url.rstrip("/")
+        return request_base_url.rstrip("/")
+
+
 def get_settings() -> Settings:
     return Settings()
