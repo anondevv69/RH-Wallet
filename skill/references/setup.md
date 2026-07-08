@@ -1,64 +1,56 @@
-# Setup — RH Wallet + Bankr
+# Setup — RH Wallet + Bankr (stateless)
 
-## Universal hosting (one Railway, many users)
+**Robinhood keys stay in Bankr — not on the gateway host.**
 
-**Host (you) on Railway:**
-
-1. Deploy repo — see [RAILWAY.md](../../RAILWAY.md)
-2. Set only:
-   - `MASTER_ENCRYPTION_KEY` (`openssl rand -hex 32`)
-   - `DATABASE_URL` (Railway Postgres)
-   - `PUBLIC_BASE_URL` (`https://your-app.up.railway.app`)
-3. Do **not** put user Robinhood keys in Railway env
-
-**Each user:**
-
-1. Open `https://your-app.up.railway.app/connect`
-2. Paste RH API key + private key
-3. Copy issued credentials into **Bankr → Agent tool environment**:
-   - `RH_WALLET_API_URL` = your public Railway URL
-   - `RH_WALLET_API_KEY` = personal `rhw_...` key
-
-4. Install skill:
-   ```text
-   install the skill at https://github.com/anondevv69/RH-Wallet/tree/main/skill
-   ```
-
-## Self-hosted (single user / dev)
-
-### 1. Robinhood credentials
+## 1. Create Robinhood API credentials
 
 ```bash
 pip install pynacl
 python scripts/generate_rh_keypair.py
 ```
 
-Register public key in Robinhood crypto settings → copy API key.
+1. Register the **public** key in Robinhood crypto settings (web classic)
+2. Copy the **API key** (`rh-api-...`)
+3. Keep the **private key** for Bankr env only
 
-### 2. Local gateway
+## 2. Host gateway (you or community)
 
-```bash
-cp .env.example .env
-# fill RH_API_KEY, RH_PRIVATE_KEY_BASE64, RH_WALLET_API_KEY
-docker compose up --build -d
-```
+Deploy to Railway — see [RAILWAY.md](../../RAILWAY.md). Host sets only:
 
-Or enable multi-tenant locally with `MASTER_ENCRYPTION_KEY` and use `/connect`.
+- `PUBLIC_BASE_URL`
+- `GATEWAY_SHARED_SECRET` (recommended)
+- `MAX_ORDER_USD`, `REQUIRE_CONFIRMATION`
 
-### 3. Bankr env vars
+Host does **not** need users' `RH_API_KEY` or private keys.
+
+## 3. Bankr Agent tool environment
+
+**Gear → Agent tool environment** (not x402):
 
 | Variable | Value |
 |----------|--------|
-| `RH_WALLET_API_URL` | Public or `http://127.0.0.1:8080` (local Bankr only) |
-| `RH_WALLET_API_KEY` | From `/connect` or gateway `.env` |
+| `RH_WALLET_API_URL` | `https://your-gateway.up.railway.app` |
+| `RH_API_KEY` | Your `rh-api-...` |
+| `RH_PRIVATE_KEY_BASE64` | Your private key |
+| `RH_GATEWAY_SECRET` | Same as host's `GATEWAY_SHARED_SECRET` (if set) |
 
-## Smoke test
+## 4. Install skill
+
+```text
+install the skill at https://github.com/anondevv69/RH-Wallet/tree/main/skill
+```
+
+## 5. Test
 
 - “What’s my Robinhood buying power?”
-- “Robinhood bid/ask for BTC-USD”
+- “Robinhood price of BTC-USD”
+
+## Local dev (optional)
+
+Run gateway locally; use `http://127.0.0.1:8080` as `RH_WALLET_API_URL` only if Bankr runs on the same machine.
 
 ## Security
 
-- Never paste RH private keys into Bankr chat
-- Use `/connect` or your own `.env` only
-- Revoke: `DELETE /v1/connect` with Bearer token (tenant keys only)
+- Keys in Bankr env = user ↔ Bankr trust (same as Shopify skill tokens)
+- Gateway does not store RH keys by default
+- Do not use `/connect` — disabled unless host explicitly enables storage

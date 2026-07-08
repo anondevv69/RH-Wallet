@@ -1,14 +1,14 @@
 # RH Wallet Gateway
 
-Robinhood Crypto wallet gateway + [Bankr](https://docs.bankr.bot/skills/overview) skill.
-
-Bankr (and X via Bankr) talk to **this gateway** with a Bearer token. The gateway holds your Robinhood Ed25519 credentials, signs every request, and proxies the [Robinhood Crypto Trading API](https://robinhood.com) **v2**.
+Stateless Robinhood Crypto signing proxy + [Bankr](https://docs.bankr.bot/skills/overview) skill.
 
 ```
-User (Bankr / X) → rh-wallet skill → RH Wallet Gateway → trading.robinhood.com
+User → Bankr (RH keys in Agent env) → RH Wallet Gateway (sign only) → Robinhood
 ```
 
-US customers only. Use of the Robinhood Crypto Trading API is subject to the Robinhood Crypto Customer Agreement.
+**Robinhood keys stay in Bankr — not on the gateway host by default.**
+
+US customers only. Subject to Robinhood Crypto Customer Agreement.
 
 ## What’s in this repo
 
@@ -141,15 +141,24 @@ Includes a golden test against Robinhood’s documented Ed25519 sample signature
 - Robinhood timestamps are valid for ~30 seconds; keep host clocks accurate (NTP).
 - Rate limits: ~100 requests/min per RH account (burst ~300).
 
-### Railway env (universal hosting)
+### Bankr env vars (each user)
 
-**One Railway project serves many users.** Host sets:
+| Variable | Where |
+|----------|--------|
+| `RH_WALLET_API_URL` | Public gateway URL |
+| `RH_API_KEY` | User's Robinhood API key |
+| `RH_PRIVATE_KEY_BASE64` | User's Ed25519 private key |
+| `RH_GATEWAY_SECRET` | Optional — if host set `GATEWAY_SHARED_SECRET` |
 
-- `MASTER_ENCRYPTION_KEY`, `DATABASE_URL`, `PUBLIC_BASE_URL`
+### Railway host env (you)
 
-Users connect at `/connect` and get a personal `rhw_...` API key. They do **not** put Robinhood keys in Railway.
+| Variable | Purpose |
+|----------|---------|
+| `PUBLIC_BASE_URL` | Your HTTPS domain |
+| `GATEWAY_SHARED_SECRET` | Optional anti-abuse secret |
+| `MAX_ORDER_USD` | Order size cap |
 
-See [RAILWAY.md](RAILWAY.md). Legacy single-tenant (one RH account in Railway env) still works for solo use.
+See [RAILWAY.md](RAILWAY.md). **Do not** put user RH keys on Railway.
 
 ## Out of scope (MVP)
 

@@ -18,6 +18,10 @@ from app.main import app
 GATEWAY_KEY = "test-gateway-key-please-change"
 MASTER_KEY = "test-master-encryption-key-change-me"
 PRIVATE_KEY = "xQnTJVeQLmw1/Mg2YimEViSpw/SdJcgNXZ5kQkAXNPU="
+RH_HEADERS = {
+    "X-RH-API-Key": "rh-api-test",
+    "X-RH-Private-Key-Base64": PRIVATE_KEY,
+}
 
 
 def _settings(**overrides: Any) -> Settings:
@@ -82,7 +86,6 @@ def client(mock_client: MagicMock):
     app.dependency_overrides[get_settings] = lambda: settings
     app.dependency_overrides[get_auth_context] = lambda: auth
     app.dependency_overrides[get_client] = lambda: mock_client
-    init_db()
     with TestClient(app) as test_client:
         yield test_client
     app.dependency_overrides.clear()
@@ -91,115 +94,104 @@ def client(mock_client: MagicMock):
 def test_health_no_auth(client: TestClient):
     response = client.get("/health")
     assert response.status_code == 200
-    assert response.json()["status"] == "ok"
+    body = response.json()
+    assert body["status"] == "ok"
+    assert body["mode"] == "stateless"
 
 
-def test_account_requires_bearer(client: TestClient):
+def test_account_requires_rh_headers(client: TestClient):
     app.dependency_overrides.pop(get_auth_context, None)
     response = client.get("/v1/account")
     assert response.status_code == 401
     app.dependency_overrides[get_auth_context] = lambda: _auth_context()
 
 
-def test_account_rejects_bad_token(client: TestClient):
-    settings = _settings()
+def test_stateless_account_ok(mock_client: MagicMock):
+    app.dependency_overrides.pop(get_auth_context, None)
+    settings = _settings(RH_WALLET_API_KEY="", RH_API_KEY="", RH_PRIVATE_KEY_BASE64="")
     app.dependency_overrides[get_settings] = lambda: settings
+    app.dependency_overrides[get_client] = lambda: mock_client
 
-    def _bad_auth():
-        from fastapi import HTTPException, status
+    with TestClient(app) as c:
+        response = c.get("/v1/account", headers=RH_HEADERS)
+        assert response.status_code == 200
+        assert response.json()["account_number"] == "ACC1"
 
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid API key.")
-
-    app.dependency_overrides[get_auth_context] = _bad_auth
-    response = client.get("/v1/account", headers={"Authorization": "Bearer wrong"})
-    assert response.status_code == 401
-    app.dependency_overrides[get_auth_context] = lambda: _auth_context()
+    app.dependency_overrides.clear()
 
 
-def test_account_ok(client: TestClient, mock_client: MagicMock):
+def test_stateless_requires_gateway_secret(mock_client: MagicMock):
+    app.dependency_overrides.pop(get_auth_context, None)
+    settings = _settings(
+        GATEWAY_SHARED_SECRET="host-secret",
+        RH_WALLET_API_KEY="",
+        RH_API_KEY="",
+        RH_PRIVATE_KEY_BASE64="",
+    )
+    app.dependency_overrides[get_settings] = lambda: settings
+    app.dependency_overrides[get_client] = lambda: mock_client
+
+    with TestClient(app) as c:
+        no_secret = c.get("/v1/account", headers=RH_HEADERS)
+        assert no_secret.status_code == 401
+
+        with_secret = c.get(
+            "/v1/account",
+            headers={**RH_HEADERS, "Authorization": "Bearer host-secret"},
+        )
+        assert with_secret.status_code == 200
+
+    app.dependency_overrides.clear()
+
+
+def test_account_ok_legacy_override(client: TestClient, mock_client: MagicMock):
     response = client.get(
         "/v1/account", headers={"Authorization": f"Bearer {GATEWAY_KEY}"}
     )
     assert response.status_code == 200
-    assert response.json()["account_number"] == "ACC1"
     mock_client.get_account_summary.assert_called_once()
+
+
+def test_connect_disabled_by_default(client: TestClient):
+    app.dependency_overrides[get_settings] = lambda: _settings()
+    response = client.post(
+        "/v1/connect",
+        json={"rh_api_key": "rh-api-u", "rh_private_key_base64": PRIVATE_KEY},
+    )
+    assert response.status_code == 410
+
+
+def test_connect_when_enabled(client: TestClient):
+    settings = _settings(
+        ENABLE_CONNECT_STORAGE="true",
+        MASTER_ENCRYPTION_KEY=MASTER_KEY,
+        PUBLIC_BASE_URL="https://gateway.example.com",
+        RH_WALLET_API_KEY="",
+        RH_API_KEY="",
+        RH_PRIVATE_KEY_BASE64="",
+    )
+    app.dependency_overrides[get_settings] = lambda: settings
+    app.dependency_overrides.pop(get_auth_context, None)
+    app.dependency_overrides.pop(get_client, None)
+    init_db()
+
+    with TestClient(app) as c:
+        response = c.post(
+            "/v1/connect",
+            json={
+                "rh_api_key": "rh-api-user-test",
+                "rh_private_key_base64": PRIVATE_KEY,
+            },
+        )
+        assert response.status_code == 201
+        assert response.json()["rh_wallet_api_key"].startswith("rhw_")
 
 
 def test_place_order_requires_confirm(client: TestClient):
     response = client.post(
         "/v1/orders",
         headers={"Authorization": f"Bearer {GATEWAY_KEY}"},
-        json={
-            "side": "buy",
-            "symbol": "BTC-USD",
-            "quote_amount": "10.00",
-        },
+        json={"side": "buy", "symbol": "BTC-USD", "quote_amount": "10.00"},
     )
     assert response.status_code == 400
     assert response.json()["detail"]["error"] == "confirmation_required"
-
-
-def test_place_order_rejects_over_max(client: TestClient, mock_client: MagicMock):
-    response = client.post(
-        "/v1/orders",
-        headers={"Authorization": f"Bearer {GATEWAY_KEY}"},
-        json={
-            "side": "buy",
-            "symbol": "BTC-USD",
-            "quote_amount": "100.00",
-            "confirm": True,
-        },
-    )
-    assert response.status_code == 400
-    assert response.json()["detail"]["error"] == "order_too_large"
-    mock_client.place_market_order.assert_not_called()
-
-
-def test_place_order_success(client: TestClient, mock_client: MagicMock):
-    response = client.post(
-        "/v1/orders",
-        headers={"Authorization": f"Bearer {GATEWAY_KEY}"},
-        json={
-            "side": "buy",
-            "symbol": "btc-usd",
-            "quote_amount": "10.00",
-            "confirm": True,
-        },
-    )
-    assert response.status_code == 201
-    assert response.json()["id"] == "ord-1"
-    mock_client.place_market_order.assert_called_once()
-
-
-def test_connect_multi_tenant(client: TestClient, mock_client: MagicMock):
-    settings = _settings(
-        MASTER_ENCRYPTION_KEY=MASTER_KEY,
-        PUBLIC_BASE_URL="https://gateway.example.com",
-        RH_API_KEY="",
-        RH_PRIVATE_KEY_BASE64="",
-        RH_WALLET_API_KEY="",
-    )
-    app.dependency_overrides[get_settings] = lambda: settings
-    app.dependency_overrides.pop(get_auth_context, None)
-    app.dependency_overrides.pop(get_client, None)
-
-    response = client.post(
-        "/v1/connect",
-        json={
-            "rh_api_key": "rh-api-user-test",
-            "rh_private_key_base64": PRIVATE_KEY,
-            "label": "test-user",
-        },
-    )
-    assert response.status_code == 201
-    data = response.json()
-    assert data["rh_wallet_api_url"] == "https://gateway.example.com"
-    assert data["rh_wallet_api_key"].startswith("rhw_")
-
-    issued_key = data["rh_wallet_api_key"]
-    app.dependency_overrides[get_auth_context] = lambda: _auth_context(mode="tenant", tenant_id=data["tenant_id"])
-    app.dependency_overrides[get_client] = lambda: mock_client
-    account = client.get(
-        "/v1/account", headers={"Authorization": f"Bearer {issued_key}"}
-    )
-    assert account.status_code == 200

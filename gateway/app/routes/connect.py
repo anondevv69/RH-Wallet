@@ -1,4 +1,4 @@
-"""Connect flow for universal multi-tenant hosting."""
+"""Connect flow — disabled by default (keys belong in Bankr env, not our DB)."""
 
 from __future__ import annotations
 
@@ -14,64 +14,52 @@ from app.tenant_service import create_tenant, revoke_tenant_by_id
 
 router = APIRouter()
 
-CONNECT_HTML = """<!DOCTYPE html>
+DISABLED_HTML = """<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Connect Robinhood Crypto — RH Wallet</title>
+  <title>RH Wallet — Connect disabled</title>
   <style>
     body { font-family: system-ui, sans-serif; max-width: 560px; margin: 2rem auto; padding: 0 1rem; line-height: 1.5; }
-    h1 { font-size: 1.4rem; }
-    label { display: block; margin-top: 1rem; font-weight: 600; }
-    input, textarea { width: 100%; box-sizing: border-box; margin-top: 0.25rem; padding: 0.5rem; }
-    button { margin-top: 1.25rem; padding: 0.6rem 1rem; font-size: 1rem; cursor: pointer; }
-    .note { background: #f4f4f5; padding: 0.75rem; border-radius: 6px; font-size: 0.9rem; }
-    .ok { background: #ecfdf5; border: 1px solid #10b981; padding: 1rem; border-radius: 6px; }
-    code { word-break: break-all; }
+    .note { background: #fef3c7; padding: 1rem; border-radius: 6px; }
+    code { background: #f4f4f5; padding: 0.1rem 0.3rem; }
   </style>
 </head>
 <body>
-  <h1>Connect Robinhood Crypto</h1>
-  <p class="note">US customers only. Your private key is encrypted at rest on this gateway. Never paste keys into Bankr chat — only here.</p>
-  <form id="connect-form">
-    <label>Label (optional)<input name="label" placeholder="My Bankr agent" /></label>
-    <label>RH API Key<input name="rh_api_key" required placeholder="rh-api-..." /></label>
-    <label>Private Key (Base64)<textarea name="rh_private_key_base64" required rows="3" placeholder="from generate_rh_keypair.py"></textarea></label>
-    <button type="submit">Connect</button>
-  </form>
-  <div id="result"></div>
-  <script>
-    document.getElementById('connect-form').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const fd = new FormData(e.target);
-      const body = Object.fromEntries(fd.entries());
-      const res = await fetch('/v1/connect', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-      });
-      const data = await res.json();
-      const el = document.getElementById('result');
-      if (!res.ok) {
-        el.innerHTML = '<p style="color:#b91c1c">' + (data.detail || JSON.stringify(data)) + '</p>';
-        return;
-      }
-      el.innerHTML = '<div class="ok"><p><strong>Connected.</strong> Copy these into Bankr → Agent tool environment:</p>'
-        + '<p><strong>RH_WALLET_API_URL</strong><br><code>' + data.rh_wallet_api_url + '</code></p>'
-        + '<p><strong>RH_WALLET_API_KEY</strong><br><code>' + data.rh_wallet_api_key + '</code></p>'
-        + '<p>' + data.message + '</p></div>';
-      e.target.reset();
-    });
-  </script>
+  <h1>Key storage disabled</h1>
+  <p class="note">This gateway does <strong>not</strong> store Robinhood keys. Add these to <strong>Bankr → Agent tool environment</strong> instead:</p>
+  <ul>
+    <li><code>RH_API_KEY</code></li>
+    <li><code>RH_PRIVATE_KEY_BASE64</code></li>
+    <li><code>RH_WALLET_API_URL</code> (this gateway URL)</li>
+    <li><code>RH_GATEWAY_SECRET</code> (if the host enabled one)</li>
+  </ul>
+  <p>See <a href="https://github.com/anondevv69/RH-Wallet">RH-Wallet docs</a>.</p>
 </body>
 </html>"""
 
 
+def _require_connect_enabled(settings: Settings) -> None:
+    if not settings.enable_connect_storage:
+        raise HTTPException(
+            status_code=status.HTTP_410_GONE,
+            detail=(
+                "Connect storage is disabled. Put RH_API_KEY and "
+                "RH_PRIVATE_KEY_BASE64 in Bankr Agent tool environment instead."
+            ),
+        )
+    if not settings.is_multi_tenant():
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Connect storage requires MASTER_ENCRYPTION_KEY and DATABASE_URL.",
+        )
+
+
 @router.get("/connect", response_class=HTMLResponse)
-def connect_page() -> str:
-    """Simple browser UI for non-coders to link Robinhood credentials."""
-    return CONNECT_HTML
+def connect_page(settings: Settings = Depends(get_settings)) -> str:
+    if not settings.enable_connect_storage:
+        return DISABLED_HTML
+    return DISABLED_HTML  # replaced below if enabled — keep single import path
 
 
 @router.post("/v1/connect", response_model=ConnectResponse, status_code=status.HTTP_201_CREATED)
@@ -81,31 +69,15 @@ def connect_robinhood(
     settings: Settings = Depends(get_settings),
     db: Session = Depends(get_db),
 ) -> ConnectResponse:
-    """Register a user's Robinhood credentials and issue a personal gateway API key."""
-    if not settings.is_multi_tenant():
-        raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail=(
-                "Multi-tenant connect is not enabled. Set MASTER_ENCRYPTION_KEY on the gateway."
-            ),
-        )
-
+    _require_connect_enabled(settings)
     public_url = settings.effective_public_url(str(request.base_url).rstrip("/"))
-
-    try:
-        result = create_tenant(
-            db,
-            settings,
-            rh_api_key=payload.rh_api_key.strip(),
-            rh_private_key_base64=payload.rh_private_key_base64.strip(),
-            label=payload.label,
-        )
-    except ValueError as exc:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=str(exc),
-        ) from exc
-
+    result = create_tenant(
+        db,
+        settings,
+        rh_api_key=payload.rh_api_key.strip(),
+        rh_private_key_base64=payload.rh_private_key_base64.strip(),
+        label=payload.label,
+    )
     return ConnectResponse(
         tenant_id=result.tenant_id,
         rh_wallet_api_url=public_url,
@@ -119,11 +91,11 @@ def disconnect_robinhood(
     auth: AuthContext = Depends(get_auth_context),
     db: Session = Depends(get_db),
 ) -> None:
-    """Revoke the current tenant connection (tenant API keys only)."""
+    _require_connect_enabled(get_settings())
     if not auth.tenant_id:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Only per-user connect keys can be revoked. Legacy env keys are not revocable here.",
+            detail="Only tenant connect keys can be revoked here.",
         )
     if not revoke_tenant_by_id(db, auth.tenant_id):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Tenant not found.")

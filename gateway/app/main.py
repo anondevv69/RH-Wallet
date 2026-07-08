@@ -20,25 +20,23 @@ logger = logging.getLogger(__name__)
 async def lifespan(_app: FastAPI):
     settings = get_settings()
     logging.basicConfig(level=settings.log_level.upper())
-    init_db()
+    if settings.enable_connect_storage:
+        init_db()
+        logger.warning("ENABLE_CONNECT_STORAGE=true — gateway will store user RH keys")
     logger.info(
-        "RH Wallet Gateway v%s starting (multi_tenant=%s, max_order_usd=%s)",
+        "RH Wallet Gateway v%s (stateless default, connect_storage=%s)",
         __version__,
-        settings.is_multi_tenant(),
-        settings.max_order_usd,
+        settings.enable_connect_storage,
     )
-    if settings.is_multi_tenant():
-        logger.info("Multi-tenant connect enabled at /connect")
-    elif not settings.has_rh_credentials():
-        logger.warning("No RH credentials — use /connect or set legacy env vars")
     yield
 
 
 app = FastAPI(
     title="RH Wallet Gateway",
     description=(
-        "Robinhood Crypto Trading API gateway for Bankr agents. "
-        "US customers only. Subject to Robinhood Crypto Customer Agreement."
+        "Stateless Robinhood Crypto signing proxy for Bankr agents. "
+        "RH keys stay in Bankr env — not stored on this server by default. "
+        "US customers only."
     ),
     version=__version__,
     lifespan=lifespan,
@@ -64,17 +62,18 @@ def health() -> dict:
     return {
         "status": "ok",
         "version": __version__,
-        "multi_tenant": settings.is_multi_tenant(),
-        "rh_credentials_configured": settings.has_rh_credentials(),
-        "gateway_auth_configured": settings.has_gateway_auth() or settings.is_multi_tenant(),
+        "mode": "stateless",
+        "connect_storage_enabled": settings.enable_connect_storage,
+        "requires_gateway_secret": settings.has_gateway_shared_secret(),
         "public_base_url": settings.public_base_url or None,
         "max_order_usd": settings.max_order_usd,
         "require_confirmation": settings.require_confirmation,
-        "connect_url": (
-            f"{settings.public_base_url.rstrip('/')}/connect"
-            if settings.public_base_url
-            else "/connect"
-        ),
+        "bankr_env_vars": [
+            "RH_WALLET_API_URL",
+            "RH_API_KEY",
+            "RH_PRIVATE_KEY_BASE64",
+            "RH_GATEWAY_SECRET",
+        ],
         "disclaimer": (
             "Robinhood Crypto Trading API is available to US customers only "
             "and is subject to the Robinhood Crypto Customer Agreement."

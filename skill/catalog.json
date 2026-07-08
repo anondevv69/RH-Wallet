@@ -1,13 +1,17 @@
 {
   "name": "rh-wallet",
   "displayName": "Robinhood Crypto Wallet",
-  "description": "Manage Robinhood Crypto via an RH Wallet Gateway — balances, prices, market buy/sell for Bankr agents.",
+  "description": "Stateless Robinhood Crypto via RH Wallet Gateway — keys in Bankr env, not on host.",
   "emoji": "🟩",
   "tags": ["robinhood", "crypto", "trading", "wallet"],
   "homepage": "https://github.com/anondevv69/RH-Wallet",
   "install": "install the skill at https://github.com/anondevv69/RH-Wallet/tree/main/skill",
   "requires": {
     "bins": ["curl", "jq"],
-    "env": ["RH_WALLET_API_URL", "RH_WALLET_API_KEY"]
+    "env": [
+      "RH_WALLET_API_URL",
+      "RH_API_KEY",
+      "RH_PRIVATE_KEY_BASE64"
+    ]
   }
 }

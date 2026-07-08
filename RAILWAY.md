@@ -1,81 +1,57 @@
-# Deploy to Railway (universal hosting)
+# Deploy to Railway (stateless — recommended)
 
-One Railway project can serve **many users**, each with their own Robinhood account.
+One public gateway. **Each user keeps their own Robinhood keys in Bankr.**
 
-## How it works
+## Who holds what
 
-| Who | What they set |
-|-----|----------------|
-| **You (Railway host)** | `MASTER_ENCRYPTION_KEY`, `DATABASE_URL`, `PUBLIC_BASE_URL` |
-| **Each user** | Connect at `/connect` → get personal `RH_WALLET_API_KEY` |
-| **Each user (Bankr)** | `RH_WALLET_API_URL` (same for everyone) + their own `RH_WALLET_API_KEY` |
-
-Robinhood keys (`RH_API_KEY`, private key) are **not** in Railway env for universal mode. Users submit them once at `/connect`; they are encrypted in Postgres.
+| What | Where |
+|------|--------|
+| `RH_API_KEY` + private key | **User → Bankr Agent tool environment** |
+| `RH_WALLET_API_URL` | Same public URL for everyone |
+| `RH_GATEWAY_SECRET` | User copies from host (optional anti-abuse) |
+| Signing code | Your Railway deploy |
+| User RH keys in your DB | **No** (disabled by default) |
 
 ## Railway variables (host only)
 
-| Variable | Required | How to generate |
-|----------|----------|-----------------|
-| `MASTER_ENCRYPTION_KEY` | Yes | `openssl rand -hex 32` |
-| `DATABASE_URL` | Yes (prod) | Railway → **Add Postgres** → copy `DATABASE_URL` |
-| `PUBLIC_BASE_URL` | Yes | `https://your-app.up.railway.app` (after Generate Domain) |
-| `MAX_ORDER_USD` | No | `50` (default per new connection) |
-| `REQUIRE_CONFIRMATION` | No | `true` |
+| Variable | Required | Notes |
+|----------|----------|--------|
+| `PUBLIC_BASE_URL` | Yes | `https://your-app.up.railway.app` |
+| `GATEWAY_SHARED_SECRET` | Recommended | `openssl rand -hex 32` — users set as `RH_GATEWAY_SECRET` in Bankr |
+| `MAX_ORDER_USD` | No | Default `50` |
+| `REQUIRE_CONFIRMATION` | No | Default `true` |
 
-**Leave empty for universal mode:**
+**Do not set** (unless you explicitly want legacy modes):
 
-- `RH_API_KEY`
-- `RH_PRIVATE_KEY_BASE64`
-- `RH_WALLET_API_KEY`
+- `RH_API_KEY` / `RH_PRIVATE_KEY_BASE64` — users put these in Bankr
+- `MASTER_ENCRYPTION_KEY` / `ENABLE_CONNECT_STORAGE` — would store keys (off by default)
 
-(Legacy single-tenant mode still works if you set all three RH vars + `RH_WALLET_API_KEY` instead of multi-tenant.)
+## Deploy
 
-## Deploy steps
+1. Railway → New Project → GitHub → `anondevv69/RH-Wallet`
+2. Set variables above
+3. Generate domain → set `PUBLIC_BASE_URL`
+4. Verify: `curl https://YOUR-URL/health` → `"mode": "stateless"`
 
-1. **New Project** → Deploy from GitHub → `anondevv69/RH-Wallet`
-2. **Add Postgres** plugin to the project
-3. Set variables above on the **gateway service**
-4. **Generate Domain** → set `PUBLIC_BASE_URL` to that URL
-5. Redeploy if needed
+## User setup (no coding)
 
-### Verify
+1. Create RH API credentials (keygen script + Robinhood settings)
+2. Bankr → **Agent tool environment**:
+   - `RH_WALLET_API_URL` = your Railway URL
+   - `RH_API_KEY` = theirs
+   - `RH_PRIVATE_KEY_BASE64` = theirs
+   - `RH_GATEWAY_SECRET` = yours (if set)
+3. Install skill from GitHub
+4. Ask: “What’s my Robinhood buying power?”
 
-```bash
-curl -sS https://YOUR-URL.up.railway.app/health | jq
+## Experimental: `/connect` key storage
+
+Only enable if you accept custody liability:
+
+```
+ENABLE_CONNECT_STORAGE=true
+MASTER_ENCRYPTION_KEY=...
+DATABASE_URL=...  # Railway Postgres
 ```
 
-Expect `"multi_tenant": true`.
-
-## User onboarding (no coding)
-
-1. User opens `https://YOUR-URL.up.railway.app/connect`
-2. Pastes Robinhood API key + private key (from Robinhood crypto settings + keygen script)
-3. Copies the issued `RH_WALLET_API_URL` + `RH_WALLET_API_KEY`
-4. In Bankr → **Agent tool environment** → paste both
-5. Installs skill:
-   ```text
-   install the skill at https://github.com/anondevv69/RH-Wallet/tree/main/skill
-   ```
-
-Or tell Bankr: **“Set up my Robinhood wallet”** → skill should send them to `/connect`.
-
-## Bankr env vars (every user)
-
-| Key | Value |
-|-----|--------|
-| `RH_WALLET_API_URL` | `https://YOUR-URL.up.railway.app` (same for all users) |
-| `RH_WALLET_API_KEY` | Personal key from `/connect` (starts with `rhw_`) |
-
-## Security notes
-
-- You custody encrypted RH keys — treat this as a vault product
-- Use Railway Postgres (not SQLite) in production — SQLite resets on ephemeral disks
-- Never commit `MASTER_ENCRYPTION_KEY` or user keys to git
-- Users can revoke at `DELETE /v1/connect` with their Bearer token
-
-## Legacy single-tenant (just you)
-
-If you only want your own account without `/connect`:
-
-Set on Railway: `RH_API_KEY`, `RH_PRIVATE_KEY_BASE64`, `RH_WALLET_API_KEY`  
-Skip `MASTER_ENCRYPTION_KEY` and Postgres.
+Not recommended for public launch.
