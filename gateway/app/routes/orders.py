@@ -11,6 +11,7 @@ from app.config import Settings, get_settings
 from app.deps import estimate_order_usd, get_auth_settings, get_client, raise_rh_error
 from app.models import PlaceOrderRequest
 from app.rh_client import RobinhoodAPIError, RobinhoodClient
+from app.redact import redact_for_client
 
 router = APIRouter(prefix="/v1", dependencies=[Depends(get_auth_context)])
 
@@ -26,12 +27,14 @@ def list_orders(
 ) -> dict:
     """List orders for the primary crypto account."""
     try:
-        return client.get_orders(
+        return redact_for_client(
+            client.get_orders(
             created_at_start=created_at_start,
             symbol=symbol,
             side=side,
             state=state,
             order_type=type,
+            )
         )
     except RobinhoodAPIError as exc:
         raise_rh_error(exc)
@@ -45,7 +48,7 @@ def get_order(
     """Fetch a single order by id."""
     try:
         raw = client.get_order(order_id)
-        return client.normalize_order(raw)
+        return redact_for_client(client.normalize_order(raw))
     except RobinhoodAPIError as exc:
         raise_rh_error(exc)
 
@@ -105,7 +108,7 @@ def place_order(
             asset_quantity=payload.asset_quantity,
             client_order_id=payload.client_order_id,
         )
-        return client.normalize_order(raw)
+        return redact_for_client(client.normalize_order(raw))
     except RobinhoodAPIError as exc:
         raise_rh_error(exc)
 
@@ -118,6 +121,6 @@ def cancel_order(
     """Cancel an open order."""
     try:
         raw = client.cancel_order(order_id)
-        return client.normalize_order(raw)
+        return redact_for_client(client.normalize_order(raw))
     except RobinhoodAPIError as exc:
         raise_rh_error(exc)

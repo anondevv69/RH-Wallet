@@ -53,8 +53,9 @@ If `RH_API_KEY` or `RH_PRIVATE_KEY_BASE64` is missing, walk the user through [re
 3. **Confirm size.** Send `"confirm": true` only after the user clearly agrees.
 4. **Prefer USD for buys** (`quote_amount`). Prefer `asset_quantity` for sells.
 5. **Never echo private credentials.** Do not print `RH_PRIVATE_KEY_BASE64` or `RH_API_KEY`. The hosted gateway secret is public (see hosted-config.md).
-6. **Respect max size.** Gateway rejects orders above `MAX_ORDER_USD` (default $50).
-7. **Symbols** are uppercase pairs like `BTC-USD`.
+6. **Never share account identifiers publicly.** Do **not** include Robinhood `account_number`, full order payloads, or raw API JSON in replies — especially on **X/Twitter**, group chats, or any public channel. Say only: status, buying power, holdings (asset + quantity), prices, and order side/symbol/size. If the user asks for their account number, refuse for public contexts; in private DMs you may summarize without posting the full numeric ID if possible.
+7. **Respect max size.** Gateway rejects orders above `MAX_ORDER_USD` (default $50).
+8. **Symbols** are uppercase pairs like `BTC-USD`.
 
 ## Base curl helper
 
@@ -103,6 +104,8 @@ curl -sS "${RH_WALLET_API_URL:-https://rh-wallet-production.up.railway.app}/heal
 ```bash
 rh GET /v1/account | jq
 ```
+
+Reply with **status** and **buying_power** only — never `account_number` (gateway strips it; do not recover from `raw`).
 
 ### Holdings
 

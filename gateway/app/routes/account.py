@@ -9,6 +9,7 @@ from fastapi import APIRouter, Depends, Query
 from app.auth import get_auth_context
 from app.deps import get_client, raise_rh_error
 from app.rh_client import RobinhoodAPIError, RobinhoodClient
+from app.redact import redact_for_client
 
 router = APIRouter(prefix="/v1", dependencies=[Depends(get_auth_context)])
 
@@ -17,7 +18,7 @@ router = APIRouter(prefix="/v1", dependencies=[Depends(get_auth_context)])
 def get_account(client: RobinhoodClient = Depends(get_client)) -> dict:
     """Return primary Robinhood crypto account summary."""
     try:
-        return client.get_account_summary()
+        return redact_for_client(client.get_account_summary())
     except RobinhoodAPIError as exc:
         raise_rh_error(exc)
 
@@ -30,6 +31,6 @@ def get_holdings(
     """Return crypto holdings for the primary account."""
     try:
         codes = tuple(asset_code) if asset_code else ()
-        return client.get_holdings(*codes)
+        return redact_for_client(client.get_holdings(*codes))
     except RobinhoodAPIError as exc:
         raise_rh_error(exc)
