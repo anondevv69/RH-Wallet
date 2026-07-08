@@ -1,0 +1,17 @@
+.git
+.gitignore
+.env
+.env.*
+!.env.example
+**/__pycache__
+**/.pytest_cache
+**/*.pyc
+.venv
+venv
+.idea
+.vscode
+skill
+scripts
+*.md
+!gateway/README.md
+docker-compose.yml

@@ -135,10 +135,15 @@ Includes a golden test against Robinhood’s documented Ed25519 sample signature
 ## Deploy notes
 
 - Deploy the gateway where Bankr can reach it (public HTTPS or VPN).
+- **Railway:** see [RAILWAY.md](RAILWAY.md) for step-by-step deploy and env vars.
 - Keep `RH_PRIVATE_KEY_BASE64` only on the gateway (KMS / platform secrets).
 - Bankr never receives the Robinhood private key — only the gateway Bearer token.
 - Robinhood timestamps are valid for ~30 seconds; keep host clocks accurate (NTP).
 - Rate limits: ~100 requests/min per RH account (burst ~300).
+
+### Railway env is not empty
+
+The host sets `RH_API_KEY`, `RH_PRIVATE_KEY_BASE64`, and `RH_WALLET_API_KEY` on Railway. Bankr users only set the public URL + gateway key in **Agent tool environment**. With the current MVP, one Railway deploy = one Robinhood account; per-user RH keys require the multi-tenant connect flow (Phase 2).
 
 ## Out of scope (MVP)
 
