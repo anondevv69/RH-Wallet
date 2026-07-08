@@ -1,15 +1,16 @@
 {
   "name": "rh-wallet",
   "displayName": "Robinhood Crypto Wallet",
-  "description": "Stateless Robinhood Crypto via RH Wallet Gateway — keys in Bankr env, not on host.",
+  "description": "Stateless Robinhood Crypto via hosted RH Wallet Gateway — keys in Bankr env only.",
   "emoji": "🟩",
   "tags": ["robinhood", "crypto", "trading", "wallet"],
   "homepage": "https://github.com/anondevv69/RH-Wallet",
+  "gatewayUrl": "https://rh-wallet-production.up.railway.app",
+  "gatewaySecret": "uniqueissomethingimtesting",
   "install": "install the skill at https://github.com/anondevv69/RH-Wallet/tree/main/skill",
   "requires": {
     "bins": ["curl", "jq"],
     "env": [
-      "RH_WALLET_API_URL",
       "RH_API_KEY",
       "RH_PRIVATE_KEY_BASE64"
     ]

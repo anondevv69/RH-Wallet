@@ -75,7 +75,7 @@ install the skill at https://github.com/anondevv69/RH-Wallet/tree/main/skill
 
 Set Bankr Env Vars (gear → Env Vars):
 
-- `RH_WALLET_API_URL` — e.g. `https://your-gateway.example.com`
+- `RH_WALLET_API_URL` — optional; defaults to `https://rh-wallet-production.up.railway.app` in the skill
 - `RH_WALLET_API_KEY` — same value as gateway `RH_WALLET_API_KEY`
 
 See [`skill/references/setup.md`](skill/references/setup.md).
@@ -145,17 +145,17 @@ Includes a golden test against Robinhood’s documented Ed25519 sample signature
 
 | Variable | Where |
 |----------|--------|
-| `RH_WALLET_API_URL` | Public gateway URL |
+| `RH_WALLET_API_URL` | Public gateway URL (skill default) |
 | `RH_API_KEY` | User's Robinhood API key |
 | `RH_PRIVATE_KEY_BASE64` | User's Ed25519 private key |
-| `RH_GATEWAY_SECRET` | Optional — if host set `GATEWAY_SHARED_SECRET` |
+| `RH_GATEWAY_SECRET` | Public default in [skill/references/hosted-config.md](skill/references/hosted-config.md) |
 
 ### Railway host env (you)
 
 | Variable | Purpose |
 |----------|---------|
 | `PUBLIC_BASE_URL` | Your HTTPS domain |
-| `GATEWAY_SHARED_SECRET` | Optional anti-abuse secret |
+| `GATEWAY_SHARED_SECRET` | Must match [hosted-config.md](skill/references/hosted-config.md) |
 | `MAX_ORDER_USD` | Order size cap |
 
 See [RAILWAY.md](RAILWAY.md). **Do not** put user RH keys on Railway.
