@@ -73,6 +73,8 @@ def health() -> dict:
             "RH_API_KEY",
             "RH_PRIVATE_KEY_BASE64",
             "RH_GATEWAY_SECRET",
+            "RH_MAX_ORDER_USD",
+            "RH_REQUIRE_CONFIRMATION",
         ],
         "disclaimer": (
             "Robinhood Crypto Trading API is available to US customers only "

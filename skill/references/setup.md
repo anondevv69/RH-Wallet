@@ -33,6 +33,8 @@ Host does **not** need users' `RH_API_KEY` or private keys.
 | `RH_API_KEY` | Your `rh-api-...` |
 | `RH_PRIVATE_KEY_BASE64` | Your private key |
 | `RH_GATEWAY_SECRET` | Same as host's `GATEWAY_SHARED_SECRET` (if set) |
+| `RH_MAX_ORDER_USD` | Optional — your personal cap (cannot exceed host `MAX_ORDER_USD`) |
+| `RH_REQUIRE_CONFIRMATION` | Optional — `true` to always require confirm on your orders |
 
 ## 4. Install skill
 

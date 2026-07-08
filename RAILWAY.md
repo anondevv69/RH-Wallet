@@ -12,14 +12,23 @@ One public gateway. **Each user keeps their own Robinhood keys in Bankr.**
 | Signing code | Your Railway deploy |
 | User RH keys in your DB | **No** (disabled by default) |
 
-## Railway variables (host only)
+## Railway variables (host only — same for all users)
 
-| Variable | Required | Notes |
-|----------|----------|--------|
-| `PUBLIC_BASE_URL` | Yes | `https://your-app.up.railway.app` |
-| `GATEWAY_SHARED_SECRET` | Recommended | `openssl rand -hex 32` — users set as `RH_GATEWAY_SECRET` in Bankr |
-| `MAX_ORDER_USD` | No | Default `50` |
-| `REQUIRE_CONFIRMATION` | No | Default `true` |
+| Variable | Who sets | Purpose |
+|----------|----------|---------|
+| `PUBLIC_BASE_URL` | **You** | One URL everyone uses as `RH_WALLET_API_URL` |
+| `GATEWAY_SHARED_SECRET` | **You** | Same secret everyone copies to `RH_GATEWAY_SECRET` |
+| `MAX_ORDER_USD` | **You** | **Ceiling** — no user can trade above this |
+| `REQUIRE_CONFIRMATION` | **You** | Default confirm rule for the gateway |
+
+## Per-user limits (Bankr env — each user sets their own)
+
+| Variable | Example | Purpose |
+|----------|---------|---------|
+| `RH_MAX_ORDER_USD` | `25` | User's stricter cap (must be ≤ host `MAX_ORDER_USD`) |
+| `RH_REQUIRE_CONFIRMATION` | `true` | User always wants confirm step |
+
+Users cannot exceed your Railway `MAX_ORDER_USD` ceiling.
 
 **Do not set** (unless you explicitly want legacy modes):
 

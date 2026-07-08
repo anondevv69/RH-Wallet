@@ -26,8 +26,35 @@ class AuthContext:
     rh_api_key: str
     rh_private_key_base64: str
     max_order_usd: float
+    require_confirmation: bool
     tenant_id: Optional[str] = None
     mode: str = "stateless"
+
+
+def _parse_user_max_order_usd(request: Request, gateway_ceiling: float) -> float:
+    """Per-user cap from X-Max-Order-USD (Bankr env RH_MAX_ORDER_USD). Cannot exceed host ceiling."""
+    raw = request.headers.get("x-max-order-usd", "").strip()
+    if not raw:
+        return gateway_ceiling
+    try:
+        user_cap = float(raw)
+    except ValueError:
+        return gateway_ceiling
+    if user_cap <= 0:
+        return gateway_ceiling
+    return min(user_cap, gateway_ceiling)
+
+
+def _parse_user_require_confirmation(
+    request: Request, gateway_default: bool
+) -> bool:
+    """Per-user stricter confirm from X-Require-Confirmation (Bankr RH_REQUIRE_CONFIRMATION)."""
+    raw = request.headers.get("x-require-confirmation", "").strip().lower()
+    if raw in ("true", "1", "yes"):
+        return True
+    if raw in ("false", "0", "no"):
+        return gateway_default
+    return gateway_default
 
 
 def _verify_gateway_secret(
@@ -74,7 +101,10 @@ async def get_auth_context(
         return AuthContext(
             rh_api_key=rh_api_key,
             rh_private_key_base64=rh_private_key,
-            max_order_usd=settings.max_order_usd,
+            max_order_usd=_parse_user_max_order_usd(request, settings.max_order_usd),
+            require_confirmation=_parse_user_require_confirmation(
+                request, settings.require_confirmation
+            ),
             mode="stateless",
         )
 
@@ -102,7 +132,13 @@ async def get_auth_context(
             return AuthContext(
                 rh_api_key=tenant.rh_api_key,
                 rh_private_key_base64=tenant.rh_private_key_base64,
-                max_order_usd=max_usd,
+                max_order_usd=min(
+                    max_usd,
+                    _parse_user_max_order_usd(request, settings.max_order_usd),
+                ),
+                require_confirmation=_parse_user_require_confirmation(
+                    request, settings.require_confirmation
+                ),
                 tenant_id=tenant.tenant_id,
                 mode="tenant",
             )
@@ -121,7 +157,10 @@ async def get_auth_context(
         return AuthContext(
             rh_api_key=settings.rh_api_key,
             rh_private_key_base64=settings.rh_private_key_base64,
-            max_order_usd=settings.max_order_usd,
+            max_order_usd=_parse_user_max_order_usd(request, settings.max_order_usd),
+            require_confirmation=_parse_user_require_confirmation(
+                request, settings.require_confirmation
+            ),
             mode="legacy",
         )
 
