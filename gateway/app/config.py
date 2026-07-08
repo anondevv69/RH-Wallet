@@ -21,10 +21,16 @@ class Settings(BaseSettings):
         default="https://trading.robinhood.com", alias="RH_BASE_URL"
     )
 
-    # Bearer token Bankr / agents use to call this gateway (legacy single-tenant mode)
+    # Legacy single-tenant Bearer token (optional)
     rh_wallet_api_key: str = Field(default="", alias="RH_WALLET_API_KEY")
 
-    # Multi-tenant universal hosting
+    # Optional shared secret for public stateless gateway (users set RH_GATEWAY_SECRET in Bankr)
+    gateway_shared_secret: str = Field(default="", alias="GATEWAY_SHARED_SECRET")
+
+    # Experimental: store user RH keys in DB via /connect (disabled by default)
+    enable_connect_storage: bool = Field(default=False, alias="ENABLE_CONNECT_STORAGE")
+
+    # Multi-tenant vault (only used when ENABLE_CONNECT_STORAGE=true)
     master_encryption_key: str = Field(default="", alias="MASTER_ENCRYPTION_KEY")
     database_url: str = Field(default="", alias="DATABASE_URL")
     public_base_url: str = Field(default="", alias="PUBLIC_BASE_URL")
@@ -43,11 +49,14 @@ class Settings(BaseSettings):
     def has_gateway_auth(self) -> bool:
         return bool(self.rh_wallet_api_key)
 
+    def has_gateway_shared_secret(self) -> bool:
+        return bool(self.gateway_shared_secret)
+
     def has_master_key(self) -> bool:
         return bool(self.master_encryption_key)
 
     def is_multi_tenant(self) -> bool:
-        return self.has_master_key()
+        return self.enable_connect_storage and self.has_master_key()
 
     def effective_public_url(self, request_base_url: str = "") -> str:
         if self.public_base_url:

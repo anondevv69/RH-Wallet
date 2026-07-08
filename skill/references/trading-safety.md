@@ -1,8 +1,10 @@
 # Trading safety
 
-## Scope
+## Key custody
 
-This skill controls **Robinhood Crypto** funds, not Bankr’s onchain wallet. Say so in every trading reply.
+Robinhood API keys live in **Bankr Agent tool environment**, not on the RH-Wallet host. The gateway signs requests in memory and does not store keys.
+
+Never paste RH private keys into Bankr chat — only into Bankr env settings.
 
 ## Confirmation policy
 
