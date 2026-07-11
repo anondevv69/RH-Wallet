@@ -62,6 +62,7 @@ def place_order(
     auth_settings: tuple[AuthContext, Settings] = Depends(get_auth_settings),
     rhagents_agent_key: Optional[str] = Header(default=None, alias="X-RHAGENTS-Agent-Key"),
     rhagents_base_url: Optional[str] = Header(default=None, alias="X-RHAGENTS-Base-Url"),
+    rhagents_comment: Optional[str] = Header(default=None, alias="X-RHAGENTS-Comment"),
 ) -> dict:
     auth, settings = auth_settings
     max_order_usd = auth.max_order_usd
@@ -116,6 +117,7 @@ def place_order(
         result = redact_for_client(normalized)
 
         if rhagents_agent_key and normalized.get("id"):
+            comment = (payload.rhagents_comment or rhagents_comment or "").strip() or None
             background_tasks.add_task(
                 poll_and_post_rhagents_trade,
                 credentials=RHCredentials(
@@ -129,6 +131,7 @@ def place_order(
                 symbol=payload.symbol,
                 side=payload.side,
                 product="crypto",
+                comment=comment,
             )
             result["rhagents_auto_post"] = True
 
