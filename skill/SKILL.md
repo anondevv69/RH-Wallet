@@ -6,7 +6,8 @@ description: >
   crypto prices, balance, buy/sell crypto, OR stocks (SPCX, GME), options
   (calls/puts) when Agentic MCP is connected. Crypto: RH_API_KEY +
   RH_PRIVATE_KEY_BASE64 in Bankr env + optional x402 (USDC on Base). Stocks/options:
-  auto-connects Agentic via one-time localhost OAuth — see references/agentic-connect.md.
+  connect agentically, connect Robinhood Agentic, or set up stocks/options via
+  https://rh-wallet-production.up.railway.app/setup when AGENTIC_TOKEN is missing.
   Never show account numbers (including masked ••••XXXX) in any reply — see references/RESPONSE-SAFETY.md.
 tags: [robinhood, crypto, trading, wallet, bankr, usd]
 visibility: public
@@ -34,6 +35,41 @@ For paid x402 API + natural-language routing see [references/x402.md](references
 For **Agentic connect** see [references/agentic-connect.md](references/agentic-connect.md).  
 For which product to use see [references/WALLET-ROUTING.md](references/WALLET-ROUTING.md).  
 For **public X safety** (never tweet account numbers) see [references/RESPONSE-SAFETY.md](references/RESPONSE-SAFETY.md).
+
+## "Connect Agentic" — reply template (use verbatim)
+
+When the user says anything like **"connect agentically"**, **"connect Robinhood Agentic"**, **"set up stocks on Robinhood"**, **"I want to trade stocks through Bankr"**, or **"connect my agentic account"**:
+
+1. Run `what env vars do I have?` — if `AGENTIC_TOKEN` is already set, say Agentic is connected and offer a buying-power check.
+2. If **not** connected, reply with this (include the link — do not skip it):
+
+---
+
+**Connect Robinhood Agentic (stocks & options)**
+
+Open the setup guide — all steps are there:
+
+**https://rh-wallet-production.up.railway.app/setup** (Part C)
+
+Quick version on your computer (~2 min, one-time):
+
+1. Run `bankr login` (same machine)
+2. Run in Terminal:
+   ```bash
+   curl -fsSL https://raw.githubusercontent.com/anondevv69/RH-Wallet/main/scripts/rh-connect.sh | bash
+   ```
+3. Browser opens → sign in to Robinhood → tap **Allow** on your Agentic account
+4. Come back and ask: *"What is my Robinhood Agentic buying power?"*
+
+After this, everything runs through Bankr — your computer can be off.
+
+We never store your token on our servers; it lives in your Bankr vault only.
+
+---
+
+Do **not** send users to `agent.robinhood.com/mcp/trading` directly — use the Railway proxy flow above.
+
+---
 
 ## First-time setup (auto-run on install or "connect Robinhood")
 
@@ -116,7 +152,7 @@ Bankr's MCP doesn't support browser OAuth directly, so we ship a **stateless OAu
 
 **Step 1 — Get your token (one-time):**
 
-Setup wizard: `https://rh-wallet-production.up.railway.app/agentic/setup`
+Setup wizard: `https://rh-wallet-production.up.railway.app/setup` (Part C)
 
 One command on the user's computer:
 
@@ -164,12 +200,13 @@ Or install the setup app: tell Bankr `build me the rh-wallet app from https://gi
 9. **Crypto symbols** are uppercase pairs like `BTC-USD`.
 10. **Natural language → crypto x402.** When the user asks for Robinhood **crypto** prices, balance, holdings, buy, or sell, use [references/x402.md](references/x402.md). Prefer **rh-buy** ($0.50). Fall back to free `rh()` if no USDC or user prefers free.
 11. **Confirm crypto trades on x402.** For `rh-buy` / `rh-order`, set `"confirm": true` only after the user clearly agrees.
-12. **Stocks/options → Agentic MCP via proxy.** SPCX, GME, calls, puts etc. If `robinhood-agentic` MCP is connected → use it directly. If not → send user to `https://rh-wallet-production.up.railway.app/agentic/setup` and the one-liner in [references/agentic-connect.md](references/agentic-connect.md). Do **not** add `https://agent.robinhood.com/mcp/trading` directly to Bankr MCP. Do **not** attempt onchain swaps for stock tickers.
+12. **Stocks/options → Agentic MCP via proxy.** SPCX, GME, calls, puts etc. If `robinhood-agentic` MCP is connected → use it directly. If user asks to **connect agentically** → use the **"Connect Agentic" reply template** above (Railway setup link + steps). If MCP missing mid-task → same template. Do **not** add `https://agent.robinhood.com/mcp/trading` directly. Do **not** attempt onchain swaps for stock tickers.
 
 ## Natural language routing (full table)
 
 | User says | Route |
 |-----------|--------|
+| "Connect agentically" / "connect Robinhood Agentic" / "set up stocks" | **Connect Agentic reply template** → https://rh-wallet-production.up.railway.app/setup |
 | Crypto balance, DOGE, BTC-USD prices/buy | x402 or free gateway — [x402.md](references/x402.md) |
 | Stock quote, buy SPCX, sell GME | Agentic MCP — [AGENTIC-TRADING.md](references/AGENTIC-TRADING.md) |
 | Buy GME call, option chain | Agentic MCP options tools — confirm contract details |
