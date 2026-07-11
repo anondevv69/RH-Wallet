@@ -71,6 +71,6 @@ return {
     hasToken: hasAgenticToken,
     error: agenticError,
   },
-  oauthUrl: `${GATEWAY_URL}/agentic/auth`,
+  oauthUrl: `${GATEWAY_URL}/agentic/setup`,
   proxyMcpUrl: `${GATEWAY_URL}/v1/agentic/mcp`,
 };

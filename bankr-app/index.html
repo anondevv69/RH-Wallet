@@ -178,8 +178,8 @@
       <ol class="steps">
         <li>
           <span class="step-num">1</span>
-          <span>On your computer, run (command copied when you click Connect):<br>
-            <code>npx github:anondevv69/RH-Wallet/packages/connect</code></span>
+          <span>On your computer, run (copied when you click Connect):<br>
+            <code>curl -fsSL https://raw.githubusercontent.com/anondevv69/RH-Wallet/main/scripts/rh-connect.sh | bash</code></span>
         </li>
         <li>
           <span class="step-num">2</span>
@@ -312,7 +312,7 @@
 
     async function connectAgentic() {
       const setupUrl = 'https://rh-wallet-production.up.railway.app/agentic/setup';
-      const cmd = 'npx github:anondevv69/RH-Wallet/packages/connect';
+      const cmd = 'curl -fsSL https://raw.githubusercontent.com/anondevv69/RH-Wallet/main/scripts/rh-connect.sh | bash';
       await bankr.copy(cmd);
       await bankr.openExternal(setupUrl);
     }
