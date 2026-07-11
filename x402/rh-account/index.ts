@@ -11,17 +11,24 @@ const GATEWAY_URL = process.env.GATEWAY_URL ?? "https://rh-wallet-production.up.
 const GATEWAY_SECRET = process.env.GATEWAY_SECRET ?? "";
 
 export default async function handler(req: Request) {
-  const rhApiKey = req.headers.get("x-rh-api-key") ?? "";
-  const rhPrivKey = req.headers.get("x-rh-private-key-b64") ?? "";
+  const body = req.method === "POST" ? await req.json().catch(() => ({})) : {};
+
+  // Accept credentials from headers (curl/SDK) or body (bankr x402 call -d)
+  const rhApiKey =
+    req.headers.get("x-rh-api-key") ??
+    body.rh_api_key ??
+    "";
+  const rhPrivKey =
+    req.headers.get("x-rh-private-key-b64") ??
+    body.rh_private_key_b64 ??
+    "";
 
   if (!rhApiKey || !rhPrivKey) {
     return new Response(
-      JSON.stringify({ error: "x-rh-api-key and x-rh-private-key-b64 headers are required" }),
+      JSON.stringify({ error: "Provide rh_api_key and rh_private_key_b64 in the request body (or x-rh-api-key / x-rh-private-key-b64 headers)" }),
       { status: 400, headers: { "Content-Type": "application/json" } }
     );
   }
-
-  const body = req.method === "POST" ? await req.json().catch(() => ({})) : {};
   const view: string = body.view ?? "account";
   const assetCodes: string[] = body.asset_codes ?? [];
 
