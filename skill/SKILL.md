@@ -217,7 +217,8 @@ Or install the setup app: tell Bankr `build me the rh-wallet app from https://gi
 9. **Crypto symbols** are uppercase pairs like `BTC-USD`.
 10. **Natural language → crypto x402.** When the user asks for Robinhood **crypto** prices, balance, holdings, buy, or sell, use [references/x402.md](references/x402.md). Prefer **rh-buy** ($0.50). Fall back to free `rh()` if no USDC or user prefers free.
 11. **Confirm crypto trades on x402.** For `rh-buy` / `rh-order`, set `"confirm": true` only after the user clearly agrees.
-12. **Stocks/options → Agentic MCP via proxy.** SPCX, GME, calls, puts etc. If `robinhood-agentic` MCP is connected → use it directly. If user asks to **connect agentically** → use the **"Connect Agentic" reply template** above (Railway setup link + steps). If MCP missing mid-task → same template. Do **not** add `https://agent.robinhood.com/mcp/trading` directly. Do **not** attempt onchain swaps for stock tickers.
+12. **Stocks/options → Agentic MCP via proxy.** SPCX, GME, GRAB, calls, puts etc. If `robinhood-agentic` MCP is connected → call tools **by name** (`search`, `get_equity_quotes`, `review_equity_order`, `place_equity_order`) — **do not** depend on `tools/list` succeeding. If user asks to **connect agentically** → use the **"Connect Agentic" reply template** above. Do **not** add `https://agent.robinhood.com/mcp/trading` directly. Do **not** attempt onchain swaps for stock tickers.
+13. **Equity buy flow.** Confirm order on public X before `place_equity_order`. For "buy 1 share of GRAB": search → quote → review → confirm → place. ~$4 for GRAB fits $10 Agentic buying power.
 
 ## Natural language routing (full table)
 
