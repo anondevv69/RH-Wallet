@@ -25,6 +25,21 @@ Robinhood docs: [Agentic overview](https://robinhood.com/us/en/support/articles/
 
 There is **no** `RH_API_KEY` for stocks.
 
+## MCP tool calls — do not rely on `tools/list`
+
+Bankr may fail `tools/list` when `refresh` is serialized wrong. **Skip listing.** Call Robinhood tools **by exact name** (snake_case):
+
+| Step | Tool name |
+|------|-----------|
+| Resolve ticker | `search` |
+| Price | `get_equity_quotes` |
+| Preview buy/sell | `review_equity_order` |
+| Execute | `place_equity_order` |
+
+Example equity buy (1 share GRAB): `search` → `get_equity_quotes` (symbol GRAB) → `review_equity_order` → user confirms → `place_equity_order`.
+
+Never guess tool names like `getequityquotes` — use underscores.
+
 ## Natural language → Agentic routing
 
 When MCP is connected, map user intent to Robinhood MCP tools. Full catalog: [AGENTIC-CAPABILITIES.md](AGENTIC-CAPABILITIES.md).

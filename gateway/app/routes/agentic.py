@@ -248,6 +248,36 @@ async def agentic_auth_callback(request: Request, code: str = "", state: str = "
     return _html_success(access_token, refresh_token, str(expires_in))
 
 
+def _normalize_mcp_body(body: bytes) -> bytes:
+    """Fix common MCP client serialization bugs before forwarding to Robinhood."""
+    if not body:
+        return body
+    try:
+        data = json.loads(body)
+    except (json.JSONDecodeError, UnicodeDecodeError):
+        return body
+    if not isinstance(data, dict):
+        return body
+
+    method = data.get("method")
+    params = data.get("params")
+    if not isinstance(params, dict):
+        return body
+
+    changed = False
+
+    # Bankr sometimes sends tools/list refresh as "true" string — Robinhood rejects it.
+    if method == "tools/list" and "refresh" in params:
+        refresh = params["refresh"]
+        if isinstance(refresh, str):
+            params["refresh"] = refresh.strip().lower() in ("true", "1", "yes")
+            changed = True
+
+    if changed:
+        return json.dumps(data).encode()
+    return body
+
+
 @router.post("/v1/agentic/mcp")
 async def agentic_mcp_proxy(request: Request):
     """Stateless MCP proxy. Reads the caller's OAuth token from Authorization header,
@@ -264,7 +294,7 @@ async def agentic_mcp_proxy(request: Request):
             ),
         )
 
-    body = await request.body()
+    body = _normalize_mcp_body(await request.body())
     forward_headers = {
         "Authorization": auth,
         "Content-Type": request.headers.get("Content-Type", "application/json"),
