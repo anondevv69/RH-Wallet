@@ -1,7 +1,7 @@
 {
   "name": "rh-wallet",
   "displayName": "Robinhood Wallet (Crypto + Agentic)",
-  "description": "Robinhood Crypto via gateway/x402 (RH_API_KEY in env). Stocks/options via Agentic MCP OAuth. Never post account numbers on X.",
+  "description": "Robinhood Crypto via gateway/x402. Agentic stocks/options via one-time connect script — see skill/references/agentic-connect.md.",
   "emoji": "🟩",
   "tags": ["robinhood", "crypto", "trading", "wallet", "x402", "agentic", "stocks", "options"],
   "homepage": "https://github.com/anondevv69/RH-Wallet",

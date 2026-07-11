@@ -137,7 +137,7 @@
       }
     },
     "rh-agentic-mcp": {
-      "description": "Paid proxy for Robinhood Agentic MCP — stocks, ETFs, and options (SPCX, GME, calls/puts). Requires an agentic_token from https://rh-wallet-production.up.railway.app/agentic/auth. Free methods: tools/list, initialize. Paid: all tool calls.",
+      "description": "Paid proxy for Robinhood Agentic MCP — stocks, ETFs, and options. Get agentic_token via https://rh-wallet-production.up.railway.app/agentic/setup",
       "price": "0.10",
       "methods": ["POST"],
       "category": "stocks",
@@ -148,7 +148,7 @@
           "properties": {
             "agentic_token": {
               "type": "string",
-              "description": "Robinhood OAuth token from https://rh-wallet-production.up.railway.app/agentic/auth"
+              "description": "Robinhood OAuth token — get via curl rh-connect.sh (see /agentic/setup)"
             },
             "method": {
               "type": "string",

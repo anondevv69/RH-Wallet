@@ -31,7 +31,7 @@ export default async function handler(req: Request): Promise<Response> {
       service: "rh-agentic-mcp",
       description:
         "Paid proxy for Robinhood Agentic MCP (stocks & options). " +
-        "Requires agentic_token from https://rh-wallet-production.up.railway.app/agentic/auth",
+        "Requires agentic_token from https://rh-wallet-production.up.railway.app/agentic/setup",
       pricing: "Free: tools/list, initialize. Paid: all tool calls.",
       setup: "https://github.com/anondevv69/RH-Wallet",
     });
@@ -58,7 +58,7 @@ export default async function handler(req: Request): Promise<Response> {
       {
         error: "agentic_token required",
         detail:
-          "Provide your Robinhood OAuth token from https://rh-wallet-production.up.railway.app/agentic/auth",
+          "Provide your Robinhood OAuth token — run rh-connect.sh from https://rh-wallet-production.up.railway.app/agentic/setup",
       },
       400
     );

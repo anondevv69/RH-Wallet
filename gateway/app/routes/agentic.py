@@ -381,8 +381,7 @@ async function copyToken(id, btn) {{
 
 
 def _html_setup_page() -> str:
-    npx_cmd = "npx @rhwallet/connect"
-    npx_fallback = "npx github:anondevv69/RH-Wallet/packages/connect"
+  npx_cmd = "curl -fsSL https://raw.githubusercontent.com/anondevv69/RH-Wallet/main/scripts/rh-connect.sh | bash"
     return f"""<!DOCTYPE html>
 <html lang="en"><head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -403,8 +402,7 @@ def _html_setup_page() -> str:
     <div><b>Copy this command</b> and run it in Terminal (Mac) or Command Prompt (Windows):
       <div class="token-box" id="cmd">{npx_cmd}</div>
       <button class="copy-btn" onclick="copyId('cmd')">Copy command</button>
-      <p style="color:#71717a;font-size:12px;margin-top:8px">Not published yet? Use:
-        <code>{npx_fallback}</code></p>
+  <p style="color:#71717a;font-size:12px;margin-top:8px">Requires Node.js and git. Run <code>bankr login</code> first for auto-save.</p>
     </div>
   </div>
 

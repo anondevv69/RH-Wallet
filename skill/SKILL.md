@@ -6,7 +6,7 @@ description: >
   crypto prices, balance, buy/sell crypto, OR stocks (SPCX, GME), options
   (calls/puts) when Agentic MCP is connected. Crypto: RH_API_KEY +
   RH_PRIVATE_KEY_BASE64 in Bankr env + optional x402 (USDC on Base). Stocks/options:
-  auto-connects https://agent.robinhood.com/mcp/trading via OAuth on first use.
+  auto-connects Agentic via one-time localhost OAuth — see references/agentic-connect.md.
   Never post account numbers on X — see references/RESPONSE-SAFETY.md.
 tags: [robinhood, crypto, trading, wallet, bankr, usd]
 visibility: public
@@ -30,7 +30,7 @@ Hosted URL + public gateway secret: [references/hosted-config.md](references/hos
 For safety see [references/trading-safety.md](references/trading-safety.md).  
 For endpoints see [references/api-reference.md](references/api-reference.md).  
 For paid x402 API + natural-language routing see [references/x402.md](references/x402.md).  
-For **stocks & options** (Agentic MCP) see [references/AGENTIC-TRADING.md](references/AGENTIC-TRADING.md).  
+For **Agentic connect** see [references/agentic-connect.md](references/agentic-connect.md).  
 For which product to use see [references/WALLET-ROUTING.md](references/WALLET-ROUTING.md).  
 For **public X safety** (never tweet account numbers) see [references/RESPONSE-SAFETY.md](references/RESPONSE-SAFETY.md).
 
@@ -55,28 +55,26 @@ Then call `rh GET /v1/account` and report account status and buying power.
 
 **Step 3 — Robinhood Agentic (stocks & options) — one-time connect**
 
-If `AGENTIC_TOKEN` is missing:
+If `AGENTIC_TOKEN` is missing, send the user to the setup wizard and one command:
 
-1. Tell the user to open the setup page:
-   ```
-   https://rh-wallet-production.up.railway.app/agentic/setup
-   ```
-2. They run **one command** on their computer (Robinhood requires localhost OAuth):
-   ```
-   npx @rhwallet/connect
-   ```
-   If not on npm yet:
-   ```
-   npx github:anondevv69/RH-Wallet/packages/connect
-   ```
+1. Open: `https://rh-wallet-production.up.railway.app/agentic/setup`
+2. Run on their computer (Mac/Windows — Robinhood requires localhost OAuth):
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/anondevv69/RH-Wallet/main/scripts/rh-connect.sh | bash
+```
+
 3. Browser opens → Robinhood login → tap **Allow**
-4. If they ran `bankr login`, the tool **auto-saves** `AGENTIC_TOKEN` to Bankr and requests MCP setup
-5. Verify: `what env vars do I have?` should include `AGENTIC_TOKEN`
+4. If they ran `bankr login` on that machine, `AGENTIC_TOKEN` saves to Bankr automatically
+5. Auto-add MCP server if missing:
 
-Also auto-add MCP server if missing:
 ```
 add an MCP server named "robinhood-agentic" at https://rh-wallet-production.up.railway.app/v1/agentic/mcp with Streamable HTTP transport and Authorization header Bearer {{AGENTIC_TOKEN}}
 ```
+
+6. Verify: ask *"What is my Robinhood Agentic buying power?"*
+
+Full details: [references/agentic-connect.md](references/agentic-connect.md)
 
 After setup, all trading runs through Bankr 24/7 — computer can be off.
 
@@ -105,17 +103,15 @@ Bankr's MCP doesn't support browser OAuth directly, so we ship a **stateless OAu
 
 **Step 1 — Get your token (one-time):**
 
-Open the setup wizard:
-```
-https://rh-wallet-production.up.railway.app/agentic/setup
-```
+Setup wizard: `https://rh-wallet-production.up.railway.app/agentic/setup`
 
-Run on the user's computer:
+One command on the user's computer:
+
 ```bash
-npx @rhwallet/connect
+curl -fsSL https://raw.githubusercontent.com/anondevv69/RH-Wallet/main/scripts/rh-connect.sh | bash
 ```
 
-Browser → Robinhood → Allow. Token auto-saves to Bankr if `bankr login` was run. We never store it on Railway.
+Browser → Robinhood → Allow. Token auto-saves to Bankr if `bankr login` was run. See [references/agentic-connect.md](references/agentic-connect.md).
 
 **Step 2 — Save token to Bankr env:**
 
@@ -140,7 +136,7 @@ Ask Bankr: "What is my Robinhood Agentic buying power?"
 
 Or install the setup app: tell Bankr `build me the rh-wallet app from https://github.com/anondevv69/RH-Wallet/tree/main/bankr-app` — it has a Connect button and status dashboard.
 
-**Token expiry:** Robinhood OAuth tokens expire. Re-run `/agentic/auth` to get a fresh token and update `AGENTIC_TOKEN` in Bankr env.
+**Token expiry:** Re-run the connect command from [references/agentic-connect.md](references/agentic-connect.md).
 
 ## Agent rules
 
@@ -155,7 +151,7 @@ Or install the setup app: tell Bankr `build me the rh-wallet app from https://gi
 9. **Crypto symbols** are uppercase pairs like `BTC-USD`.
 10. **Natural language → crypto x402.** When the user asks for Robinhood **crypto** prices, balance, holdings, buy, or sell, use [references/x402.md](references/x402.md). Prefer **rh-buy** ($0.50). Fall back to free `rh()` if no USDC or user prefers free.
 11. **Confirm crypto trades on x402.** For `rh-buy` / `rh-order`, set `"confirm": true` only after the user clearly agrees.
-12. **Stocks/options → Agentic MCP via proxy.** SPCX, GME, calls, puts etc. If `robinhood-agentic` MCP is connected → use it directly. If not → tell user to visit `https://rh-wallet-production.up.railway.app/agentic/auth`, get token, set `AGENTIC_TOKEN` in env, add MCP server (see setup above). Do **not** attempt an onchain swap of stock tickers on Robinhood Chain.
+12. **Stocks/options → Agentic MCP via proxy.** SPCX, GME, calls, puts etc. If `robinhood-agentic` MCP is connected → use it directly. If not → send user to `https://rh-wallet-production.up.railway.app/agentic/setup` and the one-liner in [references/agentic-connect.md](references/agentic-connect.md). Do **not** add `https://agent.robinhood.com/mcp/trading` directly to Bankr MCP. Do **not** attempt onchain swaps for stock tickers.
 
 ## Natural language routing (full table)
 
