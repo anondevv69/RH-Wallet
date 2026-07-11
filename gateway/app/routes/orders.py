@@ -63,6 +63,7 @@ def place_order(
     rhagents_agent_key: Optional[str] = Header(default=None, alias="X-RHAGENTS-Agent-Key"),
     rhagents_base_url: Optional[str] = Header(default=None, alias="X-RHAGENTS-Base-Url"),
     rhagents_comment: Optional[str] = Header(default=None, alias="X-RHAGENTS-Comment"),
+    rhagents_thesis: Optional[str] = Header(default=None, alias="X-RHAGENTS-Thesis"),
 ) -> dict:
     auth, settings = auth_settings
     max_order_usd = auth.max_order_usd
