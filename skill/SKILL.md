@@ -53,11 +53,32 @@ curl -sS https://rh-wallet-production.up.railway.app/health | jq
 
 Then call `rh GET /v1/account` and report account status and buying power.
 
-**Note on Robinhood Agentic (stocks & options):**
+**Step 3 — Robinhood Agentic (stocks & options) — one-time connect**
 
-> Robinhood Agentic MCP (`https://agent.robinhood.com/mcp/trading`) requires **OAuth browser authentication**. Bankr's MCP implementation currently only supports static header auth — it does **not** support OAuth browser flows. As a result, Robinhood Agentic stocks/options trading is **not currently available through Bankr**. Robinhood Crypto (BTC, DOGE, ETH, etc.) works fully via the rh-wallet gateway.
+If `AGENTIC_TOKEN` is missing:
 
-Do **not** attempt to add `https://agent.robinhood.com/mcp/trading` as a Bankr MCP server — it will always fail with "authentication required".
+1. Tell the user to open the setup page:
+   ```
+   https://rh-wallet-production.up.railway.app/agentic/setup
+   ```
+2. They run **one command** on their computer (Robinhood requires localhost OAuth):
+   ```
+   npx @rhwallet/connect
+   ```
+   If not on npm yet:
+   ```
+   npx github:anondevv69/RH-Wallet/packages/connect
+   ```
+3. Browser opens → Robinhood login → tap **Allow**
+4. If they ran `bankr login`, the tool **auto-saves** `AGENTIC_TOKEN` to Bankr and requests MCP setup
+5. Verify: `what env vars do I have?` should include `AGENTIC_TOKEN`
+
+Also auto-add MCP server if missing:
+```
+add an MCP server named "robinhood-agentic" at https://rh-wallet-production.up.railway.app/v1/agentic/mcp with Streamable HTTP transport and Authorization header Bearer {{AGENTIC_TOKEN}}
+```
+
+After setup, all trading runs through Bankr 24/7 — computer can be off.
 
 ---
 
@@ -82,19 +103,19 @@ If `RH_API_KEY` or `RH_PRIVATE_KEY_BASE64` is missing, walk the user through [re
 
 Bankr's MCP doesn't support browser OAuth directly, so we ship a **stateless OAuth proxy** on Railway. One-time browser login → token stored only in Bankr env.
 
-**Step 1 — Get your token (one-time, must run locally):**
+**Step 1 — Get your token (one-time):**
 
-Robinhood OAuth **only works with localhost callbacks**. The Railway `/agentic/auth` link reaches consent but fails on Allow.
-
-On the user's computer:
-
-```bash
-git clone https://github.com/anondevv69/RH-Wallet.git
-cd RH-Wallet
-python3 scripts/agentic_oauth.py
+Open the setup wizard:
+```
+https://rh-wallet-production.up.railway.app/agentic/setup
 ```
 
-Browser opens → sign in → tap Allow → token prints in terminal. User copies it. We never store it.
+Run on the user's computer:
+```bash
+npx @rhwallet/connect
+```
+
+Browser → Robinhood → Allow. Token auto-saves to Bankr if `bankr login` was run. We never store it on Railway.
 
 **Step 2 — Save token to Bankr env:**
 

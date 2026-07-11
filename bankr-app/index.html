@@ -178,9 +178,8 @@
       <ol class="steps">
         <li>
           <span class="step-num">1</span>
-          <span>On your computer, run the local OAuth script (Robinhood requires localhost):<br>
-            <code>git clone https://github.com/anondevv69/RH-Wallet.git && cd RH-Wallet && python3 scripts/agentic_oauth.py</code><br>
-            Or click <b>Run OAuth Script</b> below for copy-paste instructions.</span>
+          <span>On your computer, run (command copied when you click Connect):<br>
+            <code>npx github:anondevv69/RH-Wallet/packages/connect</code></span>
         </li>
         <li>
           <span class="step-num">2</span>
@@ -312,11 +311,10 @@
     }
 
     async function connectAgentic() {
-      const cmd = 'git clone https://github.com/anondevv69/RH-Wallet.git && cd RH-Wallet && python3 scripts/agentic_oauth.py';
+      const setupUrl = 'https://rh-wallet-production.up.railway.app/agentic/setup';
+      const cmd = 'npx github:anondevv69/RH-Wallet/packages/connect';
       await bankr.copy(cmd);
-      await bankr.prefillChat(
-        'Help me connect Robinhood Agentic. I need to run the local OAuth script: python3 scripts/agentic_oauth.py from the RH-Wallet repo, then paste AGENTIC_TOKEN into Bankr env and add the MCP proxy server.'
-      );
+      await bankr.openExternal(setupUrl);
     }
 
     async function cryptoSetup() {
