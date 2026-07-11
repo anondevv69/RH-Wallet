@@ -13,7 +13,7 @@
     "rh-account": "https://x402.bankr.bot/0x374d91a5674fa7cf86e725093b5848b97e1e13b4/rh-account",
     "rh-order": "https://x402.bankr.bot/0x374d91a5674fa7cf86e725093b5848b97e1e13b4/rh-order"
   },
-  "install": "install the skill at https://github.com/anondevv69/RH-Wallet/tree/main/skill",
+  "install": "install the skill at https://github.com/anondevv69/RH-Wallet/tree/main/skill — then open https://rh-wallet-production.up.railway.app/setup",
   "requires": {
     "bins": ["curl", "jq"],
     "env": [

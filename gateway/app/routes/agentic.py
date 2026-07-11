@@ -381,7 +381,7 @@ async function copyToken(id, btn) {{
 
 
 def _html_setup_page() -> str:
-  npx_cmd = "curl -fsSL https://raw.githubusercontent.com/anondevv69/RH-Wallet/main/scripts/rh-connect.sh | bash"
+    npx_cmd = "curl -fsSL https://raw.githubusercontent.com/anondevv69/RH-Wallet/main/scripts/rh-connect.sh | bash"
     return f"""<!DOCTYPE html>
 <html lang="en"><head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -395,8 +395,8 @@ def _html_setup_page() -> str:
 </style></head>
 <body><div class="card">
   <h1>Connect Robinhood Agentic</h1>
-  <p>One-time setup for stocks &amp; options through Bankr. Takes ~2 minutes.
-     After this, everything runs in Bankr — your computer can be off.</p>
+  <p>One-time setup for stocks &amp; options. Full guide (Crypto + Agentic):
+     <a href="/setup" style="color:#60a5fa">rh-wallet-production.up.railway.app/setup</a></p>
 
   <div class="step"><span class="num">1</span>
     <div><b>Copy this command</b> and run it in Terminal (Mac) or Command Prompt (Windows):

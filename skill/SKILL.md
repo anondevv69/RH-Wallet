@@ -25,7 +25,8 @@ Trade and inspect a **Robinhood Crypto** account through a **stateless RH Wallet
 
 > **US only.** Robinhood Crypto Trading API is available to US customers and is subject to the Robinhood Crypto Customer Agreement.
 
-For setup see [references/setup.md](references/setup.md).  
+For **full setup steps** see [references/GETTING-STARTED.md](references/GETTING-STARTED.md).  
+Setup wizard: **https://rh-wallet-production.up.railway.app/setup**  
 Hosted URL + public gateway secret: [references/hosted-config.md](references/hosted-config.md).  
 For safety see [references/trading-safety.md](references/trading-safety.md).  
 For endpoints see [references/api-reference.md](references/api-reference.md).  
@@ -36,45 +37,57 @@ For **public X safety** (never tweet account numbers) see [references/RESPONSE-S
 
 ## First-time setup (auto-run on install or "connect Robinhood")
 
-When this skill is first loaded, or the user says "set up rh-wallet", "connect Robinhood", or "set up my Robinhood account":
+When this skill is first loaded, or the user says **"set up rh-wallet"**, **"connect Robinhood"**, or **"set up my Robinhood account"**:
 
-**Step 1 — Check crypto env vars**
+**Always start by sending the user the setup wizard:**
+
+> **RH Wallet setup:** https://rh-wallet-production.up.railway.app/setup  
+> Follow Parts A → B (crypto) → C (Agentic). Takes ~5 minutes one-time.
+
+Then walk through each part. Full reference: [references/GETTING-STARTED.md](references/GETTING-STARTED.md).
+
+---
+
+### Part A — Install skill (Bankr)
+
+1. User installs (if not already):
+   ```
+   install the skill at https://github.com/anondevv69/RH-Wallet/tree/main/skill
+   ```
+2. User says: `set up rh-wallet`
+
+---
+
+### Part B — Robinhood Crypto (BTC, DOGE, ETH)
 
 Run: `what env vars do I have?`
 
-- `RH_API_KEY` present → crypto ready, confirm to user: "Robinhood Crypto is connected — you can trade BTC, DOGE, and other crypto pairs."
-- Missing → walk user through [references/setup.md](references/setup.md).
+| Env var | Status |
+|---------|--------|
+| `RH_API_KEY` + `RH_PRIVATE_KEY_BASE64` present | Crypto ready ✓ |
+| Missing | Walk through [references/setup.md](references/setup.md) |
 
-**Step 2 — Verify crypto connection**
+Test: *"What's my Robinhood crypto buying power?"*
 
-```bash
-curl -sS https://rh-wallet-production.up.railway.app/health | jq
-```
+---
 
-Then call `rh GET /v1/account` and report account status and buying power.
+### Part C — Robinhood Agentic (stocks & options)
 
-**Step 3 — Robinhood Agentic (stocks & options) — one-time connect**
+If `AGENTIC_TOKEN` is missing:
 
-If `AGENTIC_TOKEN` is missing, send the user to the setup wizard and one command:
-
-1. Open: `https://rh-wallet-production.up.railway.app/agentic/setup`
-2. Run on their computer (Mac/Windows — Robinhood requires localhost OAuth):
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/anondevv69/RH-Wallet/main/scripts/rh-connect.sh | bash
-```
-
-3. Browser opens → Robinhood login → tap **Allow**
-4. If they ran `bankr login` on that machine, `AGENTIC_TOKEN` saves to Bankr automatically
-5. Auto-add MCP server if missing:
-
-```
-add an MCP server named "robinhood-agentic" at https://rh-wallet-production.up.railway.app/v1/agentic/mcp with Streamable HTTP transport and Authorization header Bearer {{AGENTIC_TOKEN}}
-```
-
-6. Verify: ask *"What is my Robinhood Agentic buying power?"*
-
-Full details: [references/agentic-connect.md](references/agentic-connect.md)
+1. **Setup page:** https://rh-wallet-production.up.railway.app/setup (Part C)
+2. User runs on their computer:
+   ```bash
+   bankr login
+   curl -fsSL https://raw.githubusercontent.com/anondevv69/RH-Wallet/main/scripts/rh-connect.sh | bash
+   ```
+3. Browser → Robinhood → **Allow**
+4. Token auto-saves to Bankr if `bankr login` was run on that machine
+5. Auto-add MCP if missing:
+   ```
+   add an MCP server named "robinhood-agentic" at https://rh-wallet-production.up.railway.app/v1/agentic/mcp with Streamable HTTP transport and Authorization header Bearer {{AGENTIC_TOKEN}}
+   ```
+6. Test: *"What is my Robinhood Agentic buying power?"* — **never show account numbers** ([RESPONSE-SAFETY.md](references/RESPONSE-SAFETY.md))
 
 After setup, all trading runs through Bankr 24/7 — computer can be off.
 

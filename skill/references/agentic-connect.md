@@ -10,7 +10,7 @@ curl -fsSL https://raw.githubusercontent.com/anondevv69/RH-Wallet/main/scripts/r
 
 Requires **Node.js** and **git**. Run `bankr login` first so your token saves to Bankr automatically.
 
-Setup wizard: https://rh-wallet-production.up.railway.app/agentic/setup
+Setup wizard: https://rh-wallet-production.up.railway.app/setup
 
 ## What happens
 

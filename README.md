@@ -1,6 +1,34 @@
-# RH Wallet Gateway
+# RH Wallet
 
-Stateless Robinhood Crypto signing proxy + [Bankr](https://docs.bankr.bot/skills/overview) skill.
+Robinhood **Crypto** + **Agentic** (stocks/options) for [Bankr](https://docs.bankr.bot/skills/overview).
+
+**→ Setup wizard: https://rh-wallet-production.up.railway.app/setup**
+
+## Bankr users — quick start
+
+1. **Install skill** (Bankr chat):
+   ```
+   install the skill at https://github.com/anondevv69/RH-Wallet/tree/main/skill
+   set up rh-wallet
+   ```
+
+2. **Crypto** (BTC, DOGE): add `RH_API_KEY` + `RH_PRIVATE_KEY_BASE64` to Bankr env — [skill/references/setup.md](skill/references/setup.md)
+
+3. **Agentic** (stocks/options): one local command (~2 min):
+   ```bash
+   bankr login
+   curl -fsSL https://raw.githubusercontent.com/anondevv69/RH-Wallet/main/scripts/rh-connect.sh | bash
+   ```
+
+4. **Ask Bankr:** *"What is my Robinhood Agentic buying power?"*
+
+Full steps: [skill/references/GETTING-STARTED.md](skill/references/GETTING-STARTED.md)
+
+---
+
+# RH Wallet Gateway (developers)
+
+Stateless Robinhood Crypto signing proxy + Bankr skill.
 
 ```
 User → Bankr (RH keys in Agent env) → RH Wallet Gateway (sign only) → Robinhood
