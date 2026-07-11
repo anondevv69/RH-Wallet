@@ -41,8 +41,8 @@ Public skill/docs URLs point at **`rhagent69/rhwallet-rhagent`** (agent mirror).
 
 1. Railway → New Project → GitHub → `anondevv69/RH-Wallet` (or `rhagent69/rhwallet-rhagent`)
 2. Set variables — **`GATEWAY_SHARED_SECRET` must equal** the value in [skill/references/hosted-config.md](skill/references/hosted-config.md)
-3. Generate domain → set `PUBLIC_BASE_URL=https://rh-wallet-production.up.railway.app`
-4. Verify: `curl https://rh-wallet-production.up.railway.app/health` → `"mode": "stateless"`
+3. Generate domain → set `PUBLIC_BASE_URL=https://rhwallet-rhagent-production.up.railway.app`
+4. Verify: `curl https://rhwallet-rhagent-production.up.railway.app/health` → `"mode": "stateless"`
 
 ## User setup (no coding)
 

@@ -1,7 +1,7 @@
 // Checks Robinhood Crypto + Agentic connection status.
 // Returns status object for the frontend to render.
 
-const GATEWAY_URL = "https://rh-wallet-production.up.railway.app";
+const GATEWAY_URL = "https://rhwallet-rhagent-production.up.railway.app";
 
 const secretStatus = await secrets.status();
 const hasApiKey = secretStatus.find((s: any) => s.key === "RH_API_KEY")?.set ?? false;

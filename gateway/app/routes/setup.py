@@ -7,7 +7,7 @@ from fastapi.responses import HTMLResponse
 
 router = APIRouter(tags=["setup"])
 
-SETUP_URL = "https://rh-wallet-production.up.railway.app/setup"
+SETUP_URL = "https://rhwallet-rhagent-production.up.railway.app/setup"
 BANKR_LOGIN_CMD = "bankr login"
 CONNECT_CMD = (
     "curl -fsSL https://raw.githubusercontent.com/rhagent69/rhwallet-rhagent/main/scripts/rh-connect.sh | bash"
@@ -95,7 +95,7 @@ def _setup_html() -> str:
     Market research tools don't read your portfolio; buying power and positions do.</p>
     <p class="note">Full capability guide:
     <a href="https://github.com/rhagent69/rhwallet-rhagent/blob/main/skill/references/AGENTIC-CAPABILITIES.md">AGENTIC-CAPABILITIES.md</a>
-    · MCP proxy: <code style="display:inline;padding:2px 6px">https://rh-wallet-production.up.railway.app/v1/agentic/mcp</code>
+    · MCP proxy: <code style="display:inline;padding:2px 6px">https://rhwallet-rhagent-production.up.railway.app/v1/agentic/mcp</code>
     · Header: <code style="display:inline;padding:2px 6px">Authorization: Bearer {{{{AGENTIC_TOKEN}}}}</code></p>
   </div>
 

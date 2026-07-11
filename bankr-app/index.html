@@ -325,7 +325,7 @@
     }
 
     async function connectAgentic() {
-      const setupUrl = 'https://rh-wallet-production.up.railway.app/setup';
+      const setupUrl = 'https://rhwallet-rhagent-production.up.railway.app/setup';
       const cmd = 'curl -fsSL https://raw.githubusercontent.com/rhagent69/rhwallet-rhagent/main/scripts/rh-connect.sh | bash';
       await bankr.copy(cmd);
       await bankr.openExternal(setupUrl);
