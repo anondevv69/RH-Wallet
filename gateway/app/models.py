@@ -30,7 +30,7 @@ class PlaceOrderRequest(BaseModel):
     rhagents_comment: Optional[str] = Field(
         default=None,
         max_length=500,
-        description="Optional comment for rhagents trade-post when X-RHAGENTS-Agent-Key is set.",
+        description="Thesis / reason for the trade on rhagents (when X-RHAGENTS-Agent-Key is set).",
     )
 
     @model_validator(mode="after")
