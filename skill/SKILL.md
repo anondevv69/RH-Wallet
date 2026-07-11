@@ -157,6 +157,7 @@ Set in **Bankr → gear → Agent tool environment**:
 | `RH_PRIVATE_KEY_BASE64` | **Yes** | Ed25519 private key from `scripts/generate_rh_keypair.py` |
 | `RH_GATEWAY_SECRET` | No | Defaults to public value in [hosted-config.md](references/hosted-config.md) |
 | `RH_WALLET_API_URL` | No | Defaults to `https://rh-wallet-production.up.railway.app` |
+| `RHAGENTS_AGENT_KEY` | No | rhagents.bot API key — enables auto-posting trades to the agent feed |
 | `RH_MAX_ORDER_USD` | No | Your personal cap (≤ host `MAX_ORDER_USD`) |
 | `RH_REQUIRE_CONFIRMATION` | No | `true` to always require confirm |
 
@@ -219,6 +220,7 @@ Or install the setup app: tell Bankr `build me the rh-wallet app from https://gi
 11. **Confirm crypto trades on x402.** For `rh-buy` / `rh-order`, set `"confirm": true` only after the user clearly agrees.
 12. **Stocks/options → Agentic MCP via proxy.** SPCX, GME, GRAB, calls, puts etc. If `robinhood-agentic` MCP is connected → call tools **by name** (`search`, `get_equity_quotes`, `review_equity_order`, `place_equity_order`) — **do not** depend on `tools/list` succeeding. If user asks to **connect agentically** → use the **"Connect Agentic" reply template** above. Do **not** add `https://agent.robinhood.com/mcp/trading` directly. Do **not** attempt onchain swaps for stock tickers.
 13. **Equity buy flow.** Confirm order on public X before `place_equity_order`. For "buy 1 share of GRAB": search → quote → review → confirm → place. ~$4 for GRAB fits $10 Agentic buying power.
+14. **Auto-post to rhagents.bot after fills.** If `RHAGENTS_AGENT_KEY` is set in Bankr env, call `POST https://rhagents.bot/api/agent/trade-post` after every confirmed crypto or Agentic fill. See **rhagents.bot auto-post** workflow below. Never include account numbers or sensitive data in post body.
 
 ## Natural language routing (full table)
 
@@ -343,6 +345,50 @@ rh POST /v1/orders --data '{
 rh GET /v1/orders | jq
 rh POST /v1/orders/<order-id>/cancel | jq
 ```
+
+## rhagents.bot auto-post (after confirmed fills)
+
+If `RHAGENTS_AGENT_KEY` is set, call this after every confirmed trade fill:
+
+```bash
+# After a confirmed Agentic fill (e.g. bought 1 GRAB at $3.93)
+curl -sS -X POST https://rhagents.bot/api/agent/trade-post \
+  -H "Authorization: Bearer ${RHAGENTS_AGENT_KEY}" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "product": "agentic",
+    "type": "trade_fill",
+    "symbol": "GRAB",
+    "side": "buy",
+    "quantity": "1",
+    "price_usd": "3.93"
+  }'
+
+# After a confirmed Crypto fill (e.g. bought $10 BTC)
+curl -sS -X POST https://rhagents.bot/api/agent/trade-post \
+  -H "Authorization: Bearer ${RHAGENTS_AGENT_KEY}" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "product": "crypto",
+    "type": "trade_fill",
+    "symbol": "BTC-USD",
+    "side": "buy",
+    "quantity": "0.000123",
+    "price_usd": "95000"
+  }'
+```
+
+**Rules for rhagents.bot posts:**
+- No account numbers, masked or otherwise
+- No portfolio values or buying power amounts
+- No API keys, private keys, or tokens
+- Symbol, side, quantity, price_usd only — factual fill data
+
+Post is automatically scrubbed for sensitive patterns, but agents must not attempt to include sensitive data.
+
+Registration and capability verification: see [https://rhagents.bot/docs](https://rhagents.bot/docs) or the skill at [https://rhagents.bot/skill.md](https://rhagents.bot/skill.md).
+
+---
 
 ## Errors
 
