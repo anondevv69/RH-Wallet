@@ -6,6 +6,8 @@ Robinhood's official agent product for **equities and options** — separate fro
 
 Robinhood docs: [Agentic overview](https://robinhood.com/us/en/support/articles/agentic-trading-overview/)
 
+**Full capability list (tools + example prompts):** [AGENTIC-CAPABILITIES.md](AGENTIC-CAPABILITIES.md)
+
 ## Two products, two setups
 
 | | **Robinhood Crypto** (rh-wallet) | **Robinhood Agentic** (stocks/options) |
@@ -25,16 +27,26 @@ There is **no** `RH_API_KEY` for stocks.
 
 ## Natural language → Agentic routing
 
-When MCP is connected, map user intent to Robinhood MCP tools:
+When MCP is connected, map user intent to Robinhood MCP tools. Full catalog: [AGENTIC-CAPABILITIES.md](AGENTIC-CAPABILITIES.md).
 
 | User says | MCP tools (typical flow) |
 |-----------|--------------------------|
-| "What's my Robinhood stock portfolio?" | `get_portfolio`, `get_accounts` |
-| "Quote on SPCX" / "price of GME" | `search` → `get_equity_quotes` |
+| "What's my Robinhood stock portfolio?" / buying power | `get_portfolio` (prefer on **public X** — avoid `get_accounts`) |
+| "Find ticker for SpaceX ETF" | `search` |
+| "Quote SPCX" / "price of GME" | `search` → `get_equity_quotes` (up to 20 symbols) |
+| "NVDA RSI" / fundamentals / earnings | `get_equity_technical_indicators`, `get_equity_fundamentals`, `get_earnings_results` |
+| "Earnings this week" | `get_earnings_calendar` |
+| "Is SPCX fractional?" | `get_equity_tradability` |
+| "100 most popular on Robinhood" | `get_popular_watchlists` |
+| "Run a momentum scan" | `create_scan` / `run_scan` |
 | "Buy $100 of SPCX" | `review_equity_order` → confirm → `place_equity_order` |
-| "Buy a GME call" | option chain tools → confirm → `place_option_order` |
+| "Buy a GME call" | `get_option_chains` → `get_option_quotes` → confirm → `place_option_order` |
+
+**Account vs market:** quotes, fundamentals, earnings, and indexes are **not** your portfolio data — but they still use your MCP session. Positions, orders, and buying power **are** account-specific.
 
 **Always confirm** before placing orders on public X — see [RESPONSE-SAFETY.md](RESPONSE-SAFETY.md).
+
+**Public X:** never post account numbers or list non-Agentic accounts (margin, IRA). Use `get_portfolio`, one-line Agentic summary only.
 
 ## Troubleshooting
 

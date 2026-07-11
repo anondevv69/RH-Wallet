@@ -2,10 +2,12 @@
 
 ## Privacy (public channels — X, group chats)
 
-- **Never post** Robinhood account numbers, `rh-api-...` keys, private keys, or full API JSON.
-- **Safe to share:** buying power, holdings (e.g. “0.02 ETH”), prices, order intent (“buy $10 SOL-USD”), order status without account metadata.
-- On **X/Twitter** or any automated public reply: treat all Robinhood account identifiers as **forbidden output**.
-- Gateway responses omit `account_number`; agents must not quote it from memory or older messages.
+- **Never post** Robinhood account numbers — full, masked (`••••6789`), or last-4 — on **X/Twitter or any public reply**
+- **Never list** margin, IRA, or other Robinhood accounts on X — Agentic summary only
+- **Never post** `rh-api-...` keys, private keys, or full API JSON
+- **Safe on X:** buying power, portfolio/cash USD amounts, holdings (e.g. "10 shares SPCX"), prices, trade intent
+- For Agentic wallet questions on X: use `get_portfolio`, not `get_accounts` — see [RESPONSE-SAFETY.md](RESPONSE-SAFETY.md)
+- Gateway responses omit `account_number`; agents must not quote it from memory or older messages
 
 ## Key custody
 

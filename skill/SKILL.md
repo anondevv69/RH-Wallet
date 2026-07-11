@@ -4,11 +4,12 @@ description: >
   Manage Robinhood Crypto (pairs like BTC-USD) via RH Wallet gateway or paid
   x402 API, and route Robinhood stocks/options to Agentic MCP. Use for Robinhood
   crypto prices, balance, buy/sell crypto, OR stocks (SPCX, GME), options
-  (calls/puts) when Agentic MCP is connected. Crypto: RH_API_KEY +
-  RH_PRIVATE_KEY_BASE64 in Bankr env + optional x402 (USDC on Base). Stocks/options:
-  connect agentically, connect Robinhood Agentic, or set up stocks/options via
-  https://rh-wallet-production.up.railway.app/setup when AGENTIC_TOKEN is missing.
-  Never show account numbers (including masked ••••XXXX) in any reply — see references/RESPONSE-SAFETY.md.
+  (calls/puts), quotes, fundamentals, earnings, technicals, and scans when Agentic
+  MCP is connected. Crypto: RH_API_KEY + RH_PRIVATE_KEY_BASE64 in Bankr env +
+  optional x402 (USDC on Base). Stocks/options: connect via
+  https://rh-wallet-production.up.railway.app/setup. Capabilities:
+  references/AGENTIC-CAPABILITIES.md. PUBLIC X: never tweet account numbers (including
+  masked ••••XXXX) or list margin/IRA accounts — see references/RESPONSE-SAFETY.md.
 tags: [robinhood, crypto, trading, wallet, bankr, usd]
 visibility: public
 metadata:
@@ -33,8 +34,23 @@ For safety see [references/trading-safety.md](references/trading-safety.md).
 For endpoints see [references/api-reference.md](references/api-reference.md).  
 For paid x402 API + natural-language routing see [references/x402.md](references/x402.md).  
 For **Agentic connect** see [references/agentic-connect.md](references/agentic-connect.md).  
+For **what Agentic can do** (quotes, fundamentals, earnings, options, scans) see [references/AGENTIC-CAPABILITIES.md](references/AGENTIC-CAPABILITIES.md).  
 For which product to use see [references/WALLET-ROUTING.md](references/WALLET-ROUTING.md).  
-For **public X safety** (never tweet account numbers) see [references/RESPONSE-SAFETY.md](references/RESPONSE-SAFETY.md).
+For **public X safety** (never tweet account numbers — mandatory) see [references/RESPONSE-SAFETY.md](references/RESPONSE-SAFETY.md).
+
+## Public X / tweets — mandatory (rule #0)
+
+If the reply will be posted to **X/Twitter** (including @bankrbot automated replies):
+
+1. **Never** include account numbers — masked (`••••6789`), last-4, or full
+2. **Never** use headings like `Agentic Account (••••XXXX)` or list margin/IRA/other accounts
+3. For *"what's in my Agentic wallet?"* → **`get_portfolio` only** (not `get_accounts`); one line:
+
+   `Robinhood Agentic: $X portfolio · $X cash · $X buying power · [holdings or "no positions"]`
+
+4. Run the pre-tweet checklist in [RESPONSE-SAFETY.md](references/RESPONSE-SAFETY.md) before posting
+
+---
 
 ## "Connect Agentic" — reply template (use verbatim)
 
@@ -189,13 +205,14 @@ Or install the setup app: tell Bankr `build me the rh-wallet app from https://gi
 
 ## Agent rules
 
+0. **Public X first.** If output goes to X/Twitter: **tweet-safe mode** — no account numbers (including `••••6789`), no multi-account lists, no margin/IRA mentions. Agentic wallet questions → `get_portfolio` + one-line summary only. See [RESPONSE-SAFETY.md](references/RESPONSE-SAFETY.md). **This overrides verbose MCP formatting.**
 1. **Route first.** Crypto pairs → rh-wallet/x402. Stock tickers / options → Agentic MCP. Table: [references/WALLET-ROUTING.md](references/WALLET-ROUTING.md).
 2. **Disambiguate wallets.** Bankr onchain ≠ Robinhood Crypto ≠ Robinhood Agentic.
 3. **Estimate before crypto buy.** Call `/v1/estimate` before placing crypto orders.
 4. **Confirm size.** Send `"confirm": true` only after the user clearly agrees.
 5. **Prefer USD for crypto buys** (`quote_amount`). Prefer `asset_quantity` for sells.
 6. **Never echo private credentials.** Do not print `RH_PRIVATE_KEY_BASE64` or `RH_API_KEY`. The hosted gateway secret is public (see hosted-config.md).
-7. **Never show account identifiers — any channel.** Strip **all** account numbers from replies: full (`311040298697`), masked (`••••6789`), or last-4 (`6789`). Never write "Agentic account (••••XXXX)" or similar. See [references/RESPONSE-SAFETY.md](references/RESPONSE-SAFETY.md). Applies to **private terminal and public X**. MCP `get_accounts` returns account numbers — redact before responding.
+7. **Never show account identifiers — any channel.** Strip **all** account numbers from replies: full (`311040298697`), masked (`••••6789`), or last-4 (`6789`). Never write "Agentic account (••••XXXX)" or "Agentic Account (••••XXXX)". Never list margin/IRA/other accounts on **public X**. See [references/RESPONSE-SAFETY.md](references/RESPONSE-SAFETY.md). MCP `get_accounts` returns account numbers — **do not use on public X**; use `get_portfolio` for Agentic balances instead.
 8. **Respect max size.** Gateway rejects orders above `MAX_ORDER_USD` (default $50).
 9. **Crypto symbols** are uppercase pairs like `BTC-USD`.
 10. **Natural language → crypto x402.** When the user asks for Robinhood **crypto** prices, balance, holdings, buy, or sell, use [references/x402.md](references/x402.md). Prefer **rh-buy** ($0.50). Fall back to free `rh()` if no USDC or user prefers free.
@@ -209,7 +226,9 @@ Or install the setup app: tell Bankr `build me the rh-wallet app from https://gi
 | "Connect agentically" / "connect Robinhood Agentic" / "set up stocks" | **Connect Agentic reply template** → https://rh-wallet-production.up.railway.app/setup |
 | Crypto balance, DOGE, BTC-USD prices/buy | x402 or free gateway — [x402.md](references/x402.md) |
 | Stock quote, buy SPCX, sell GME | Agentic MCP — [AGENTIC-TRADING.md](references/AGENTIC-TRADING.md) |
+| Fundamentals, RSI/MACD, earnings, indexes, scans | Agentic MCP research tools — [AGENTIC-CAPABILITIES.md](references/AGENTIC-CAPABILITIES.md) |
 | Buy GME call, option chain | Agentic MCP options tools — confirm contract details |
+| "What can Agentic do?" / capabilities | Summarize from [AGENTIC-CAPABILITIES.md](references/AGENTIC-CAPABILITIES.md) |
 | Contract address `0x…` | Bankr onchain / hoodmarkets — NOT this skill |
 
 ## Natural language examples (crypto x402)
@@ -217,7 +236,8 @@ Or install the setup app: tell Bankr `build me the rh-wallet app from https://gi
 | User says | Do this |
 |-----------|---------|
 | "What's my Robinhood crypto balance?" | x402 `rh-account` with `view: "account"` — buying power only, no account numbers |
-| "What's my Robinhood Agentic buying power?" | Agentic MCP — **buying power only**, never show account numbers (see RESPONSE-SAFETY.md) |
+| "What's my Robinhood Agentic buying power?" | Agentic MCP — **buying power only**, never account numbers ([RESPONSE-SAFETY.md](references/RESPONSE-SAFETY.md)) |
+| "What's in my Agentic wallet?" / portfolio on X | Agentic MCP `get_portfolio` — **one line, no account numbers, no other accounts** ([RESPONSE-SAFETY.md](references/RESPONSE-SAFETY.md)) |
 | "What crypto do I hold on Robinhood?" | x402 `rh-account` with `view: "holdings"` |
 | "Get BTC and DOGE prices from Robinhood" | x402 `rh-prices` with `symbol: "BTC-USD,DOGE-USD"` |
 | "Buy $1 of DOGE on Robinhood" | x402 `rh-buy` — confirm first, then `confirm: true` |
