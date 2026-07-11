@@ -48,12 +48,21 @@ export default async function handler(req: Request) {
 
     if (!rhApiKey || !rhPrivKey) {
       return json(
-        { error: "rh_api_key and rh_private_key_b64 are required (in body or x-rh-* headers)" },
+        {
+          error: "rh_api_key and rh_private_key_b64 are required",
+          hint: "Use straight ASCII quotes in JSON — smart quotes break parsing",
+        },
         400
       );
     }
 
     const { symbol, side, quote_amount, asset_quantity, confirm, client_order_id } = body;
+
+    const confirmed =
+      confirm === true ||
+      confirm === "true" ||
+      confirm === 1 ||
+      confirm === "1";
 
     if (!symbol || !side) {
       return json({ error: "symbol and side are required" }, 400);
@@ -61,9 +70,12 @@ export default async function handler(req: Request) {
     if (!quote_amount && !asset_quantity) {
       return json({ error: "Provide quote_amount or asset_quantity" }, 400);
     }
-    if (!confirm) {
+    if (!confirmed) {
       return json(
-        { error: "confirm must be true — this endpoint places a real order after showing prices and account" },
+        {
+          error: "confirm must be true — this endpoint places a real order after showing prices and account",
+          received_confirm: confirm,
+        },
         400
       );
     }
@@ -101,25 +113,26 @@ export default async function handler(req: Request) {
       body: JSON.stringify({
         symbol: sym,
         side: String(side).toLowerCase(),
-        quote_amount,
-        asset_quantity,
+        quote_amount: quote_amount != null ? String(quote_amount) : undefined,
+        asset_quantity: asset_quantity != null ? String(asset_quantity) : undefined,
         confirm: true,
         client_order_id,
       }),
     });
 
-    const status = order.ok ? 201 : order.status;
+    // Always return 200 when prices + account succeeded so caller gets full context
     return json(
       {
         flow: "prices → account → order",
         symbol: sym,
         side: String(side).toLowerCase(),
         buying_power_note: buyingPowerNote,
+        order_ok: order.ok,
         prices: prices.data,
         account: account.data,
         order: order.data,
       },
-      status
+      order.ok ? 201 : 200
     );
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err);
