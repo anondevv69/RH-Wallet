@@ -5,7 +5,7 @@
     "rh-prices": {
       "description": "Real-time best bid/ask prices from Robinhood Crypto. Query any symbol: BTC-USD, ETH-USD, SOL-USD, DOGE-USD and more. Pass rh_api_key and rh_private_key_b64 as query params.",
       "price": "0.25",
-      "methods": ["GET"],
+      "methods": ["GET", "POST"],
       "category": "crypto",
       "tags": ["robinhood", "crypto", "prices", "market-data"],
       "schema": {
