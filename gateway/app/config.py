@@ -35,6 +35,13 @@ class Settings(BaseSettings):
     database_url: str = Field(default="", alias="DATABASE_URL")
     public_base_url: str = Field(default="", alias="PUBLIC_BASE_URL")
 
+    # Robinhood Agentic OAuth (stocks/options MCP proxy)
+    # Pre-register a client with Robinhood, or leave blank to attempt dynamic registration.
+    agentic_client_id: str = Field(default="", alias="AGENTIC_CLIENT_ID")
+    agentic_client_secret: str = Field(default="", alias="AGENTIC_CLIENT_SECRET")
+    # HMAC key for signing OAuth state parameter (stateless PKCE)
+    agentic_state_secret: str = Field(default="", alias="AGENTIC_STATE_SECRET")
+
     # Safety
     max_order_usd: float = Field(default=50.0, alias="MAX_ORDER_USD")
     require_confirmation: bool = Field(default=True, alias="REQUIRE_CONFIRMATION")

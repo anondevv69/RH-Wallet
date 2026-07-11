@@ -1,0 +1,21 @@
+{
+  "slug": "rh-wallet",
+  "title": "RH Wallet — Robinhood Setup",
+  "description": "Connect and manage Robinhood Crypto and Agentic (stocks/options) accounts.",
+  "tags": ["robinhood", "crypto", "trading", "setup"],
+  "permissions": [
+    "read:wallet",
+    "read:appdata",
+    "write:appdata",
+    "fetch:http",
+    "read:secrets"
+  ],
+  "scripts": ["checkStatus"],
+  "schedule": [],
+  "secrets": [
+    { "key": "RH_API_KEY", "required": false, "scope": "author" },
+    { "key": "AGENTIC_TOKEN", "required": false, "scope": "author" }
+  ],
+  "publicDataKeys": [],
+  "frontendIdentity": "viewer"
+}

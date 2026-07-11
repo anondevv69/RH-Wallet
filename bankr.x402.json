@@ -136,6 +136,37 @@
         }
       }
     },
+    "rh-agentic-mcp": {
+      "description": "Paid proxy for Robinhood Agentic MCP — stocks, ETFs, and options (SPCX, GME, calls/puts). Requires an agentic_token from https://rh-wallet-production.up.railway.app/agentic/auth. Free methods: tools/list, initialize. Paid: all tool calls.",
+      "price": "0.10",
+      "methods": ["POST"],
+      "category": "stocks",
+      "tags": ["robinhood", "agentic", "stocks", "options", "equity", "mcp"],
+      "schema": {
+        "input": {
+          "type": "object",
+          "properties": {
+            "agentic_token": {
+              "type": "string",
+              "description": "Robinhood OAuth token from https://rh-wallet-production.up.railway.app/agentic/auth"
+            },
+            "method": {
+              "type": "string",
+              "description": "MCP JSON-RPC method, e.g. tools/list, tools/call"
+            },
+            "params": {
+              "type": "object",
+              "description": "MCP method parameters (tool name, arguments, etc.)"
+            }
+          },
+          "required": ["agentic_token", "method"]
+        },
+        "output": {
+          "type": "object",
+          "description": "MCP JSON-RPC response from Robinhood Agentic"
+        }
+      }
+    },
     "rh-buy": {
       "description": "Bundled Robinhood Crypto buy/sell flow: fetch prices, check account buying power, then place the order — one payment instead of three separate calls.",
       "price": "0.50",
