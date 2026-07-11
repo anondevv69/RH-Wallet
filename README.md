@@ -4,7 +4,8 @@ Robinhood **Crypto** + **Agentic** (stocks/options) for [Bankr](https://docs.ban
 
 **Public repo (skill install + scripts):** [github.com/rhagent69/rhwallet-rhagent](https://github.com/rhagent69/rhwallet-rhagent)
 
-**→ Setup wizard: https://rhwallet-rhagent-production.up.railway.app/setup**
+**→ Setup wizard: https://rhwallet-rhagent-production.up.railway.app/setup**  
+(also: `/helpsetup` — same page)
 
 ## Bankr users — quick start
 

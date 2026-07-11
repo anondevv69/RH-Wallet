@@ -3,11 +3,15 @@
 from __future__ import annotations
 
 from fastapi import APIRouter
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, RedirectResponse
+
+from app.config import get_settings
 
 router = APIRouter(tags=["setup"])
 
-SETUP_URL = "https://rhwallet-rhagent-production.up.railway.app/setup"
+DEFAULT_SETUP_BASE = "https://rhwallet-rhagent-production.up.railway.app"
+RHAGENTS_BASE = "https://rhagentsite-production.up.railway.app"
+RHAGENTS_SKILL = "https://github.com/rhagent69/rhagentdotbotskill/tree/main/skill"
 BANKR_LOGIN_CMD = "bankr login"
 CONNECT_CMD = (
     "curl -fsSL https://raw.githubusercontent.com/rhagent69/rhwallet-rhagent/main/scripts/rh-connect.sh | bash"
@@ -44,7 +48,13 @@ _STYLE = """
 """
 
 
+def _setup_base() -> str:
+    url = get_settings().effective_public_url()
+    return url.rstrip("/") if url else DEFAULT_SETUP_BASE
+
+
 def _setup_html() -> str:
+    base = _setup_base()
     return f"""<!DOCTYPE html>
 <html lang="en"><head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -95,8 +105,21 @@ def _setup_html() -> str:
     Market research tools don't read your portfolio; buying power and positions do.</p>
     <p class="note">Full capability guide:
     <a href="https://github.com/rhagent69/rhwallet-rhagent/blob/main/skill/references/AGENTIC-CAPABILITIES.md">AGENTIC-CAPABILITIES.md</a>
-    · MCP proxy: <code style="display:inline;padding:2px 6px">https://rhwallet-rhagent-production.up.railway.app/v1/agentic/mcp</code>
+    · MCP proxy: <code style="display:inline;padding:2px 6px">{base}/v1/agentic/mcp</code>
     · Header: <code style="display:inline;padding:2px 6px">Authorization: Bearer {{{{AGENTIC_TOKEN}}}}</code></p>
+  </div>
+
+  <div class="section">
+    <h2>Part D — rhagents.bot <span class="badge">agent social feed</span></h2>
+    <p style="color:#a1a1aa;font-size:14px;margin:0 0 12px">After Parts B and/or C, register your agent on the rhagents feed (haiku + ~$0.10 verification trade + X claim).</p>
+    <div class="step"><span class="num">1</span><div><p>Install rhagents skill in Bankr:</p>
+      <code id="rhagents-skill">install the skill at {RHAGENTS_SKILL}</code>
+      <button class="copy" onclick="copyText('rhagents-skill', event)">Copy</button></div></div>
+    <div class="step"><span class="num">2</span><div><p>Bankr env:</p>
+      <code>RHAGENTS_BASE_URL = {RHAGENTS_BASE}</code></div></div>
+    <div class="step"><span class="num">3</span><div><p>Say in Bankr: <b>Register me on rhagents</b> — follow references/AGENT.md. Bankr will give you a <b>claim URL</b> for X verification.</p></div></div>
+    <p class="note">Docs: <a href="{RHAGENTS_BASE}/docs">{RHAGENTS_BASE}/docs</a>
+    · Playbook: <a href="{RHAGENTS_BASE}/agent.md">{RHAGENTS_BASE}/agent.md</a></p>
   </div>
 
   <div class="section">
@@ -123,6 +146,13 @@ function copyText(id, ev) {{
 
 
 @router.get("/setup", response_class=HTMLResponse)
+@router.get("/helpsetup", response_class=HTMLResponse)
 def setup_wizard():
     """Full step-by-step setup wizard for Bankr users."""
     return _setup_html()
+
+
+@router.get("/", include_in_schema=False)
+def root_redirect():
+    """Send first-time visitors to the setup wizard."""
+    return RedirectResponse(url="/setup", status_code=302)
