@@ -306,10 +306,22 @@ class RobinhoodClient:
     ) -> Any:
         account = account_number or self.get_primary_account_number()
         order_config: dict[str, str] = {}
-        if quote_amount:
-            order_config["quote_amount"] = str(quote_amount)
-        elif asset_quantity:
+        if asset_quantity:
             order_config["asset_quantity"] = str(asset_quantity)
+        elif quote_amount:
+            # Robinhood API requires asset_quantity; derive it from current ask price
+            prices = self.get_best_bid_ask(symbol.upper())
+            results = prices.get("results", []) if isinstance(prices, dict) else []
+            ask = next(
+                (r.get("ask") or r.get("ask_inclusive_of_buy_spread") for r in results if r),
+                None,
+            )
+            if not ask:
+                raise ValueError(
+                    f"Could not determine ask price for {symbol} to convert quote_amount."
+                )
+            qty = float(quote_amount) / float(ask)
+            order_config["asset_quantity"] = f"{qty:.8f}"
         else:
             raise ValueError("Provide quote_amount or asset_quantity.")
 
