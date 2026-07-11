@@ -332,12 +332,35 @@ class RobinhoodClient:
             "symbol": symbol.upper(),
             "market_order_config": order_config,
         }
-        return self.request(
-            "POST",
-            "/api/v2/crypto/trading/orders/",
-            body,
-            params={"account_number": account},
-        )
+        try:
+            return self.request(
+                "POST",
+                "/api/v2/crypto/trading/orders/",
+                body,
+                params={"account_number": account},
+            )
+        except RobinhoodAPIError as exc:
+            # Robinhood tells us the required precision — extract it and retry once
+            if exc.status_code == 400 and isinstance(exc.payload, dict):
+                import re as _re
+                for err in exc.payload.get("errors", []):
+                    match = _re.search(r"nearest\s+(0\.\d+)", err.get("detail", ""))
+                    if match:
+                        step_str = match.group(1).rstrip("0") or "1"
+                        decimals = len(step_str.split(".")[-1])
+                        step = float(match.group(1))
+                        qty = float(order_config["asset_quantity"])
+                        rounded = round(round(qty / step) * step, decimals)
+                        order_config["asset_quantity"] = f"{rounded:.{decimals}f}"
+                        body["market_order_config"] = order_config
+                        body["client_order_id"] = str(uuid.uuid4())
+                        return self.request(
+                            "POST",
+                            "/api/v2/crypto/trading/orders/",
+                            body,
+                            params={"account_number": account},
+                        )
+            raise
 
     def cancel_order(self, order_id: str) -> Any:
         path = f"/api/v2/crypto/trading/orders/{order_id}/cancel/"
