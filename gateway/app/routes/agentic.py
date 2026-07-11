@@ -381,6 +381,7 @@ async function copyToken(id, btn) {{
 
 
 def _html_setup_page() -> str:
+    bankr_cmd = "bankr login"
     npx_cmd = "curl -fsSL https://raw.githubusercontent.com/anondevv69/RH-Wallet/main/scripts/rh-connect.sh | bash"
     return f"""<!DOCTYPE html>
 <html lang="en"><head><meta charset="UTF-8">
@@ -392,44 +393,59 @@ def _html_setup_page() -> str:
           display:flex; align-items:center; justify-content:center;
           font-weight:700; font-size:13px; flex-shrink:0; }}
   .copy-btn {{ margin-top:8px; }}
+  .trust {{ background:#052e16; border:1px solid #166534; border-radius:8px;
+            padding:12px 14px; margin:16px 0; font-size:13px; color:#bbf7d0; }}
+  .trust b {{ color:#86efac; }}
 </style></head>
 <body><div class="card">
   <h1>Connect Robinhood Agentic</h1>
   <p>One-time setup for stocks &amp; options. Full guide (Crypto + Agentic):
      <a href="/setup" style="color:#60a5fa">rh-wallet-production.up.railway.app/setup</a></p>
 
+  <div class="trust"><b>We hold nothing.</b> RH Wallet does not store your Robinhood tokens or keys
+  on our servers. OAuth runs on your machine; credentials save only to your Bankr vault.</div>
+
   <div class="step"><span class="num">1</span>
-    <div><b>Copy this command</b> and run it in Terminal (Mac) or Command Prompt (Windows):
-      <div class="token-box" id="cmd">{npx_cmd}</div>
-      <button class="copy-btn" onclick="copyId('cmd')">Copy command</button>
-  <p style="color:#71717a;font-size:12px;margin-top:8px">Requires Node.js and git. Run <code>bankr login</code> first for auto-save.</p>
+    <div><b>Copy and run in Terminal</b> (Mac/PC):
+      <div class="token-box" id="bankr-cmd">{bankr_cmd}</div>
+      <button class="copy-btn" onclick="copyId('bankr-cmd', 'Copy command')">Copy command</button>
+      <p style="color:#71717a;font-size:12px;margin-top:8px">Logs you into Bankr so the connect script can auto-save your token.</p>
     </div>
   </div>
 
   <div class="step"><span class="num">2</span>
+    <div><b>Copy and run in Terminal</b>:
+      <div class="token-box" id="cmd">{npx_cmd}</div>
+      <button class="copy-btn" onclick="copyId('cmd', 'Copy command')">Copy command</button>
+  <p style="color:#71717a;font-size:12px;margin-top:8px">Requires Node.js and git. One-time — Robinhood requires localhost OAuth.</p>
+    </div>
+  </div>
+
+  <div class="step"><span class="num">3</span>
     <div>Your browser opens → sign in to Robinhood → tap <b>Allow</b>
       on your Agentic account.</div>
   </div>
 
-  <div class="step"><span class="num">3</span>
-    <div>If you ran <code>bankr login</code>, your token saves to Bankr automatically.
-      Otherwise copy the token and add <code>AGENTIC_TOKEN</code> in Bankr → Settings → Env Vars.</div>
+  <div class="step"><span class="num">4</span>
+    <div>Token saves to <b>your Bankr vault</b> as <code>AGENTIC_TOKEN</code> (if you ran step 1).
+      Otherwise copy the token and add it in Bankr → Settings → Env Vars.</div>
   </div>
 
-  <div class="step"><span class="num">4</span>
+  <div class="step"><span class="num">5</span>
     <div>Back in Bankr, ask: <em>"What is my Robinhood Agentic buying power?"</em></div>
   </div>
 
   <p style="color:#71717a;font-size:13px;margin-top:24px">
-    We never store your token on our servers. It lives in your Bankr vault only.
+    <b>Zero custody:</b> we never store your token on Railway. The MCP proxy is stateless — it forwards
+    your request with your token and does not write secrets to disk.
     MCP proxy: <code>https://rh-wallet-production.up.railway.app/v1/agentic/mcp</code>
   </p>
 </div>
 <script>
-function copyId(id) {{
+function copyId(id, label) {{
   navigator.clipboard.writeText(document.getElementById(id).textContent.trim());
   event.target.textContent = 'Copied!';
-  setTimeout(() => event.target.textContent = 'Copy command', 2000);
+  setTimeout(() => event.target.textContent = label, 2000);
 }}
 </script>
 </body></html>"""

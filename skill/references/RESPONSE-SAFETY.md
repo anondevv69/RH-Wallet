@@ -2,6 +2,55 @@
 
 Gateway and MCP responses may include balances, holdings, orders, and **account numbers**. Treat all fields as **sensitive user data**.
 
+## Public X / tweets — highest priority
+
+**Any reply posted to X (Twitter), including @bankrbot automated tweets, is public forever.**
+
+Before sending a public reply, apply **tweet-safe mode**:
+
+1. **Zero account numbers** — full, masked (`••••6789`), spaced (`••• 6789`), or last-4 alone (`6789`)
+2. **Zero account labels with digits** — never `Agentic Account (••••6789)`, `Margin individual (••••5327)`, etc.
+3. **Do not list other Robinhood accounts** on X — no margin, IRA, default, or "not accessible to the agent" account summaries
+4. **Agentic-only scope on X** — answer about **Robinhood Agentic** balances and holdings only
+5. **Prefer `get_portfolio`** for wallet/balance questions — **avoid `get_accounts` on public X** (it returns every account + numbers)
+6. **One short paragraph** — no multi-account bullet lists
+
+### Real violation (never repeat on X)
+
+```
+Agentic Account (••••6789) — individual cash account
+- Portfolio value: $10.00
+...
+Margin individual (••••5327) — default account
+Traditional IRA (••••6892) — cash account
+```
+
+### Tweet-safe replacement
+
+User: *"What's in my Robinhood Agentic wallet?"*
+
+```
+Robinhood Agentic: $10.00 portfolio · $10.00 cash · $10.00 buying power · no stock or option positions yet.
+```
+
+User: *"What's my Robinhood Agentic buying power?"*
+
+```
+Robinhood Agentic buying power: $10.00
+```
+
+### Pre-tweet checklist (run mentally before every public post)
+
+- [ ] No `••••`, no 4+ digit account fragments, no `(••••XXXX)` patterns
+- [ ] No "Agentic Account (…)" / "Margin … (…)" / "IRA (…)" headings
+- [ ] No mention of other Robinhood accounts on X
+- [ ] Label is **"Robinhood Agentic"** only — not "Agentic Account"
+- [ ] No raw MCP JSON, tokens, or keys
+
+If the draft fails any check, **rewrite** using the tweet-safe templates above — do not post the draft.
+
+---
+
 ## Never show in ANY reply (public or private)
 
 - Robinhood **account numbers** — full, partial, or masked (e.g. `311040298697`, `••••6789`, `••• 6789`, `6789`, `account ••••5327`)
@@ -14,10 +63,10 @@ Gateway and MCP responses may include balances, holdings, orders, and **account 
 
 ## Safe to share (any channel)
 
-- Product label only: **"Robinhood Crypto (US)"** or **"Robinhood Agentic"** — no account suffix
+- Product label only: **"Robinhood Crypto (US)"** or **"Robinhood Agentic"** — no account suffix, no "Account (••••…)"
 - Account **status** (e.g. active)
 - **Buying power** (USD amount only)
-- **Account value** / cash (USD amounts)
+- **Portfolio / cash value** (USD amounts)
 - **Holdings**: asset + quantity (e.g. "0.02 ETH", "10 shares SPCX")
 - **Prices** / quotes for a symbol
 - Trade **intent** before confirm
@@ -28,19 +77,26 @@ Gateway and MCP responses may include balances, holdings, orders, and **account 
 MCP `get_accounts`, `get_portfolio`, and similar tools **return account numbers**. Before every reply:
 
 1. **Drop** all `account_number`, `account_id`, masked account strings, last-4 digits
-2. **Never** prefix with "Agentic account (••••XXXX)"
+2. **Never** prefix with "Agentic account (••••XXXX)" or "Agentic Account (••••XXXX)"
 3. Summarize in plain language only
+4. **On public X:** do not call `get_accounts` for balance/wallet questions — use `get_portfolio` and Agentic-only fields; omit other accounts entirely
 
-### Bad (never)
+### Bad (never — this exact format has been posted to X; forbidden)
 
 ```
-Your Robinhood Agentic buying power is $10.00.
+Here's your Robinhood Agentic wallet overview:
 
-Agentic account (••••6789):
-  buying power: $10.00
+Agentic Account (••••6789) — individual cash account
+- Portfolio value: $10.00
+- Cash: $10.00
+- Buying power: $10.00
+
+You also have two other accounts that aren't accessible to the agent:
+- Margin individual (••••5327) — default account
+- Traditional IRA (••••6892) — cash account
 ```
 
-### Good
+### Good (private terminal or public X)
 
 ```
 Robinhood Agentic: $10.00 buying power · $10.00 cash · no holdings
@@ -50,9 +106,11 @@ Robinhood Agentic: $10.00 buying power · $10.00 cash · no holdings
 
 Gateway redacts `account_number` — do not recover from `raw` or logs.
 
-## Public X — extra strict
+On public X: same rules — buying power and holdings only, no account metadata.
 
-Also avoid buying power + holdings + account metadata in one paste (fingerprinting).
+## Public X — fingerprinting
+
+Also avoid dumping buying power + full holdings + order history + account metadata in one paste.
 
 ## Examples
 
@@ -66,11 +124,16 @@ Robinhood Crypto (US): active · $43.69 buying power · 49.74 DOGE
 Robinhood Agentic: GME $25 call · exp Aug 15 · ~$1.20 — confirm?
 ```
 
-**Never (any channel):**
+```
+Robinhood Agentic: $10.00 portfolio · no positions yet
+```
+
+**Never (any channel, especially X):**
 
 ```
 Account: 311040298697
 Agentic account (••••6789):
+Margin individual (••••5327)
 RH_API_KEY=rh-api-...
 {"accounts":[{"account_number":"..."}]}
 ```

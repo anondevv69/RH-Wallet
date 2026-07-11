@@ -8,6 +8,7 @@ from fastapi.responses import HTMLResponse
 router = APIRouter(tags=["setup"])
 
 SETUP_URL = "https://rh-wallet-production.up.railway.app/setup"
+BANKR_LOGIN_CMD = "bankr login"
 CONNECT_CMD = (
     "curl -fsSL https://raw.githubusercontent.com/anondevv69/RH-Wallet/main/scripts/rh-connect.sh | bash"
 )
@@ -35,6 +36,9 @@ _STYLE = """
           padding: 8px 14px; font-size: 13px; font-weight: 600; cursor: pointer; }
   .copy:hover { opacity: .9; }
   .note { font-size: 12px; color: #71717a; margin-top: 8px; }
+  .trust { background: #052e16; border: 1px solid #166534; border-radius: 8px;
+           padding: 12px 14px; margin: 16px 0 4px; font-size: 13px; color: #bbf7d0; }
+  .trust b { color: #86efac; }
   a { color: #60a5fa; }
   hr { border: none; border-top: 1px solid #27272a; margin: 24px 0; }
 """
@@ -54,7 +58,7 @@ def _setup_html() -> str:
     <h2>Part A — Install skill <span class="badge">Bankr terminal</span></h2>
     <div class="step"><span class="num">1</span><div><p>In Bankr chat, paste:</p>
       <code id="skill">{SKILL_INSTALL}</code>
-      <button class="copy" onclick="copyText('skill')">Copy</button></div></div>
+      <button class="copy" onclick="copyText('skill', event)">Copy</button></div></div>
     <div class="step"><span class="num">2</span><div><p>Then say: <b>set up rh-wallet</b></p></div></div>
   </div>
 
@@ -71,33 +75,48 @@ def _setup_html() -> str:
 
   <div class="section">
     <h2>Part C — Robinhood Agentic <span class="badge">stocks &amp; options</span></h2>
-    <div class="step"><span class="num">1</span><div><p>On your Mac/PC, run <code style="display:inline;padding:2px 6px">bankr login</code> (auto-saves token).</p></div></div>
+    <div class="trust"><b>We hold nothing.</b> RH Wallet does not store your Robinhood tokens, API keys,
+    or account data on our servers. OAuth runs on your machine; credentials save only to your
+    Bankr vault. Our Railway gateway is a stateless pass-through — it never writes your secrets to disk.</div>
+    <div class="step"><span class="num">1</span><div><p>On your Mac/PC, copy and run in Terminal:</p>
+      <code id="bankrlogin">{BANKR_LOGIN_CMD}</code>
+      <button class="copy" onclick="copyText('bankrlogin', event)">Copy command</button>
+      <p class="note">Logs you into Bankr so the connect script can auto-save your token.</p></div></div>
     <div class="step"><span class="num">2</span><div><p>Copy and run in Terminal:</p>
       <code id="connect">{CONNECT_CMD}</code>
-      <button class="copy" onclick="copyText('connect')">Copy command</button>
+      <button class="copy" onclick="copyText('connect', event)">Copy command</button>
       <p class="note">Requires Node.js + git. One-time — Robinhood requires localhost OAuth.</p></div></div>
     <div class="step"><span class="num">3</span><div><p>Browser opens → Robinhood → tap <b>Allow</b> on your Agentic account.</p></div></div>
-    <div class="step"><span class="num">4</span><div><p>Token saves to Bankr as <code style="display:inline;padding:2px 6px">AGENTIC_TOKEN</code>. MCP server is added automatically.</p>
+    <div class="step"><span class="num">4</span><div><p>Token saves to <b>your Bankr vault</b> as <code style="display:inline;padding:2px 6px">AGENTIC_TOKEN</code>. MCP server is added automatically.</p>
       <p class="note">Manual fallback: Env Vars → AGENTIC_TOKEN · MCP URL below</p></div></div>
     <div class="step"><span class="num">5</span><div><p>Test: <b>"What is my Robinhood Agentic buying power?"</b></p></div></div>
-    <p class="note">MCP proxy: <code style="display:inline;padding:2px 6px">https://rh-wallet-production.up.railway.app/v1/agentic/mcp</code>
+    <p style="color:#a1a1aa;font-size:14px;margin:16px 0 8px"><b>What you can do</b> — quotes (20 symbols), fundamentals, RSI/MACD,
+    earnings calendar, index values, option chains, custom scans, watchlists, buy/sell stocks &amp; options.
+    Market research tools don't read your portfolio; buying power and positions do.</p>
+    <p class="note">Full capability guide:
+    <a href="https://github.com/anondevv69/RH-Wallet/blob/main/skill/references/AGENTIC-CAPABILITIES.md">AGENTIC-CAPABILITIES.md</a>
+    · MCP proxy: <code style="display:inline;padding:2px 6px">https://rh-wallet-production.up.railway.app/v1/agentic/mcp</code>
     · Header: <code style="display:inline;padding:2px 6px">Authorization: Bearer {{{{AGENTIC_TOKEN}}}}</code></p>
   </div>
 
   <div class="section">
     <h2>After setup</h2>
     <p style="color:#a1a1aa;font-size:14px;margin:0">Use Bankr only — X, terminal, phone. Computer can be off. Re-run Part C when token expires (~9 days).</p>
-    <p class="note" style="margin-top:12px">We never store your tokens on Railway. Keys live in your Bankr vault. 
+    <p class="note" style="margin-top:12px"><b>Zero custody:</b> we never store your Robinhood tokens or API keys on Railway or anywhere on our side. Secrets stay in your Bankr vault; the gateway only forwards requests.
     <a href="https://github.com/anondevv69/RH-Wallet">GitHub</a></p>
   </div>
 </div>
 <script>
-function copyText(id) {{
+function copyText(id, ev) {{
   const el = document.getElementById(id);
   const text = el.innerText || el.textContent;
+  const btn = ev && ev.target;
+  const label = btn && btn.textContent;
   navigator.clipboard.writeText(text.trim());
-  event.target.textContent = 'Copied!';
-  setTimeout(() => event.target.textContent = 'Copy', 1500);
+  if (btn) {{
+    btn.textContent = 'Copied!';
+    setTimeout(() => {{ btn.textContent = label; }}, 1500);
+  }}
 }}
 </script>
 </body></html>"""

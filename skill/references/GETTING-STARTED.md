@@ -75,8 +75,15 @@ Details: [agentic-connect.md](agentic-connect.md)
 |----------|-----|
 | Crypto balance | "What's my Robinhood crypto buying power?" |
 | Buy DOGE | "Buy $1 of DOGE on Robinhood" |
+| Agentic buying power | "What is my Robinhood Agentic buying power?" |
 | Stock quote | "Quote SPCX on Robinhood Agentic" |
+| Fundamentals / technicals | "What's NVDA's P/E and RSI on Agentic?" |
+| Earnings | "When does AAPL report earnings?" |
+| Tradability | "Is SPCX fractional on Robinhood Agentic?" |
 | Buy stock | "Buy $5 of SPCX on my Agentic account" |
+| Options | "Show GME option chain" / "Buy a GME call" |
+
+Full Agentic tool list and prompts: [AGENTIC-CAPABILITIES.md](AGENTIC-CAPABILITIES.md)
 
 ---
 

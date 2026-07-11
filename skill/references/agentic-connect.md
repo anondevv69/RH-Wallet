@@ -33,6 +33,8 @@ Ask Bankr: *"What is my Robinhood Agentic buying power?"*
 
 MCP proxy (auto-configured): `https://rh-wallet-production.up.railway.app/v1/agentic/mcp`
 
+**What you can do once connected:** quotes, fundamentals, earnings, technicals, options, scans, watchlists, and trading — [AGENTIC-CAPABILITIES.md](AGENTIC-CAPABILITIES.md)
+
 ## Token expired?
 
 Re-run the one-liner above.

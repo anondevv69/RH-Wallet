@@ -10,6 +10,7 @@
 | Buy HOODIE, memecoin on chain | **Yes** | No | No | **Bankr onchain** — NOT rh-wallet |
 | hood.markets, Robinhood Chain | Often yes | No | No | **hoodmarkets** skill |
 | SPCX, GME, AAPL, “buy a call” | No | No | **Yes** | **Robinhood Agentic MCP** — see [AGENTIC-TRADING.md](AGENTIC-TRADING.md) |
+| Fundamentals, earnings, RSI, scans | No | No | **Yes** | **Agentic MCP research tools** — [AGENTIC-CAPABILITIES.md](AGENTIC-CAPABILITIES.md) |
 | “My Robinhood balance” (ambiguous) | — | — | — | **Ask:** Crypto (USD pairs) vs stocks (Agentic) |
 
 ## rh-wallet handles (Robinhood Crypto)
