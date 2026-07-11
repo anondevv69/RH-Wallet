@@ -169,6 +169,23 @@ class RobinhoodClient:
     def get_accounts(self) -> Any:
         return self.request("GET", "/api/v2/crypto/trading/accounts/")
 
+    @staticmethod
+    def _select_trading_account(results: list[dict[str, Any]]) -> dict[str, Any]:
+        """Prefer is_api_tradable accounts — Robinhood rejects orders on non-tradable accounts."""
+        if not results:
+            raise RobinhoodAPIError("No crypto trading accounts found.")
+
+        api_tradable = [a for a in results if a.get("is_api_tradable") is True]
+        candidates = api_tradable if api_tradable else results
+
+        def _buying_power(account: dict[str, Any]) -> float:
+            try:
+                return float(account.get("buying_power") or 0)
+            except (TypeError, ValueError):
+                return 0.0
+
+        return max(candidates, key=_buying_power)
+
     def get_primary_account_number(self, *, force_refresh: bool = False) -> str:
         if self._account_number and not force_refresh:
             return self._account_number
@@ -180,7 +197,8 @@ class RobinhoodClient:
                 self._account_number = str(data["account_number"])
                 return self._account_number
             raise RobinhoodAPIError("No crypto trading accounts found.")
-        account_number = results[0].get("account_number")
+        primary = self._select_trading_account(results)
+        account_number = primary.get("account_number")
         if not account_number:
             raise RobinhoodAPIError("Account response missing account_number.")
         self._account_number = str(account_number)
@@ -190,7 +208,7 @@ class RobinhoodClient:
         data = self.get_accounts()
         results = data.get("results") if isinstance(data, dict) else None
         if results:
-            primary = results[0]
+            primary = self._select_trading_account(results)
             self._account_number = str(primary.get("account_number", "")) or None
             return {
                 "account_number": primary.get("account_number"),
@@ -198,6 +216,7 @@ class RobinhoodClient:
                 "buying_power": primary.get("buying_power"),
                 "buying_power_currency": primary.get("buying_power_currency"),
                 "fee_tier": primary.get("fee_tier"),
+                "is_api_tradable": primary.get("is_api_tradable"),
                 "accounts": results,
             }
         if isinstance(data, dict) and data.get("account_number"):
