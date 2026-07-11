@@ -75,6 +75,12 @@ async function main() {
     } catch (err) {
       console.error("⚠ Could not save to Bankr:", err.message);
       console.log("  Copy the token below and paste into Bankr → Env Vars manually.\n");
+      copyToClipboard(tokens.accessToken);
+      console.log("AGENTIC_TOKEN:");
+      console.log("-".repeat(50));
+      console.log(tokens.accessToken);
+      console.log("-".repeat(50));
+      console.log("(Also copied to clipboard if supported)\n");
     }
   } else {
     console.log("\nNo Bankr API key found.");
