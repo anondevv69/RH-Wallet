@@ -82,16 +82,19 @@ If `RH_API_KEY` or `RH_PRIVATE_KEY_BASE64` is missing, walk the user through [re
 
 Bankr's MCP doesn't support browser OAuth directly, so we ship a **stateless OAuth proxy** on Railway. One-time browser login → token stored only in Bankr env.
 
-**Step 1 — Get your token (one-time):**
+**Step 1 — Get your token (one-time, must run locally):**
 
-Tell the user to open this URL in their browser:
+Robinhood OAuth **only works with localhost callbacks**. The Railway `/agentic/auth` link reaches consent but fails on Allow.
 
+On the user's computer:
+
+```bash
+git clone https://github.com/anondevv69/RH-Wallet.git
+cd RH-Wallet
+python3 scripts/agentic_oauth.py
 ```
-https://rh-wallet-production.up.railway.app/agentic/auth
-```
 
-Log in with Robinhood → select Agentic account → copy the access token shown on screen.
-The gateway never stores it — the token is only shown once, then lives in Bankr env.
+Browser opens → sign in → tap Allow → token prints in terminal. User copies it. We never store it.
 
 **Step 2 — Save token to Bankr env:**
 
