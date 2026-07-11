@@ -183,9 +183,15 @@ async def _get_client_credentials(callback_url: str) -> tuple[str, Optional[str]
 # ---------------------------------------------------------------------------
 
 @router.get("/agentic/auth", response_class=HTMLResponse)
-async def agentic_auth_start(request: Request):
-    """Explain Robinhood localhost OAuth requirement — hosted callbacks fail on Allow."""
-    return _html_localhost_required()
+async def agentic_auth_start(_request: Request):
+    """Redirect users to the setup wizard (hosted OAuth fails on Allow)."""
+    return _html_setup_page()
+
+
+@router.get("/agentic/setup", response_class=HTMLResponse)
+async def agentic_setup(_request: Request):
+    """Setup wizard — copy npx command, then localhost OAuth on user's machine."""
+    return _html_setup_page()
 
 
 @router.get("/agentic/callback", response_class=HTMLResponse)
@@ -369,6 +375,63 @@ async function copyToken(id, btn) {{
   btn.textContent = 'Copied!';
   btn.classList.add('copied');
   setTimeout(() => {{ btn.textContent = id === 'access' ? 'Copy Access Token' : 'Copy Refresh Token'; btn.classList.remove('copied'); }}, 2000);
+}}
+</script>
+</body></html>"""
+
+
+def _html_setup_page() -> str:
+    npx_cmd = "npx @rhwallet/connect"
+    npx_fallback = "npx github:anondevv69/RH-Wallet/packages/connect"
+    return f"""<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RH Wallet — Connect Robinhood Agentic</title>
+<style>{_PAGE_STYLE}
+  .step {{ display:flex; gap:14px; margin:16px 0; align-items:flex-start; }}
+  .num {{ background:#27272a; width:28px; height:28px; border-radius:50%;
+          display:flex; align-items:center; justify-content:center;
+          font-weight:700; font-size:13px; flex-shrink:0; }}
+  .copy-btn {{ margin-top:8px; }}
+</style></head>
+<body><div class="card">
+  <h1>Connect Robinhood Agentic</h1>
+  <p>One-time setup for stocks &amp; options through Bankr. Takes ~2 minutes.
+     After this, everything runs in Bankr — your computer can be off.</p>
+
+  <div class="step"><span class="num">1</span>
+    <div><b>Copy this command</b> and run it in Terminal (Mac) or Command Prompt (Windows):
+      <div class="token-box" id="cmd">{npx_cmd}</div>
+      <button class="copy-btn" onclick="copyId('cmd')">Copy command</button>
+      <p style="color:#71717a;font-size:12px;margin-top:8px">Not published yet? Use:
+        <code>{npx_fallback}</code></p>
+    </div>
+  </div>
+
+  <div class="step"><span class="num">2</span>
+    <div>Your browser opens → sign in to Robinhood → tap <b>Allow</b>
+      on your Agentic account.</div>
+  </div>
+
+  <div class="step"><span class="num">3</span>
+    <div>If you ran <code>bankr login</code>, your token saves to Bankr automatically.
+      Otherwise copy the token and add <code>AGENTIC_TOKEN</code> in Bankr → Settings → Env Vars.</div>
+  </div>
+
+  <div class="step"><span class="num">4</span>
+    <div>Back in Bankr, ask: <em>"What is my Robinhood Agentic buying power?"</em></div>
+  </div>
+
+  <p style="color:#71717a;font-size:13px;margin-top:24px">
+    We never store your token on our servers. It lives in your Bankr vault only.
+    MCP proxy: <code>https://rh-wallet-production.up.railway.app/v1/agentic/mcp</code>
+  </p>
+</div>
+<script>
+function copyId(id) {{
+  navigator.clipboard.writeText(document.getElementById(id).textContent.trim());
+  event.target.textContent = 'Copied!';
+  setTimeout(() => event.target.textContent = 'Copy command', 2000);
 }}
 </script>
 </body></html>"""
