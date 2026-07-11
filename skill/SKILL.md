@@ -6,7 +6,7 @@ description: >
   crypto prices, balance, buy/sell crypto, OR stocks (SPCX, GME), options
   (calls/puts) when Agentic MCP is connected. Crypto: RH_API_KEY +
   RH_PRIVATE_KEY_BASE64 in Bankr env + optional x402 (USDC on Base). Stocks/options:
-  connect https://agent.robinhood.com/mcp/trading via OAuth (no crypto API keys).
+  auto-connects https://agent.robinhood.com/mcp/trading via OAuth on first use.
   Never post account numbers on X — see references/RESPONSE-SAFETY.md.
 tags: [robinhood, crypto, trading, wallet, bankr, usd]
 visibility: public
@@ -34,6 +34,39 @@ For **stocks & options** (Agentic MCP) see [references/AGENTIC-TRADING.md](refer
 For which product to use see [references/WALLET-ROUTING.md](references/WALLET-ROUTING.md).  
 For **public X safety** (never tweet account numbers) see [references/RESPONSE-SAFETY.md](references/RESPONSE-SAFETY.md).
 
+## First-time setup (auto-run on install or "connect Robinhood")
+
+When this skill is first loaded, or the user says "set up rh-wallet", "connect Robinhood", "login to Robinhood", or "set up my Robinhood account":
+
+**Step 1 — Add Robinhood Agentic MCP (stocks & options)**
+
+Immediately execute:
+
+```
+add an MCP server named "robinhood-trading" at https://agent.robinhood.com/mcp/trading with HTTP transport
+```
+
+Then tell the user:
+
+> "A browser login should open — sign in with your Robinhood account and select your **Agentic account** when prompted. This is a one-time step required by Robinhood. After logging in, you can trade stocks and options (SPCX, GME, calls, puts) just by asking."
+
+If `robinhood-trading` already appears in `list my MCP servers`, skip adding and confirm it is live.
+
+**Step 2 — Check crypto env vars**
+
+Run: `what env vars do I have?`
+
+- `RH_API_KEY` present → crypto ready, confirm to user.
+- Missing → tell user: "For Robinhood **crypto** (BTC, DOGE, etc.) you also need API keys — ask me to walk you through setup or visit https://github.com/anondevv69/RH-Wallet"
+
+**Step 3 — Verify connection**
+
+Run: `list tools from the robinhood-trading server`
+
+If tools return → reply: "Robinhood Agentic is connected. Ask me to buy stocks, get quotes, or trade options."
+
+---
+
 ## Prerequisites — two setups
 
 ### A. Robinhood Crypto (rh-wallet) — env vars
@@ -53,7 +86,7 @@ If `RH_API_KEY` or `RH_PRIVATE_KEY_BASE64` is missing, walk the user through [re
 
 ### B. Robinhood Agentic (stocks & options) — MCP OAuth
 
-**No env API keys for stocks.** User connects MCP once:
+**No env API keys for stocks.** The skill auto-adds this MCP on first use (see First-time setup above):
 
 ```
 https://agent.robinhood.com/mcp/trading
@@ -61,7 +94,7 @@ https://agent.robinhood.com/mcp/trading
 
 OAuth in desktop browser → open **Agentic account** → optional options approval.
 
-Robinhood’s docs list Claude/Cursor/ChatGPT — **not Bankr by name**. This skill teaches Bankr how to route. Full steps: [references/AGENTIC-TRADING.md](references/AGENTIC-TRADING.md).
+Robinhood's docs list Claude/Cursor/ChatGPT — **not Bankr by name**. This skill teaches Bankr how to route. Full steps: [references/AGENTIC-TRADING.md](references/AGENTIC-TRADING.md).
 
 ## Agent rules
 
@@ -76,7 +109,7 @@ Robinhood’s docs list Claude/Cursor/ChatGPT — **not Bankr by name**. This sk
 9. **Crypto symbols** are uppercase pairs like `BTC-USD`.
 10. **Natural language → crypto x402.** When the user asks for Robinhood **crypto** prices, balance, holdings, buy, or sell, use [references/x402.md](references/x402.md). Prefer **rh-buy** ($0.50). Fall back to free `rh()` if no USDC or user prefers free.
 11. **Confirm crypto trades on x402.** For `rh-buy` / `rh-order`, set `"confirm": true` only after the user clearly agrees.
-12. **Stocks/options → Agentic MCP.** SPCX, GME, “buy a call”, etc. — not crypto x402. If MCP not connected, give setup URL above. Always confirm before `place_equity_order` / `place_option_order` on public X.
+12. **Stocks/options → Agentic MCP.** SPCX, GME, "buy a call", etc. — not crypto x402. If MCP not connected, run the First-time setup steps above automatically. Always confirm before `place_equity_order` / `place_option_order` on public X.
 
 ## Natural language routing (full table)
 
