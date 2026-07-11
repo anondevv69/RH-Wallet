@@ -11,7 +11,7 @@ US only. Two products: **Robinhood Crypto** (BTC, DOGE) and **Robinhood Agentic*
 In Bankr terminal chat:
 
 ```
-install the skill at https://github.com/anondevv69/RH-Wallet/tree/main/skill
+install the skill at https://github.com/rhagent69/rhwallet-rhagent/tree/main/skill
 ```
 
 Then:
@@ -56,7 +56,7 @@ One-time on your Mac/PC (~2 min). After this, everything runs in Bankr 24/7.
 2. Run locally:
    ```bash
    bankr login
-   curl -fsSL https://raw.githubusercontent.com/anondevv69/RH-Wallet/main/scripts/rh-connect.sh | bash
+   curl -fsSL https://raw.githubusercontent.com/rhagent69/rhwallet-rhagent/main/scripts/rh-connect.sh | bash
    ```
 
 3. Browser → Robinhood → tap **Allow** on your Agentic account.
@@ -100,5 +100,5 @@ Full Agentic tool list and prompts: [AGENTIC-CAPABILITIES.md](AGENTIC-CAPABILITI
 Agentic token expires ~every 9 days. Re-run:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/anondevv69/RH-Wallet/main/scripts/rh-connect.sh | bash
+curl -fsSL https://raw.githubusercontent.com/rhagent69/rhwallet-rhagent/main/scripts/rh-connect.sh | bash
 ```

@@ -10,9 +10,9 @@ router = APIRouter(tags=["setup"])
 SETUP_URL = "https://rh-wallet-production.up.railway.app/setup"
 BANKR_LOGIN_CMD = "bankr login"
 CONNECT_CMD = (
-    "curl -fsSL https://raw.githubusercontent.com/anondevv69/RH-Wallet/main/scripts/rh-connect.sh | bash"
+    "curl -fsSL https://raw.githubusercontent.com/rhagent69/rhwallet-rhagent/main/scripts/rh-connect.sh | bash"
 )
-SKILL_INSTALL = "install the skill at https://github.com/anondevv69/RH-Wallet/tree/main/skill"
+SKILL_INSTALL = "install the skill at https://github.com/rhagent69/rhwallet-rhagent/tree/main/skill"
 
 _STYLE = """
   body { background: #0d0d0f; color: #f4f4f5; font-family: system-ui, sans-serif;
@@ -65,7 +65,7 @@ def _setup_html() -> str:
   <div class="section">
     <h2>Part B — Robinhood Crypto <span class="badge">BTC, DOGE, ETH</span></h2>
     <div class="step"><span class="num">1</span><div><p>Generate keys (once):</p>
-      <code>pip install pynacl && curl -fsSL https://raw.githubusercontent.com/anondevv69/RH-Wallet/main/scripts/generate_rh_keypair.py | python3</code>
+      <code>pip install pynacl && curl -fsSL https://raw.githubusercontent.com/rhagent69/rhwallet-rhagent/main/scripts/generate_rh_keypair.py | python3</code>
       <p class="note">Or clone the repo and run <code style="display:inline;padding:2px 6px">python3 scripts/generate_rh_keypair.py</code></p></div></div>
     <div class="step"><span class="num">2</span><div><p>Register the <b>public key</b> in Robinhood crypto API settings (web).</p></div></div>
     <div class="step"><span class="num">3</span><div><p>Bankr → <b>Settings → Env Vars</b> → add:</p>
@@ -94,7 +94,7 @@ def _setup_html() -> str:
     earnings calendar, index values, option chains, custom scans, watchlists, buy/sell stocks &amp; options.
     Market research tools don't read your portfolio; buying power and positions do.</p>
     <p class="note">Full capability guide:
-    <a href="https://github.com/anondevv69/RH-Wallet/blob/main/skill/references/AGENTIC-CAPABILITIES.md">AGENTIC-CAPABILITIES.md</a>
+    <a href="https://github.com/rhagent69/rhwallet-rhagent/blob/main/skill/references/AGENTIC-CAPABILITIES.md">AGENTIC-CAPABILITIES.md</a>
     · MCP proxy: <code style="display:inline;padding:2px 6px">https://rh-wallet-production.up.railway.app/v1/agentic/mcp</code>
     · Header: <code style="display:inline;padding:2px 6px">Authorization: Bearer {{{{AGENTIC_TOKEN}}}}</code></p>
   </div>
@@ -103,7 +103,7 @@ def _setup_html() -> str:
     <h2>After setup</h2>
     <p style="color:#a1a1aa;font-size:14px;margin:0">Use Bankr only — X, terminal, phone. Computer can be off. Re-run Part C when token expires (~9 days).</p>
     <p class="note" style="margin-top:12px"><b>Zero custody:</b> we never store your Robinhood tokens or API keys on Railway or anywhere on our side. Secrets stay in your Bankr vault; the gateway only forwards requests.
-    <a href="https://github.com/anondevv69/RH-Wallet">GitHub</a></p>
+    <a href="https://github.com/rhagent69/rhwallet-rhagent">GitHub</a></p>
   </div>
 </div>
 <script>

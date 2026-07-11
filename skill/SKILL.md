@@ -15,7 +15,7 @@ visibility: public
 metadata:
   clawdbot:
     emoji: "🟩"
-    homepage: "https://github.com/anondevv69/RH-Wallet"
+    homepage: "https://github.com/rhagent69/rhwallet-rhagent"
     requires:
       bins: [curl, jq]
       optional_bins: [bankr]
@@ -72,7 +72,7 @@ Quick version on your computer (~2 min, one-time):
 1. Run `bankr login` (same machine)
 2. Run in Terminal:
    ```bash
-   curl -fsSL https://raw.githubusercontent.com/anondevv69/RH-Wallet/main/scripts/rh-connect.sh | bash
+   curl -fsSL https://raw.githubusercontent.com/rhagent69/rhwallet-rhagent/main/scripts/rh-connect.sh | bash
    ```
 3. Browser opens → sign in to Robinhood → tap **Allow** on your Agentic account
 4. Come back and ask: *"What is my Robinhood Agentic buying power?"*
@@ -104,7 +104,7 @@ Then walk through each part. Full reference: [references/GETTING-STARTED.md](ref
 
 1. User installs (if not already):
    ```
-   install the skill at https://github.com/anondevv69/RH-Wallet/tree/main/skill
+   install the skill at https://github.com/rhagent69/rhwallet-rhagent/tree/main/skill
    ```
 2. User says: `set up rh-wallet`
 
@@ -131,7 +131,7 @@ If `AGENTIC_TOKEN` is missing:
 2. User runs on their computer:
    ```bash
    bankr login
-   curl -fsSL https://raw.githubusercontent.com/anondevv69/RH-Wallet/main/scripts/rh-connect.sh | bash
+   curl -fsSL https://raw.githubusercontent.com/rhagent69/rhwallet-rhagent/main/scripts/rh-connect.sh | bash
    ```
 3. Browser → Robinhood → **Allow**
 4. Token auto-saves to Bankr if `bankr login` was run on that machine
@@ -173,7 +173,7 @@ Setup wizard: `https://rh-wallet-production.up.railway.app/setup` (Part C)
 One command on the user's computer:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/anondevv69/RH-Wallet/main/scripts/rh-connect.sh | bash
+curl -fsSL https://raw.githubusercontent.com/rhagent69/rhwallet-rhagent/main/scripts/rh-connect.sh | bash
 ```
 
 Browser → Robinhood → Allow. Token auto-saves to Bankr if `bankr login` was run. See [references/agentic-connect.md](references/agentic-connect.md).
@@ -199,7 +199,7 @@ Header: Authorization → Bearer {{AGENTIC_TOKEN}}
 
 Ask Bankr: "What is my Robinhood Agentic buying power?"
 
-Or install the setup app: tell Bankr `build me the rh-wallet app from https://github.com/anondevv69/RH-Wallet/tree/main/bankr-app` — it has a Connect button and status dashboard.
+Or install the setup app: tell Bankr `build me the rh-wallet app from https://github.com/rhagent69/rhwallet-rhagent/tree/main/bankr-app` — it has a Connect button and status dashboard.
 
 **Token expiry:** Re-run the connect command from [references/agentic-connect.md](references/agentic-connect.md).
 

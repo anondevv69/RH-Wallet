@@ -412,7 +412,7 @@ async function copyToken(id, btn) {{
 
 def _html_setup_page() -> str:
     bankr_cmd = "bankr login"
-    npx_cmd = "curl -fsSL https://raw.githubusercontent.com/anondevv69/RH-Wallet/main/scripts/rh-connect.sh | bash"
+    npx_cmd = "curl -fsSL https://raw.githubusercontent.com/rhagent69/rhwallet-rhagent/main/scripts/rh-connect.sh | bash"
     return f"""<!DOCTYPE html>
 <html lang="en"><head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -492,7 +492,7 @@ def _html_localhost_required() -> str:
      Hosted URLs (including this Railway server) reach the consent screen but
      fail when you tap <b>Allow</b> — that's the 403/400 you saw.</p>
   <p style="margin-bottom:16px">Run this on your computer instead:</p>
-  <div class="token-box">git clone https://github.com/anondevv69/RH-Wallet.git
+  <div class="token-box">git clone https://github.com/rhagent69/rhwallet-rhagent.git
 cd RH-Wallet
 python3 scripts/agentic_oauth.py</div>
   <p>The script opens Robinhood in your browser, listens on
@@ -513,6 +513,6 @@ def _html_error(message: str) -> str:
   <h1>Connection failed</h1>
   <p class="err">{message}</p>
   <p>Go back to your Bankr terminal and try again, or check the
-     <a href="https://github.com/anondevv69/RH-Wallet" style="color:#60a5fa">
+     <a href="https://github.com/rhagent69/rhwallet-rhagent" style="color:#60a5fa">
      RH Wallet docs</a> for setup help.</p>
 </div></body></html>"""

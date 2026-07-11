@@ -2,13 +2,15 @@
 
 Robinhood **Crypto** + **Agentic** (stocks/options) for [Bankr](https://docs.bankr.bot/skills/overview).
 
+**Public repo (skill install + scripts):** [github.com/rhagent69/rhwallet-rhagent](https://github.com/rhagent69/rhwallet-rhagent)
+
 **→ Setup wizard: https://rh-wallet-production.up.railway.app/setup**
 
 ## Bankr users — quick start
 
 1. **Install skill** (Bankr chat):
    ```
-   install the skill at https://github.com/anondevv69/RH-Wallet/tree/main/skill
+   install the skill at https://github.com/rhagent69/rhwallet-rhagent/tree/main/skill
    set up rh-wallet
    ```
 
@@ -17,7 +19,7 @@ Robinhood **Crypto** + **Agentic** (stocks/options) for [Bankr](https://docs.ban
 3. **Agentic** (stocks/options): one local command (~2 min):
    ```bash
    bankr login
-   curl -fsSL https://raw.githubusercontent.com/anondevv69/RH-Wallet/main/scripts/rh-connect.sh | bash
+   curl -fsSL https://raw.githubusercontent.com/rhagent69/rhwallet-rhagent/main/scripts/rh-connect.sh | bash
    ```
 
 4. **Ask Bankr:** *"What is my Robinhood Agentic buying power?"*
@@ -98,7 +100,7 @@ curl http://localhost:8080/health
 In Bankr (or any skills-compatible agent):
 
 ```text
-install the skill at https://github.com/anondevv69/RH-Wallet/tree/main/skill
+install the skill at https://github.com/rhagent69/rhwallet-rhagent/tree/main/skill
 ```
 
 Set Bankr Env Vars (gear → Env Vars):
