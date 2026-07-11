@@ -135,6 +135,54 @@
           "description": "Order object or list of orders from Robinhood"
         }
       }
+    },
+    "rh-buy": {
+      "description": "Bundled Robinhood Crypto buy/sell flow: fetch prices, check account buying power, then place the order — one payment instead of three separate calls.",
+      "price": "0.50",
+      "methods": ["POST"],
+      "category": "crypto",
+      "tags": ["robinhood", "crypto", "buy", "sell", "trade", "bundle"],
+      "schema": {
+        "input": {
+          "type": "object",
+          "properties": {
+            "rh_api_key": {
+              "type": "string",
+              "description": "Your Robinhood API key (rh-api-...)"
+            },
+            "rh_private_key_b64": {
+              "type": "string",
+              "description": "Your Robinhood Ed25519 private key, base64-encoded"
+            },
+            "symbol": {
+              "type": "string",
+              "description": "Trading pair, e.g. DOGE-USD, BTC-USD"
+            },
+            "side": {
+              "type": "string",
+              "description": "buy or sell",
+              "enum": ["buy", "sell"]
+            },
+            "quote_amount": {
+              "type": "string",
+              "description": "USD amount to spend/receive (use this OR asset_quantity)"
+            },
+            "asset_quantity": {
+              "type": "string",
+              "description": "Asset units to buy/sell (use this OR quote_amount)"
+            },
+            "confirm": {
+              "type": "boolean",
+              "description": "Must be true — places a real order after prices + account check"
+            }
+          },
+          "required": ["rh_api_key", "rh_private_key_b64", "symbol", "side", "confirm"]
+        },
+        "output": {
+          "type": "object",
+          "description": "Combined response with prices, account, and order objects"
+        }
+      }
     }
   }
 }
