@@ -1,9 +1,9 @@
 {
   "name": "rh-wallet",
-  "displayName": "Robinhood Crypto Wallet",
-  "description": "Robinhood Crypto via hosted gateway (free) or x402 paid API — keys in Bankr env.",
+  "displayName": "Robinhood Wallet (Crypto + Agentic)",
+  "description": "Robinhood Crypto via gateway/x402 (RH_API_KEY in env). Stocks/options via Agentic MCP OAuth. Never post account numbers on X.",
   "emoji": "🟩",
-  "tags": ["robinhood", "crypto", "trading", "wallet", "x402"],
+  "tags": ["robinhood", "crypto", "trading", "wallet", "x402", "agentic", "stocks", "options"],
   "homepage": "https://github.com/anondevv69/RH-Wallet",
   "gatewayUrl": "https://rh-wallet-production.up.railway.app",
   "gatewaySecret": "uniqueissomethingimtesting",
