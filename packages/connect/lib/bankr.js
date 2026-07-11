@@ -21,19 +21,23 @@ function loadBankrApiKey(explicit) {
   return null;
 }
 
-async function setEnvVar(apiKey, key, value) {
+async function setEnvVars(apiKey, vars) {
   const res = await fetch(`${BANKR_API_URL}/agent/env`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       "X-API-Key": apiKey,
     },
-    body: JSON.stringify({ key, value }),
+    body: JSON.stringify({ vars }),
   });
   const text = await res.text();
   if (!res.ok) {
-    throw new Error(`Failed to set ${key} in Bankr (${res.status}): ${text}`);
+    throw new Error(`Failed to set env in Bankr (${res.status}): ${text}`);
   }
+}
+
+async function setEnvVar(apiKey, key, value) {
+  return setEnvVars(apiKey, { [key]: value });
 }
 
 async function listEnvKeys(apiKey) {
@@ -68,10 +72,11 @@ async function setupMcpViaAgent(apiKey) {
 }
 
 async function saveToBankr({ accessToken, refreshToken, apiKey, setupMcp }) {
-  await setEnvVar(apiKey, "AGENTIC_TOKEN", accessToken);
+  const vars = { AGENTIC_TOKEN: accessToken };
   if (refreshToken) {
-    await setEnvVar(apiKey, "AGENTIC_REFRESH_TOKEN", refreshToken);
+    vars.AGENTIC_REFRESH_TOKEN = refreshToken;
   }
+  await setEnvVars(apiKey, vars);
   let mcpJob = null;
   if (setupMcp) {
     try {
