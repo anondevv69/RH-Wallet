@@ -1,15 +1,15 @@
 ---
 name: rh-wallet
 description: >
-  Manage a Robinhood Crypto wallet through the RH Wallet Gateway — check
-  balances/holdings, query bid/ask and estimated prices, place market buy/sell
+  Manage a Robinhood Crypto wallet through the RH Wallet Gateway or paid x402
+  API — check balances/holdings, query bid/ask prices, place market buy/sell
   orders, list and cancel orders. Use when the user mentions Robinhood, RH
-  wallet, RH crypto, buy/sell on Robinhood, Robinhood holdings, BTC-USD on
-  Robinhood, or similar. This is separate from Bankr's onchain wallet: always
-  say "Robinhood Crypto (US)" when acting. Requires RH_API_KEY and
-  RH_PRIVATE_KEY_BASE64 in Bankr Agent tool environment. Uses hosted gateway
-  https://rh-wallet-production.up.railway.app and public gateway secret from
-  references/hosted-config.md unless overridden.
+  wallet, RH crypto, buy/sell on Robinhood, Robinhood holdings, Robinhood
+  balance, BTC-USD on Robinhood, "get prices from Robinhood", or similar.
+  Route natural-language requests to x402 endpoints (rh-prices, rh-account,
+  rh-buy, rh-order) via bankr x402 call when Bankr CLI is available; fall back
+  to the free hosted gateway. Requires RH_API_KEY and RH_PRIVATE_KEY_BASE64 in
+  Bankr Agent tool environment. x402 calls also require USDC on Base.
 tags: [robinhood, crypto, trading, wallet, bankr, usd]
 visibility: public
 metadata:
@@ -18,6 +18,7 @@ metadata:
     homepage: "https://github.com/anondevv69/RH-Wallet"
     requires:
       bins: [curl, jq]
+      optional_bins: [bankr]
 ---
 
 # Robinhood Crypto Wallet (via RH Wallet Gateway)
@@ -29,7 +30,8 @@ Trade and inspect a **Robinhood Crypto** account through a **stateless RH Wallet
 For setup see [references/setup.md](references/setup.md).  
 Hosted URL + public gateway secret: [references/hosted-config.md](references/hosted-config.md).  
 For safety see [references/trading-safety.md](references/trading-safety.md).  
-For endpoints see [references/api-reference.md](references/api-reference.md).
+For endpoints see [references/api-reference.md](references/api-reference.md).  
+For paid x402 API + natural-language routing see [references/x402.md](references/x402.md).
 
 ## Prerequisites — Bankr Agent tool environment
 
@@ -56,8 +58,22 @@ If `RH_API_KEY` or `RH_PRIVATE_KEY_BASE64` is missing, walk the user through [re
 6. **Never share account identifiers publicly.** Do **not** include Robinhood `account_number`, full order payloads, or raw API JSON in replies — especially on **X/Twitter**, group chats, or any public channel. Say only: status, buying power, holdings (asset + quantity), prices, and order side/symbol/size. If the user asks for their account number, refuse for public contexts; in private DMs you may summarize without posting the full numeric ID if possible.
 7. **Respect max size.** Gateway rejects orders above `MAX_ORDER_USD` (default $50).
 8. **Symbols** are uppercase pairs like `BTC-USD`.
+9. **Natural language → x402.** When the user asks for Robinhood prices, balance, holdings, buy, or sell, use the intent table in [references/x402.md](references/x402.md) and call the matching endpoint with `bankr x402 call --yes`. Inject `RH_API_KEY` and `RH_PRIVATE_KEY_BASE64` from env into the JSON body — never paste keys into chat. Prefer **rh-buy** ($0.50) for buy/sell (prices + account + order in one call). If x402 is unavailable or the user wants no fee, use the free `rh()` gateway below instead.
+10. **Confirm trades on x402.** For `rh-buy` / `rh-order`, set `"confirm": true` only after the user clearly agrees to the size and symbol.
 
-## Base curl helper
+## Natural language examples (agent routing)
+
+| User says | Do this |
+|-----------|---------|
+| "What's my Robinhood balance?" | x402 `rh-account` with `view: "account"` |
+| "What crypto do I hold on Robinhood?" | x402 `rh-account` with `view: "holdings"` |
+| "Get BTC and DOGE prices from Robinhood" | x402 `rh-prices` with `symbol: "BTC-USD,DOGE-USD"` |
+| "Buy $1 of DOGE on Robinhood" | x402 `rh-buy` — confirm first, then `confirm: true` |
+| "Sell my DOGE on Robinhood" | x402 `rh-buy` with `side: "sell"` — confirm quantity first |
+
+Full command templates: [references/x402.md](references/x402.md).
+
+## Base curl helper (free gateway)
 
 ```bash
 # Hosted gateway (default) — see references/hosted-config.md
