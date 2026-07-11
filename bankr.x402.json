@@ -4,7 +4,7 @@
   "services": {
     "rh-prices": {
       "description": "Real-time Robinhood Crypto best bid/ask prices. Pass symbol=BTC-USD,ETH-USD as a query param. Requires x-rh-api-key and x-rh-private-key-b64 headers.",
-      "price": "0.001",
+      "price": "1",
       "methods": ["GET"],
       "category": "crypto",
       "tags": ["robinhood", "crypto", "prices", "market-data"],
@@ -31,7 +31,7 @@
     },
     "rh-account": {
       "description": "Robinhood Crypto account summary or holdings. POST {view: 'account'|'holdings', asset_codes: ['BTC']}. Requires x-rh-api-key and x-rh-private-key-b64 headers.",
-      "price": "0.002",
+      "price": "1",
       "methods": ["POST"],
       "category": "crypto",
       "tags": ["robinhood", "crypto", "account", "portfolio", "holdings"],
@@ -60,7 +60,7 @@
     },
     "rh-order": {
       "description": "Place, list, or cancel Robinhood Crypto orders. POST {action: 'place'|'list'|'cancel', ...}. Requires x-rh-api-key and x-rh-private-key-b64 headers.",
-      "price": "0.01",
+      "price": "1",
       "methods": ["POST"],
       "category": "crypto",
       "tags": ["robinhood", "crypto", "order", "trade", "buy", "sell"],

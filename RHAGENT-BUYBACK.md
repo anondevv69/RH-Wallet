@@ -65,6 +65,6 @@ At that point callers pay RHAGENT directly — no buyback step needed.
 
 | Endpoint | Price/req | Notes |
 |----------|-----------|-------|
-| rh-prices | $0.001 USDC | Read-only, cheapest |
-| rh-account | $0.002 USDC | Account/holdings read |
-| rh-order | $0.01 USDC | Order placement, highest value |
+| rh-prices | $1.00 USDC | Real-time prices |
+| rh-account | $1.00 USDC | Account/holdings read |
+| rh-order | $1.00 USDC | Order placement |
