@@ -10,7 +10,7 @@ Revenue from the x402 endpoints settles as **USDC on Base** into your Bankr wall
 | Contract | `0x894fac757250f8e02180e1856957274d84ac4ba3` |
 | Chain | Robinhood Chain (chain ID `4663`) |
 | Decimals | 18 |
-| Bankr wallet (pays to) | `0x71df689ce7e4446547f30dc2522af73a1b50ff6b` |
+| Bankr wallet (pays to) | `0x374d91a5674fa7cf86e725093b5848b97e1e13b4` |
 
 ## Current architecture
 
