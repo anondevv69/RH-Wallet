@@ -11,7 +11,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app import __version__
 from app.config import get_settings
 from app.database import init_db
-from app.routes import account, connect, market, orders
+from app.routes import account, agentic, connect, market, orders
 
 logger = logging.getLogger(__name__)
 
@@ -54,6 +54,7 @@ app.include_router(connect.router)
 app.include_router(account.router)
 app.include_router(market.router)
 app.include_router(orders.router)
+app.include_router(agentic.router)
 
 
 @app.get("/health")
