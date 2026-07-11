@@ -17,15 +17,24 @@ function json(data: unknown, status = 200) {
 export default async function handler(req: Request) {
   try {
     const url = new URL(req.url);
-    const symbol = url.searchParams.get("symbol") ?? "";
+
+    // Parse body if POST
+    const body = req.method === "POST" ? await req.json().catch(() => ({})) : {};
+
+    const symbol =
+      url.searchParams.get("symbol") ??
+      body.symbol ??
+      "";
 
     const rhApiKey =
       req.headers.get("x-rh-api-key") ??
       url.searchParams.get("rh_api_key") ??
+      body.rh_api_key ??
       "";
     const rhPrivKey =
       req.headers.get("x-rh-private-key-b64") ??
       url.searchParams.get("rh_private_key_b64") ??
+      body.rh_private_key_b64 ??
       "";
 
     if (!rhApiKey || !rhPrivKey) {
@@ -51,14 +60,14 @@ export default async function handler(req: Request) {
     });
 
     const text = await res.text();
-    let body: unknown;
+    let parsed: unknown;
     try {
-      body = JSON.parse(text);
+      parsed = JSON.parse(text);
     } catch {
       return json({ error: "Gateway returned non-JSON", status: res.status, raw: text.slice(0, 200) }, 502);
     }
 
-    return json(body, res.ok ? 200 : res.status);
+    return json(parsed, res.ok ? 200 : res.status);
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err);
     return json({ error: "Handler error", detail: msg }, 500);
