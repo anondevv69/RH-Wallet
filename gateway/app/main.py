@@ -11,7 +11,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app import __version__
 from app.config import get_settings
 from app.database import init_db
-from app.routes import account, agentic, connect, market, orders
+from app.routes import account, agentic, connect, market, orders, setup
 
 logger = logging.getLogger(__name__)
 
@@ -50,6 +50,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(setup.router)
 app.include_router(connect.router)
 app.include_router(account.router)
 app.include_router(market.router)
