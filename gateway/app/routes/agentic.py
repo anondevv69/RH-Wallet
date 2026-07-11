@@ -182,41 +182,10 @@ async def _get_client_credentials(callback_url: str) -> tuple[str, Optional[str]
 # Routes
 # ---------------------------------------------------------------------------
 
-@router.get("/agentic/auth", response_class=RedirectResponse)
+@router.get("/agentic/auth", response_class=HTMLResponse)
 async def agentic_auth_start(request: Request):
-    """Start Robinhood Agentic OAuth PKCE flow. Redirects to Robinhood login."""
-    callback = _callback_url(request)
-    verifier, challenge = _pkce_pair()
-    state = _encode_state(verifier)
-
-    try:
-        client_id, _ = await _get_client_credentials(callback)
-        meta = await _oauth_metadata()
-    except HTTPException:
-        raise
-    except Exception as exc:
-        raise HTTPException(status_code=503, detail=str(exc)) from exc
-
-    auth_endpoint = meta.get("authorization_endpoint")
-    if not auth_endpoint:
-        raise HTTPException(
-            status_code=503,
-            detail="Could not discover Robinhood OAuth authorization endpoint.",
-        )
-
-    params = {
-        "client_id": client_id,
-        "redirect_uri": callback,
-        "response_type": "code",
-        "code_challenge": challenge,
-        "code_challenge_method": "S256",
-        "state": state,
-        "scope": "trading",
-    }
-    from urllib.parse import urlencode
-    auth_url = f"{auth_endpoint}?{urlencode(params)}"
-    logger.info("Redirecting to Robinhood OAuth: %s", auth_endpoint)
-    return RedirectResponse(url=auth_url)
+    """Explain Robinhood localhost OAuth requirement — hosted callbacks fail on Allow."""
+    return _html_localhost_required()
 
 
 @router.get("/agentic/callback", response_class=HTMLResponse)
@@ -403,6 +372,29 @@ async function copyToken(id, btn) {{
 }}
 </script>
 </body></html>"""
+
+
+def _html_localhost_required() -> str:
+    return f"""<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8">
+<title>Robinhood Agentic — Local OAuth Required</title>
+<style>{_PAGE_STYLE}</style></head>
+<body><div class="card">
+  <h1>Local OAuth required</h1>
+  <p>Robinhood only completes Agentic OAuth with a <b>localhost</b> callback.
+     Hosted URLs (including this Railway server) reach the consent screen but
+     fail when you tap <b>Allow</b> — that's the 403/400 you saw.</p>
+  <p style="margin-bottom:16px">Run this on your computer instead:</p>
+  <div class="token-box">git clone https://github.com/anondevv69/RH-Wallet.git
+cd RH-Wallet
+python3 scripts/agentic_oauth.py</div>
+  <p>The script opens Robinhood in your browser, listens on
+     <code>127.0.0.1:9876</code>, and prints your token. Paste it into Bankr
+     as <code>AGENTIC_TOKEN</code>. We never store it.</p>
+  <p>Then add MCP server:</p>
+  <div class="token-box">URL: https://rh-wallet-production.up.railway.app/v1/agentic/mcp
+Header: Authorization → Bearer {{{{AGENTIC_TOKEN}}}}</div>
+</div></body></html>"""
 
 
 def _html_error(message: str) -> str:

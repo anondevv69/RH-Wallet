@@ -166,7 +166,7 @@
         <div id="agentic-error" class="error-msg" style="display:none"></div>
         <div class="btn-row">
           <button class="btn btn-green" id="connect-agentic-btn" onclick="connectAgentic()">
-            Connect Robinhood →
+            Run OAuth Script →
           </button>
         </div>
       </div>
@@ -178,13 +178,13 @@
       <ol class="steps">
         <li>
           <span class="step-num">1</span>
-          <span>Click <b>Connect Robinhood →</b> above. A Robinhood login page opens
-            in your browser.</span>
+          <span>On your computer, run the local OAuth script (Robinhood requires localhost):<br>
+            <code>git clone https://github.com/anondevv69/RH-Wallet.git && cd RH-Wallet && python3 scripts/agentic_oauth.py</code><br>
+            Or click <b>Run OAuth Script</b> below for copy-paste instructions.</span>
         </li>
         <li>
           <span class="step-num">2</span>
-          <span>Sign in with your Robinhood account and select your
-            <b>Agentic account</b> when prompted.</span>
+          <span>Sign in with Robinhood and tap <b>Allow</b> — this works with localhost only.</span>
         </li>
         <li>
           <span class="step-num">3</span>
@@ -312,11 +312,11 @@
     }
 
     async function connectAgentic() {
-      if (_oauthUrl) {
-        await bankr.openExternal(_oauthUrl);
-      } else {
-        await bankr.openExternal('https://rh-wallet-production.up.railway.app/agentic/auth');
-      }
+      const cmd = 'git clone https://github.com/anondevv69/RH-Wallet.git && cd RH-Wallet && python3 scripts/agentic_oauth.py';
+      await bankr.copy(cmd);
+      await bankr.prefillChat(
+        'Help me connect Robinhood Agentic. I need to run the local OAuth script: python3 scripts/agentic_oauth.py from the RH-Wallet repo, then paste AGENTIC_TOKEN into Bankr env and add the MCP proxy server.'
+      );
     }
 
     async function cryptoSetup() {
