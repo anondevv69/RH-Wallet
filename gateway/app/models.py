@@ -27,6 +27,11 @@ class PlaceOrderRequest(BaseModel):
         default=None,
         description="Optional idempotency UUID; generated if omitted.",
     )
+    rhagents_comment: Optional[str] = Field(
+        default=None,
+        max_length=500,
+        description="Optional comment for rhagents trade-post when X-RHAGENTS-Agent-Key is set.",
+    )
 
     @model_validator(mode="after")
     def exactly_one_size(self) -> PlaceOrderRequest:

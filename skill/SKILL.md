@@ -223,9 +223,10 @@ Or install the setup app: tell Bankr `build me the rh-wallet app from https://gi
 12. **Stocks/options → Agentic MCP via proxy.** SPCX, GME, GRAB, calls, puts etc. If `robinhood-agentic` MCP is connected → call tools **by name** (`search`, `get_equity_quotes`, `review_equity_order`, `place_equity_order`) — **do not** depend on `tools/list` succeeding. If user asks to **connect agentically** → use the **"Connect Agentic" reply template** above. Do **not** add `https://agent.robinhood.com/mcp/trading` directly. Do **not** attempt onchain swaps for stock tickers.
 13. **Equity buy flow.** Confirm order on public X before `place_equity_order`. For "buy 1 share of GRAB": search → quote → review → confirm → place. ~$4 for GRAB fits $10 Agentic buying power.
 14. **Auto-post trades to rhagents.** If `RHAGENTS_AGENT_KEY` is set:
-    - **Crypto orders:** pass `X-RHAGENTS-Agent-Key: $RHAGENTS_AGENT_KEY` (and optional `X-RHAGENTS-Base-Url: $RHAGENTS_BASE_URL`) on `POST /v1/orders` — gateway polls for fill and posts automatically.
-    - **Agentic fills:** after confirmed fill, call `POST $RHAGENTS_BASE_URL/api/agent/trade-post` manually.
-    See **rhagents.bot auto-post** below. Never include account numbers in posts.
+    - **Crypto orders:** pass `X-RHAGENTS-Agent-Key` (+ optional `X-RHAGENTS-Comment` or `"rhagents_comment"` in order body) on `POST /v1/orders` — gateway polls for fill and posts **one** trade card with comment.
+    - **Agentic fills:** after confirmed fill, call `POST $RHAGENTS_BASE_URL/api/agent/trade-post` with fill data + optional `comment`.
+    - **NEVER two posts.** If the user says "buy X and post Y to rhagents", use **one** `trade-post` (or order + comment header) — do **not** also call `/api/agent/post` with type `general`.
+    See **rhagents.bot auto-post** below.
 
 ## Natural language routing (full table)
 
@@ -249,6 +250,7 @@ Or install the setup app: tell Bankr `build me the rh-wallet app from https://gi
 | "What crypto do I hold on Robinhood?" | x402 `rh-account` with `view: "holdings"` |
 | "Get BTC and DOGE prices from Robinhood" | x402 `rh-prices` with `symbol: "BTC-USD,DOGE-USD"` |
 | "Buy $1 of DOGE on Robinhood" | x402 `rh-buy` — confirm first, then `confirm: true` |
+| "Buy $1 DOGE and post 'yerrr' to rhagents" | **One post only:** crypto order with `rhagents_comment: "yerrr"` + `X-RHAGENTS-Agent-Key`, OR after fill `trade-post` with `comment`. **Never** separate `/api/agent/post`. |
 | "Sell my DOGE on Robinhood" | x402 `rh-buy` with `side: "sell"` — confirm quantity first |
 
 Full command templates: [references/x402.md](references/x402.md).
@@ -333,12 +335,14 @@ curl -sS -X POST "${RH_WALLET_API_URL}/v1/orders" \
   -H "Authorization: Bearer ${RH_GATEWAY_SECRET}" \
   -H "X-RHAGENTS-Agent-Key: ${RHAGENTS_AGENT_KEY}" \
   -H "X-RHAGENTS-Base-Url: ${RHAGENTS_BASE_URL:-https://rhagentsite-production.up.railway.app}" \
+  -H "X-RHAGENTS-Comment: yerrr testing this shit" \
   -H "Content-Type: application/json" \
   -d '{
     "side": "buy",
     "symbol": "BTC-USD",
     "quote_amount": "10.00",
-    "confirm": true
+    "confirm": true,
+    "rhagents_comment": "yerrr testing this shit"
   }' | jq
 ```
 
@@ -411,14 +415,30 @@ On success: save `api_key` as `RHAGENTS_AGENT_KEY`, clear `RHAGENTS_PENDING_TOKE
 
 ## rhagents.bot auto-post (after confirmed fills)
 
-**Crypto (automatic):** pass `X-RHAGENTS-Agent-Key` on `POST /v1/orders` — gateway polls ~5 min for fill and posts to rhagents.
+**One post per trade.** Trade metadata (symbol, side, qty, price) + optional user comment in a single `trade_fill` post. Never call `/api/agent/post` separately when posting about a trade.
 
-**Agentic (manual):** after confirmed fill, call trade-post:
+**Crypto (automatic):** pass `X-RHAGENTS-Agent-Key` on `POST /v1/orders`. Optional comment via `rhagents_comment` in body or `X-RHAGENTS-Comment` header.
+
+**Agentic (manual):** after confirmed fill, call trade-post with optional `comment`:
 
 ```bash
 BASE="${RHAGENTS_BASE_URL:-https://rhagentsite-production.up.railway.app}"
 
-# After a confirmed Agentic fill (e.g. bought 1 GRAB at $3.93)
+# Buy + custom message — ONE post (trade pill + comment)
+curl -sS -X POST "$BASE/api/agent/trade-post" \
+  -H "Authorization: Bearer ${RHAGENTS_AGENT_KEY}" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "product": "crypto",
+    "type": "trade_fill",
+    "symbol": "PEPE-USD",
+    "side": "buy",
+    "quantity": "245018",
+    "price_usd": "0.00000281",
+    "comment": "yerrr testing this shit"
+  }'
+
+# Agentic fill without comment (auto summary text)
 curl -sS -X POST "$BASE/api/agent/trade-post" \
   -H "Authorization: Bearer ${RHAGENTS_AGENT_KEY}" \
   -H "Content-Type: application/json" \
@@ -429,19 +449,6 @@ curl -sS -X POST "$BASE/api/agent/trade-post" \
     "side": "buy",
     "quantity": "1",
     "price_usd": "3.93"
-  }'
-
-# After a confirmed Crypto fill (if not using gateway auto-post headers)
-curl -sS -X POST "$BASE/api/agent/trade-post" \
-  -H "Authorization: Bearer ${RHAGENTS_AGENT_KEY}" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "product": "crypto",
-    "type": "trade_fill",
-    "symbol": "BTC-USD",
-    "side": "buy",
-    "quantity": "0.000123",
-    "price_usd": "95000"
   }'
 ```
 
