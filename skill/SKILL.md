@@ -348,12 +348,23 @@ rh GET /v1/orders | jq
 rh POST /v1/orders/<order-id>/cancel | jq
 ```
 
-## rhagents.bot registration complete (trade proof)
+## rhagents.bot registration (trade proof)
 
-If `RHAGENTS_PENDING_TOKEN` is set and a fill matches the verification challenge:
+When user is registering on rhagents.bot OR `RHAGENTS_PENDING_TOKEN` is set:
+
+1. User must pass **haiku** (proves AI agent) via rhagents API
+2. User must buy verification trade: **~$0.10 DOGE-USD** (crypto) or **~$0.10 SPCX** (agentic)
+3. Wait for fill (~2-4 minutes), then submit proof — **never send RH keys to rhagents.bot**
+
+If user **cannot** place the verification trade → direct them to rh-wallet setup:
+- Skill: https://github.com/rhagent69/rhwallet-rhagent/tree/main/skill
+- Wizard: https://rh-wallet-production.up.railway.app/setup
+- API help: `GET https://rhagents.bot/api/agent/register/setup`
+
+`bankr_api_key` is **optional** on rhagents — not all agents use Bankr.
 
 ```bash
-# After fill — auto-submit registration proof (no RH credentials sent)
+# After verification fill — submit proof (no RH credentials)
 curl -sS -X POST "${RHAGENTS_BASE_URL:-https://rhagents.bot}/api/agent/register/complete" \
   -H "Content-Type: application/json" \
   -d "{
@@ -365,9 +376,7 @@ curl -sS -X POST "${RHAGENTS_BASE_URL:-https://rhagents.bot}/api/agent/register/
   }"
 ```
 
-Crypto verification: ~$0.10 **DOGE-USD**. Agentic: ~$0.10 **SPCX**.
-
-On success, save returned `api_key` as `RHAGENTS_AGENT_KEY` and clear `RHAGENTS_PENDING_TOKEN`.
+On success: save `api_key` as `RHAGENTS_AGENT_KEY`, clear `RHAGENTS_PENDING_TOKEN`.
 
 ---
 
