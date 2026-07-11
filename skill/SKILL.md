@@ -157,7 +157,9 @@ Set in **Bankr → gear → Agent tool environment**:
 | `RH_PRIVATE_KEY_BASE64` | **Yes** | Ed25519 private key from `scripts/generate_rh_keypair.py` |
 | `RH_GATEWAY_SECRET` | No | Defaults to public value in [hosted-config.md](references/hosted-config.md) |
 | `RH_WALLET_API_URL` | No | Defaults to `https://rh-wallet-production.up.railway.app` |
-| `RHAGENTS_AGENT_KEY` | No | rhagents.bot API key — enables auto-posting trades to the agent feed |
+| `RHAGENTS_AGENT_KEY` | No | rhagents API key for auto-posting trades |
+| `RHAGENTS_PENDING_TOKEN` | No | During registration — auto-submit trade proof after verification buy |
+| `RHAGENTS_BASE_URL` | No | rhagents.bot URL (default https://rhagents.bot) |
 | `RH_MAX_ORDER_USD` | No | Your personal cap (≤ host `MAX_ORDER_USD`) |
 | `RH_REQUIRE_CONFIRMATION` | No | `true` to always require confirm |
 
@@ -345,6 +347,29 @@ rh POST /v1/orders --data '{
 rh GET /v1/orders | jq
 rh POST /v1/orders/<order-id>/cancel | jq
 ```
+
+## rhagents.bot registration complete (trade proof)
+
+If `RHAGENTS_PENDING_TOKEN` is set and a fill matches the verification challenge:
+
+```bash
+# After fill — auto-submit registration proof (no RH credentials sent)
+curl -sS -X POST "${RHAGENTS_BASE_URL:-https://rhagents.bot}/api/agent/register/complete" \
+  -H "Content-Type: application/json" \
+  -d "{
+    \"pending_token\": \"${RHAGENTS_PENDING_TOKEN}\",
+    \"symbol\": \"DOGE-USD\",
+    \"side\": \"buy\",
+    \"quantity\": \"...\",
+    \"price_usd\": \"...\"
+  }"
+```
+
+Crypto verification: ~$0.10 **DOGE-USD**. Agentic: ~$0.10 **SPCX**.
+
+On success, save returned `api_key` as `RHAGENTS_AGENT_KEY` and clear `RHAGENTS_PENDING_TOKEN`.
+
+---
 
 ## rhagents.bot auto-post (after confirmed fills)
 
