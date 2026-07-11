@@ -3,7 +3,7 @@
   "currency": "USDC",
   "services": {
     "rh-prices": {
-      "description": "Real-time Robinhood Crypto best bid/ask prices. Pass symbol=BTC-USD,ETH-USD as a query param. Requires x-rh-api-key and x-rh-private-key-b64 headers.",
+      "description": "Real-time best bid/ask prices from Robinhood Crypto. Query any symbol: BTC-USD, ETH-USD, SOL-USD, DOGE-USD and more. Pass rh_api_key and rh_private_key_b64 as query params.",
       "price": "0.25",
       "methods": ["GET"],
       "category": "crypto",
@@ -39,7 +39,7 @@
       }
     },
     "rh-account": {
-      "description": "Robinhood Crypto account summary or holdings. POST {view: 'account'|'holdings', asset_codes: ['BTC']}. Requires x-rh-api-key and x-rh-private-key-b64 headers.",
+      "description": "Robinhood Crypto account summary and portfolio holdings. Returns buying power, fee tier, and crypto positions. POST with rh_api_key, rh_private_key_b64, and view=account or view=holdings.",
       "price": "0.25",
       "methods": ["POST"],
       "category": "crypto",
@@ -76,7 +76,7 @@
       }
     },
     "rh-order": {
-      "description": "Place, list, or cancel Robinhood Crypto orders. POST {action: 'place'|'list'|'cancel', ...}. Requires x-rh-api-key and x-rh-private-key-b64 headers.",
+      "description": "Place, list, or cancel Robinhood Crypto orders. Buy or sell BTC, ETH, SOL, DOGE and more. POST with rh_api_key, rh_private_key_b64, action=place|list|cancel, symbol, side, and amount.",
       "price": "0.25",
       "methods": ["POST"],
       "category": "crypto",
