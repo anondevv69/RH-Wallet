@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 # RH Wallet Connect — one-command Robinhood Agentic OAuth for Bankr
-# Usage: curl -fsSL https://raw.githubusercontent.com/anondevv69/RH-Wallet/main/scripts/rh-connect.sh | bash
+# Usage: curl -fsSL https://raw.githubusercontent.com/rhagent69/rhwallet-rhagent/main/scripts/rh-connect.sh | bash
 
 set -euo pipefail
 
-REPO="${RH_WALLET_REPO:-https://github.com/anondevv69/RH-Wallet.git}"
+REPO="${RH_WALLET_REPO:-https://github.com/rhagent69/rhwallet-rhagent.git}"
 BRANCH="${RH_WALLET_BRANCH:-main}"
 
 if ! command -v node >/dev/null 2>&1; then

@@ -5,7 +5,7 @@ One-time setup for Bankr users. Robinhood requires OAuth on **your computer** (l
 ## One command
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/anondevv69/RH-Wallet/main/scripts/rh-connect.sh | bash
+curl -fsSL https://raw.githubusercontent.com/rhagent69/rhwallet-rhagent/main/scripts/rh-connect.sh | bash
 ```
 
 Requires **Node.js** and **git**. Run `bankr login` first so your token saves to Bankr automatically.
@@ -22,7 +22,7 @@ Setup wizard: https://rh-wallet-production.up.railway.app/setup
 ## Manual alternative
 
 ```bash
-git clone https://github.com/anondevv69/RH-Wallet.git
+git clone https://github.com/rhagent69/rhwallet-rhagent.git
 cd RH-Wallet/packages/connect
 node bin/cli.js
 ```

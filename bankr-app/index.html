@@ -199,7 +199,7 @@
           <span class="step-num">2</span>
           <div>
             <span>Copy and run in Terminal (copied when you click Connect):</span>
-            <div class="code-block">curl -fsSL https://raw.githubusercontent.com/anondevv69/RH-Wallet/main/scripts/rh-connect.sh | bash</div>
+            <div class="code-block">curl -fsSL https://raw.githubusercontent.com/rhagent69/rhwallet-rhagent/main/scripts/rh-connect.sh | bash</div>
           </div>
         </li>
         <li>
@@ -326,7 +326,7 @@
 
     async function connectAgentic() {
       const setupUrl = 'https://rh-wallet-production.up.railway.app/setup';
-      const cmd = 'curl -fsSL https://raw.githubusercontent.com/anondevv69/RH-Wallet/main/scripts/rh-connect.sh | bash';
+      const cmd = 'curl -fsSL https://raw.githubusercontent.com/rhagent69/rhwallet-rhagent/main/scripts/rh-connect.sh | bash';
       await bankr.copy(cmd);
       await bankr.openExternal(setupUrl);
     }

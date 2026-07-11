@@ -33,7 +33,7 @@ export default async function handler(req: Request): Promise<Response> {
         "Paid proxy for Robinhood Agentic MCP (stocks & options). " +
         "Requires agentic_token from https://rh-wallet-production.up.railway.app/agentic/setup",
       pricing: "Free: tools/list, initialize. Paid: all tool calls.",
-      setup: "https://github.com/anondevv69/RH-Wallet",
+      setup: "https://github.com/rhagent69/rhwallet-rhagent",
     });
   }
 

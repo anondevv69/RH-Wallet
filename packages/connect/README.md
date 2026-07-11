@@ -5,7 +5,7 @@ One-time Robinhood Agentic OAuth for Bankr users.
 ## Recommended — one command
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/anondevv69/RH-Wallet/main/scripts/rh-connect.sh | bash
+curl -fsSL https://raw.githubusercontent.com/rhagent69/rhwallet-rhagent/main/scripts/rh-connect.sh | bash
 ```
 
 Setup wizard: https://rh-wallet-production.up.railway.app/agentic/setup
@@ -13,7 +13,7 @@ Setup wizard: https://rh-wallet-production.up.railway.app/agentic/setup
 ## Manual
 
 ```bash
-git clone https://github.com/anondevv69/RH-Wallet.git
+git clone https://github.com/rhagent69/rhwallet-rhagent.git
 cd RH-Wallet/packages/connect
 node bin/cli.js
 ```

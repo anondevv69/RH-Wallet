@@ -7,7 +7,7 @@ Full guide: [GETTING-STARTED.md](GETTING-STARTED.md)
 ## 1. Install skill
 
 ```
-install the skill at https://github.com/anondevv69/RH-Wallet/tree/main/skill
+install the skill at https://github.com/rhagent69/rhwallet-rhagent/tree/main/skill
 set up rh-wallet
 ```
 

@@ -34,7 +34,7 @@ DISABLED_HTML = """<!DOCTYPE html>
     <li><code>RH_WALLET_API_URL</code> (this gateway URL)</li>
     <li><code>RH_GATEWAY_SECRET</code> (if the host enabled one)</li>
   </ul>
-  <p>See <a href="https://github.com/anondevv69/RH-Wallet">RH-Wallet docs</a>.</p>
+  <p>See <a href="https://github.com/rhagent69/rhwallet-rhagent">RH-Wallet docs</a>.</p>
 </body>
 </html>"""
 
