@@ -1,0 +1,115 @@
+{
+  "network": "base",
+  "currency": "USDC",
+  "services": {
+    "rh-prices": {
+      "description": "Real-time Robinhood Crypto best bid/ask prices. Pass symbol=BTC-USD,ETH-USD as a query param. Requires x-rh-api-key and x-rh-private-key-b64 headers.",
+      "price": "0.001",
+      "methods": ["GET"],
+      "category": "crypto",
+      "tags": ["robinhood", "crypto", "prices", "market-data"],
+      "schema": {
+        "input": {
+          "type": "object",
+          "properties": {
+            "symbol": {
+              "type": "string",
+              "description": "Comma-separated trading pairs (e.g. BTC-USD,ETH-USD). Leave empty for all pairs."
+            }
+          }
+        },
+        "output": {
+          "type": "object",
+          "properties": {
+            "results": {
+              "type": "array",
+              "description": "List of price objects with symbol, bid_inclusive_of_sell_spread, ask_inclusive_of_buy_spread, mark_price"
+            }
+          }
+        }
+      }
+    },
+    "rh-account": {
+      "description": "Robinhood Crypto account summary or holdings. POST {view: 'account'|'holdings', asset_codes: ['BTC']}. Requires x-rh-api-key and x-rh-private-key-b64 headers.",
+      "price": "0.002",
+      "methods": ["POST"],
+      "category": "crypto",
+      "tags": ["robinhood", "crypto", "account", "portfolio", "holdings"],
+      "schema": {
+        "input": {
+          "type": "object",
+          "properties": {
+            "view": {
+              "type": "string",
+              "description": "What to fetch: 'account' (buying power, account summary) or 'holdings' (crypto positions)",
+              "enum": ["account", "holdings"]
+            },
+            "asset_codes": {
+              "type": "array",
+              "items": { "type": "string" },
+              "description": "Optional asset filter for holdings view, e.g. ['BTC', 'ETH']"
+            }
+          },
+          "required": ["view"]
+        },
+        "output": {
+          "type": "object",
+          "description": "Account summary or holdings object from Robinhood"
+        }
+      }
+    },
+    "rh-order": {
+      "description": "Place, list, or cancel Robinhood Crypto orders. POST {action: 'place'|'list'|'cancel', ...}. Requires x-rh-api-key and x-rh-private-key-b64 headers.",
+      "price": "0.01",
+      "methods": ["POST"],
+      "category": "crypto",
+      "tags": ["robinhood", "crypto", "order", "trade", "buy", "sell"],
+      "schema": {
+        "input": {
+          "type": "object",
+          "properties": {
+            "action": {
+              "type": "string",
+              "description": "Operation to perform",
+              "enum": ["place", "list", "cancel"]
+            },
+            "symbol": {
+              "type": "string",
+              "description": "Trading pair for place/list, e.g. BTC-USD"
+            },
+            "side": {
+              "type": "string",
+              "description": "buy or sell (required for place)",
+              "enum": ["buy", "sell"]
+            },
+            "quote_amount": {
+              "type": "string",
+              "description": "USD amount to spend/receive (use this OR asset_quantity)"
+            },
+            "asset_quantity": {
+              "type": "string",
+              "description": "Asset units to buy/sell (use this OR quote_amount)"
+            },
+            "confirm": {
+              "type": "boolean",
+              "description": "Set true to confirm and place the order (gateway may require this)"
+            },
+            "order_id": {
+              "type": "string",
+              "description": "Order UUID for cancel action"
+            },
+            "state": {
+              "type": "string",
+              "description": "Filter by order state for list action (open, filled, canceled)"
+            }
+          },
+          "required": ["action"]
+        },
+        "output": {
+          "type": "object",
+          "description": "Order object or list of orders from Robinhood"
+        }
+      }
+    }
+  }
+}
