@@ -15,8 +15,17 @@
             "symbol": {
               "type": "string",
               "description": "Comma-separated trading pairs (e.g. BTC-USD,ETH-USD). Leave empty for all pairs."
+            },
+            "rh_api_key": {
+              "type": "string",
+              "description": "Your Robinhood API key (rh-api-...)"
+            },
+            "rh_private_key_b64": {
+              "type": "string",
+              "description": "Your Robinhood Ed25519 private key, base64-encoded"
             }
-          }
+          },
+          "required": ["rh_api_key", "rh_private_key_b64"]
         },
         "output": {
           "type": "object",
@@ -39,6 +48,14 @@
         "input": {
           "type": "object",
           "properties": {
+            "rh_api_key": {
+              "type": "string",
+              "description": "Your Robinhood API key (rh-api-...)"
+            },
+            "rh_private_key_b64": {
+              "type": "string",
+              "description": "Your Robinhood Ed25519 private key, base64-encoded"
+            },
             "view": {
               "type": "string",
               "description": "What to fetch: 'account' (buying power, account summary) or 'holdings' (crypto positions)",
@@ -50,7 +67,7 @@
               "description": "Optional asset filter for holdings view, e.g. ['BTC', 'ETH']"
             }
           },
-          "required": ["view"]
+          "required": ["rh_api_key", "rh_private_key_b64", "view"]
         },
         "output": {
           "type": "object",
@@ -68,6 +85,14 @@
         "input": {
           "type": "object",
           "properties": {
+            "rh_api_key": {
+              "type": "string",
+              "description": "Your Robinhood API key (rh-api-...)"
+            },
+            "rh_private_key_b64": {
+              "type": "string",
+              "description": "Your Robinhood Ed25519 private key, base64-encoded"
+            },
             "action": {
               "type": "string",
               "description": "Operation to perform",
@@ -103,7 +128,7 @@
               "description": "Filter by order state for list action (open, filled, canceled)"
             }
           },
-          "required": ["action"]
+          "required": ["rh_api_key", "rh_private_key_b64", "action"]
         },
         "output": {
           "type": "object",

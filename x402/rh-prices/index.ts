@@ -15,12 +15,19 @@ export default async function handler(req: Request) {
   const url = new URL(req.url);
   const symbol = url.searchParams.get("symbol") ?? "";
 
-  const rhApiKey = req.headers.get("x-rh-api-key") ?? "";
-  const rhPrivKey = req.headers.get("x-rh-private-key-b64") ?? "";
+  // Accept credentials from headers (curl/SDK) or query params (bankr x402 call)
+  const rhApiKey =
+    req.headers.get("x-rh-api-key") ??
+    url.searchParams.get("rh_api_key") ??
+    "";
+  const rhPrivKey =
+    req.headers.get("x-rh-private-key-b64") ??
+    url.searchParams.get("rh_private_key_b64") ??
+    "";
 
   if (!rhApiKey || !rhPrivKey) {
     return new Response(
-      JSON.stringify({ error: "x-rh-api-key and x-rh-private-key-b64 headers are required" }),
+      JSON.stringify({ error: "Provide rh_api_key and rh_private_key_b64 as query params (or x-rh-api-key / x-rh-private-key-b64 headers)" }),
       { status: 400, headers: { "Content-Type": "application/json" } }
     );
   }
