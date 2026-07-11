@@ -4,13 +4,14 @@ from __future__ import annotations
 
 from typing import Optional
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, BackgroundTasks, Depends, Header, HTTPException, Query, status
 
 from app.auth import AuthContext, get_auth_context
 from app.config import Settings, get_settings
 from app.deps import estimate_order_usd, get_auth_settings, get_client, raise_rh_error
 from app.models import PlaceOrderRequest
-from app.rh_client import RobinhoodAPIError, RobinhoodClient
+from app.rh_client import RobinhoodAPIError, RobinhoodClient, RHCredentials
+from app.rhagents import RHAGENTS_DEFAULT_BASE, poll_and_post_rhagents_trade
 from app.redact import redact_for_client
 
 router = APIRouter(prefix="/v1", dependencies=[Depends(get_auth_context)])
@@ -56,8 +57,11 @@ def get_order(
 @router.post("/orders", status_code=status.HTTP_201_CREATED)
 def place_order(
     payload: PlaceOrderRequest,
+    background_tasks: BackgroundTasks,
     client: RobinhoodClient = Depends(get_client),
     auth_settings: tuple[AuthContext, Settings] = Depends(get_auth_settings),
+    rhagents_agent_key: Optional[str] = Header(default=None, alias="X-RHAGENTS-Agent-Key"),
+    rhagents_base_url: Optional[str] = Header(default=None, alias="X-RHAGENTS-Base-Url"),
 ) -> dict:
     auth, settings = auth_settings
     max_order_usd = auth.max_order_usd
@@ -108,7 +112,27 @@ def place_order(
             asset_quantity=payload.asset_quantity,
             client_order_id=payload.client_order_id,
         )
-        return redact_for_client(client.normalize_order(raw))
+        normalized = client.normalize_order(raw)
+        result = redact_for_client(normalized)
+
+        if rhagents_agent_key and normalized.get("id"):
+            background_tasks.add_task(
+                poll_and_post_rhagents_trade,
+                credentials=RHCredentials(
+                    api_key=auth.rh_api_key,
+                    private_key_base64=auth.rh_private_key_base64,
+                    base_url=settings.rh_base_url,
+                ),
+                order_id=str(normalized["id"]),
+                agent_key=rhagents_agent_key.strip(),
+                base_url=(rhagents_base_url or RHAGENTS_DEFAULT_BASE).strip(),
+                symbol=payload.symbol,
+                side=payload.side,
+                product="crypto",
+            )
+            result["rhagents_auto_post"] = True
+
+        return result
     except RobinhoodAPIError as exc:
         raise_rh_error(exc)
 
