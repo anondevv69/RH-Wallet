@@ -137,7 +137,7 @@
       }
     },
     "rh-agentic-mcp": {
-      "description": "Paid proxy for Robinhood Agentic MCP — stocks, ETFs, and options. Get agentic_token via https://rh-wallet-production.up.railway.app/agentic/setup",
+      "description": "Paid proxy for Robinhood Agentic MCP — stocks, ETFs, and options. Get agentic_token via https://rhwallet-rhagent-production.up.railway.app/agentic/setup",
       "price": "0.10",
       "methods": ["POST"],
       "category": "stocks",

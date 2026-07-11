@@ -4,7 +4,7 @@
  * POST { "rh_api_key": "...", "rh_private_key_b64": "...", "view": "account" | "holdings", "asset_codes": ["BTC"] }
  */
 
-const GATEWAY_URL = process.env.GATEWAY_URL ?? "https://rh-wallet-production.up.railway.app";
+const GATEWAY_URL = process.env.GATEWAY_URL ?? "https://rhwallet-rhagent-production.up.railway.app";
 const GATEWAY_SECRET = process.env.GATEWAY_SECRET ?? "";
 
 function json(data: unknown, status = 200) {

@@ -164,7 +164,7 @@ Robinhood source: [Trading with your agent](https://robinhood.com/us/en/support/
 ```
 Bankr (AGENTIC_TOKEN in vault)
   → MCP: robinhood-agentic
-  → https://rh-wallet-production.up.railway.app/v1/agentic/mcp
+  → https://rhwallet-rhagent-production.up.railway.app/v1/agentic/mcp
   → Robinhood agent.robinhood.com/mcp/trading
 ```
 

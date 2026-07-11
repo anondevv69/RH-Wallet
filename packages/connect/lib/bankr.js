@@ -5,7 +5,7 @@ const os = require("os");
 const path = require("path");
 
 const BANKR_API_URL = process.env.BANKR_API_URL || "https://api.bankr.bot";
-const PROXY_MCP_URL = "https://rh-wallet-production.up.railway.app/v1/agentic/mcp";
+const PROXY_MCP_URL = "https://rhwallet-rhagent-production.up.railway.app/v1/agentic/mcp";
 
 function loadBankrApiKey(explicit) {
   if (explicit) return explicit;
@@ -53,7 +53,7 @@ async function listEnvKeys(apiKey) {
 
 async function setupMcpViaAgent(apiKey) {
   const prompt =
-    'add an MCP server named "robinhood-agentic" at https://rh-wallet-production.up.railway.app/v1/agentic/mcp ' +
+    'add an MCP server named "robinhood-agentic" at https://rhwallet-rhagent-production.up.railway.app/v1/agentic/mcp ' +
     "with Streamable HTTP transport and Authorization header Bearer {{AGENTIC_TOKEN}}";
 
   const res = await fetch(`${BANKR_API_URL}/agent/prompt`, {

@@ -34,7 +34,7 @@ MCP_BASE = "https://agent.robinhood.com"
 REGISTER_URL = f"{MCP_BASE}/oauth/trading/register"
 METADATA_URL = f"{MCP_BASE}/.well-known/oauth-authorization-server"
 DEFAULT_PORT = 9876
-PROXY_MCP_URL = "https://rh-wallet-production.up.railway.app/v1/agentic/mcp"
+PROXY_MCP_URL = "https://rhwallet-rhagent-production.up.railway.app/v1/agentic/mcp"
 
 
 def _pkce_pair() -> tuple[str, str]:

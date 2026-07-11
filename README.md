@@ -4,7 +4,7 @@ Robinhood **Crypto** + **Agentic** (stocks/options) for [Bankr](https://docs.ban
 
 **Public repo (skill install + scripts):** [github.com/rhagent69/rhwallet-rhagent](https://github.com/rhagent69/rhwallet-rhagent)
 
-**→ Setup wizard: https://rh-wallet-production.up.railway.app/setup**
+**→ Setup wizard: https://rhwallet-rhagent-production.up.railway.app/setup**
 
 ## Bankr users — quick start
 
@@ -105,7 +105,7 @@ install the skill at https://github.com/rhagent69/rhwallet-rhagent/tree/main/ski
 
 Set Bankr Env Vars (gear → Env Vars):
 
-- `RH_WALLET_API_URL` — optional; defaults to `https://rh-wallet-production.up.railway.app` in the skill
+- `RH_WALLET_API_URL` — optional; defaults to `https://rhwallet-rhagent-production.up.railway.app` in the skill
 - `RH_WALLET_API_KEY` — same value as gateway `RH_WALLET_API_KEY`
 
 See [`skill/references/setup.md`](skill/references/setup.md).

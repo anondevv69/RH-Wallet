@@ -15,7 +15,7 @@ Robinhood docs: [Agentic overview](https://robinhood.com/us/en/support/articles/
 | **Buy** | BTC-USD, DOGE-USD, … | SPCX, GME, AAPL, options calls/puts |
 | **Auth** | `RH_API_KEY` + `RH_PRIVATE_KEY_BASE64` in Bankr env | `AGENTIC_TOKEN` in Bankr env (one-time OAuth) |
 | **Account** | Crypto account | Dedicated **Agentic** account |
-| **API** | RH Wallet gateway / x402 | MCP via `https://rh-wallet-production.up.railway.app/v1/agentic/mcp` |
+| **API** | RH Wallet gateway / x402 | MCP via `https://rhwallet-rhagent-production.up.railway.app/v1/agentic/mcp` |
 
 ## Bankr setup (Agentic)
 

@@ -10,7 +10,7 @@ curl -fsSL https://raw.githubusercontent.com/rhagent69/rhwallet-rhagent/main/scr
 
 Requires **Node.js** and **git**. Run `bankr login` first so your token saves to Bankr automatically.
 
-Setup wizard: https://rh-wallet-production.up.railway.app/setup
+Setup wizard: https://rhwallet-rhagent-production.up.railway.app/setup
 
 ## What happens
 
@@ -31,7 +31,7 @@ node bin/cli.js
 
 Ask Bankr: *"What is my Robinhood Agentic buying power?"*
 
-MCP proxy (auto-configured): `https://rh-wallet-production.up.railway.app/v1/agentic/mcp`
+MCP proxy (auto-configured): `https://rhwallet-rhagent-production.up.railway.app/v1/agentic/mcp`
 
 **What you can do once connected:** quotes, fundamentals, earnings, technicals, options, scans, watchlists, and trading — [AGENTIC-CAPABILITIES.md](AGENTIC-CAPABILITIES.md)
 

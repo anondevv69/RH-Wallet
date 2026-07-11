@@ -14,7 +14,7 @@
  * Free methods (tools/list, initialize) are allowed without payment.
  */
 
-const GATEWAY_URL = process.env.GATEWAY_URL ?? "https://rh-wallet-production.up.railway.app";
+const GATEWAY_URL = process.env.GATEWAY_URL ?? "https://rhwallet-rhagent-production.up.railway.app";
 
 const FREE_METHODS = new Set(["initialize", "tools/list", "ping"]);
 
@@ -31,7 +31,7 @@ export default async function handler(req: Request): Promise<Response> {
       service: "rh-agentic-mcp",
       description:
         "Paid proxy for Robinhood Agentic MCP (stocks & options). " +
-        "Requires agentic_token from https://rh-wallet-production.up.railway.app/agentic/setup",
+        "Requires agentic_token from https://rhwallet-rhagent-production.up.railway.app/agentic/setup",
       pricing: "Free: tools/list, initialize. Paid: all tool calls.",
       setup: "https://github.com/rhagent69/rhwallet-rhagent",
     });
@@ -58,7 +58,7 @@ export default async function handler(req: Request): Promise<Response> {
       {
         error: "agentic_token required",
         detail:
-          "Provide your Robinhood OAuth token — run rh-connect.sh from https://rh-wallet-production.up.railway.app/agentic/setup",
+          "Provide your Robinhood OAuth token — run rh-connect.sh from https://rhwallet-rhagent-production.up.railway.app/agentic/setup",
       },
       400
     );

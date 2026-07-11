@@ -7,7 +7,7 @@ description: >
   (calls/puts), quotes, fundamentals, earnings, technicals, and scans when Agentic
   MCP is connected. Crypto: RH_API_KEY + RH_PRIVATE_KEY_BASE64 in Bankr env +
   optional x402 (USDC on Base). Stocks/options: connect via
-  https://rh-wallet-production.up.railway.app/setup. Capabilities:
+  https://rhwallet-rhagent-production.up.railway.app/setup. Capabilities:
   references/AGENTIC-CAPABILITIES.md. PUBLIC X: never tweet account numbers (including
   masked ••••XXXX) or list margin/IRA accounts — see references/RESPONSE-SAFETY.md.
 tags: [robinhood, crypto, trading, wallet, bankr, usd]
@@ -28,7 +28,7 @@ Trade and inspect a **Robinhood Crypto** account through a **stateless RH Wallet
 > **US only.** Robinhood Crypto Trading API is available to US customers and is subject to the Robinhood Crypto Customer Agreement.
 
 For **full setup steps** see [references/GETTING-STARTED.md](references/GETTING-STARTED.md).  
-Setup wizard: **https://rh-wallet-production.up.railway.app/setup**  
+Setup wizard: **https://rhwallet-rhagent-production.up.railway.app/setup**  
 Hosted URL + public gateway secret: [references/hosted-config.md](references/hosted-config.md).  
 For safety see [references/trading-safety.md](references/trading-safety.md).  
 For endpoints see [references/api-reference.md](references/api-reference.md).  
@@ -65,7 +65,7 @@ When the user says anything like **"connect agentically"**, **"connect Robinhood
 
 Open the setup guide — all steps are there:
 
-**https://rh-wallet-production.up.railway.app/setup** (Part C)
+**https://rhwallet-rhagent-production.up.railway.app/setup** (Part C)
 
 Quick version on your computer (~2 min, one-time):
 
@@ -93,7 +93,7 @@ When this skill is first loaded, or the user says **"set up rh-wallet"**, **"con
 
 **Always start by sending the user the setup wizard:**
 
-> **RH Wallet setup:** https://rh-wallet-production.up.railway.app/setup  
+> **RH Wallet setup:** https://rhwallet-rhagent-production.up.railway.app/setup  
 > Follow Parts A → B (crypto) → C (Agentic). Takes ~5 minutes one-time.
 
 Then walk through each part. Full reference: [references/GETTING-STARTED.md](references/GETTING-STARTED.md).
@@ -127,7 +127,7 @@ Test: *"What's my Robinhood crypto buying power?"*
 
 If `AGENTIC_TOKEN` is missing:
 
-1. **Setup page:** https://rh-wallet-production.up.railway.app/setup (Part C)
+1. **Setup page:** https://rhwallet-rhagent-production.up.railway.app/setup (Part C)
 2. User runs on their computer:
    ```bash
    bankr login
@@ -137,7 +137,7 @@ If `AGENTIC_TOKEN` is missing:
 4. Token auto-saves to Bankr if `bankr login` was run on that machine
 5. Auto-add MCP if missing:
    ```
-   add an MCP server named "robinhood-agentic" at https://rh-wallet-production.up.railway.app/v1/agentic/mcp with Streamable HTTP transport and Authorization header Bearer {{AGENTIC_TOKEN}}
+   add an MCP server named "robinhood-agentic" at https://rhwallet-rhagent-production.up.railway.app/v1/agentic/mcp with Streamable HTTP transport and Authorization header Bearer {{AGENTIC_TOKEN}}
    ```
 6. Test: *"What is my Robinhood Agentic buying power?"* — **never show account numbers** ([RESPONSE-SAFETY.md](references/RESPONSE-SAFETY.md))
 
@@ -156,7 +156,7 @@ Set in **Bankr → gear → Agent tool environment**:
 | `RH_API_KEY` | **Yes** | Robinhood API key (`rh-api-...`) from crypto settings |
 | `RH_PRIVATE_KEY_BASE64` | **Yes** | Ed25519 private key from `scripts/generate_rh_keypair.py` |
 | `RH_GATEWAY_SECRET` | No | Defaults to public value in [hosted-config.md](references/hosted-config.md) |
-| `RH_WALLET_API_URL` | No | Defaults to `https://rh-wallet-production.up.railway.app` |
+| `RH_WALLET_API_URL` | No | Defaults to `https://rhwallet-rhagent-production.up.railway.app` |
 | `RHAGENTS_AGENT_KEY` | No | rhagents API key for auto-posting trades |
 | `RHAGENTS_PENDING_TOKEN` | No | During registration — auto-submit trade proof after verification buy |
 | `RHAGENTS_BASE_URL` | No | rhagents.bot URL (default https://rhagents.bot) |
@@ -171,7 +171,7 @@ Bankr's MCP doesn't support browser OAuth directly, so we ship a **stateless OAu
 
 **Step 1 — Get your token (one-time):**
 
-Setup wizard: `https://rh-wallet-production.up.railway.app/setup` (Part C)
+Setup wizard: `https://rhwallet-rhagent-production.up.railway.app/setup` (Part C)
 
 One command on the user's computer:
 
@@ -193,7 +193,7 @@ Value: <paste token>
 
 ```
 Name: robinhood-agentic
-URL: https://rh-wallet-production.up.railway.app/v1/agentic/mcp
+URL: https://rhwallet-rhagent-production.up.railway.app/v1/agentic/mcp
 Transport: Streamable HTTP
 Header: Authorization → Bearer {{AGENTIC_TOKEN}}
 ```
@@ -228,7 +228,7 @@ Or install the setup app: tell Bankr `build me the rh-wallet app from https://gi
 
 | User says | Route |
 |-----------|--------|
-| "Connect agentically" / "connect Robinhood Agentic" / "set up stocks" | **Connect Agentic reply template** → https://rh-wallet-production.up.railway.app/setup |
+| "Connect agentically" / "connect Robinhood Agentic" / "set up stocks" | **Connect Agentic reply template** → https://rhwallet-rhagent-production.up.railway.app/setup |
 | Crypto balance, DOGE, BTC-USD prices/buy | x402 or free gateway — [x402.md](references/x402.md) |
 | Stock quote, buy SPCX, sell GME | Agentic MCP — [AGENTIC-TRADING.md](references/AGENTIC-TRADING.md) |
 | Fundamentals, RSI/MACD, earnings, indexes, scans | Agentic MCP research tools — [AGENTIC-CAPABILITIES.md](references/AGENTIC-CAPABILITIES.md) |
@@ -254,7 +254,7 @@ Full command templates: [references/x402.md](references/x402.md).
 
 ```bash
 # Hosted gateway (default) — see references/hosted-config.md
-RH_WALLET_API_URL="${RH_WALLET_API_URL:-https://rh-wallet-production.up.railway.app}"
+RH_WALLET_API_URL="${RH_WALLET_API_URL:-https://rhwallet-rhagent-production.up.railway.app}"
 RH_GATEWAY_SECRET="${RH_GATEWAY_SECRET:-uniqueissomethingimtesting}"
 
 rh() {
@@ -289,7 +289,7 @@ Always pipe JSON through `jq` when available.
 ### Health / connectivity
 
 ```bash
-curl -sS "${RH_WALLET_API_URL:-https://rh-wallet-production.up.railway.app}/health" | jq
+curl -sS "${RH_WALLET_API_URL:-https://rhwallet-rhagent-production.up.railway.app}/health" | jq
 ```
 
 ### Account + buying power
@@ -363,7 +363,7 @@ When user is registering on rhagents.bot OR `RHAGENTS_PENDING_TOKEN` is set:
 
 If user **cannot** place the verification trade → direct them to rh-wallet setup:
 - Skill: https://github.com/rhagent69/rhwallet-rhagent/tree/main/skill
-- Wizard: https://rh-wallet-production.up.railway.app/setup
+- Wizard: https://rhwallet-rhagent-production.up.railway.app/setup
 - API help: `GET ${RHAGENTS_BASE_URL:-https://rhagentsite-production.up.railway.app}/api/agent/register/setup`
 
 `bankr_api_key` is **optional** on rhagents — not all agents use Bankr.

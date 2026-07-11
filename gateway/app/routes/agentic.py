@@ -289,7 +289,7 @@ async def agentic_mcp_proxy(request: Request):
             detail=(
                 "Authorization: Bearer <token> required. "
                 "Set AGENTIC_TOKEN in Bankr env vars, then add MCP server "
-                "https://rh-wallet-production.up.railway.app/v1/agentic/mcp "
+                "https://rhwallet-rhagent-production.up.railway.app/v1/agentic/mcp "
                 "with header Authorization: Bearer {{AGENTIC_TOKEN}}"
             ),
         )
@@ -392,7 +392,7 @@ def _html_success(access_token: str, refresh_token: str, expires_in: str) -> str
       Key: <code>AGENTIC_TOKEN</code> &nbsp; Value: <em>paste token above</em></li>
     <li>Add MCP server in Bankr settings:<br>
       Name: <code>robinhood-agentic</code><br>
-      URL: <code>https://rh-wallet-production.up.railway.app/v1/agentic/mcp</code><br>
+      URL: <code>https://rhwallet-rhagent-production.up.railway.app/v1/agentic/mcp</code><br>
       Transport: <code>Streamable HTTP</code><br>
       Header: <code>Authorization</code> → <code>Bearer {{{{AGENTIC_TOKEN}}}}</code></li>
     <li>Ask Bankr: <em>"What is my Robinhood Agentic buying power?"</em></li>
@@ -430,7 +430,7 @@ def _html_setup_page() -> str:
 <body><div class="card">
   <h1>Connect Robinhood Agentic</h1>
   <p>One-time setup for stocks &amp; options. Full guide (Crypto + Agentic):
-     <a href="/setup" style="color:#60a5fa">rh-wallet-production.up.railway.app/setup</a></p>
+     <a href="/setup" style="color:#60a5fa">rhwallet-rhagent-production.up.railway.app/setup</a></p>
 
   <div class="trust"><b>We hold nothing.</b> RH Wallet does not store your Robinhood tokens or keys
   on our servers. OAuth runs on your machine; credentials save only to your Bankr vault.</div>
@@ -468,7 +468,7 @@ def _html_setup_page() -> str:
   <p style="color:#71717a;font-size:13px;margin-top:24px">
     <b>Zero custody:</b> we never store your token on Railway. The MCP proxy is stateless — it forwards
     your request with your token and does not write secrets to disk.
-    MCP proxy: <code>https://rh-wallet-production.up.railway.app/v1/agentic/mcp</code>
+    MCP proxy: <code>https://rhwallet-rhagent-production.up.railway.app/v1/agentic/mcp</code>
   </p>
 </div>
 <script>
@@ -499,7 +499,7 @@ python3 scripts/agentic_oauth.py</div>
      <code>127.0.0.1:9876</code>, and prints your token. Paste it into Bankr
      as <code>AGENTIC_TOKEN</code>. We never store it.</p>
   <p>Then add MCP server:</p>
-  <div class="token-box">URL: https://rh-wallet-production.up.railway.app/v1/agentic/mcp
+  <div class="token-box">URL: https://rhwallet-rhagent-production.up.railway.app/v1/agentic/mcp
 Header: Authorization → Bearer {{{{AGENTIC_TOKEN}}}}</div>
 </div></body></html>"""
 
