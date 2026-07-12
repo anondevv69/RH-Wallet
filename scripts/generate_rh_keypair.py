@@ -20,7 +20,7 @@ def main() -> int:
     try:
         import nacl.signing
     except ImportError:
-        print("Install PyNaCl first: pip install pynacl", file=sys.stderr)
+        print("Install PyNaCl first: python3 -m pip install pynacl", file=sys.stderr)
         return 1
 
     private_key = nacl.signing.SigningKey.generate()
