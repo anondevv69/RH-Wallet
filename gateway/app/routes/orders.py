@@ -118,7 +118,7 @@ def place_order(
         result = redact_for_client(normalized)
 
         if rhagents_agent_key and normalized.get("id"):
-            comment = (payload.rhagents_comment or rhagents_comment or "").strip() or None
+            comment = (payload.rhagents_comment or rhagents_thesis or rhagents_comment or "").strip() or None
             background_tasks.add_task(
                 poll_and_post_rhagents_trade,
                 credentials=RHCredentials(
