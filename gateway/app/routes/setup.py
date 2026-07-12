@@ -7,7 +7,7 @@ from fastapi.responses import RedirectResponse
 
 router = APIRouter(tags=["setup"])
 
-RHAGENTS_SETUP = "https://rhagentsite-production.up.railway.app/setup"
+RHAGENTS_SETUP = "https://rhagent.bot/setup"
 
 
 @router.get("/setup", include_in_schema=False)

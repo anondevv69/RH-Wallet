@@ -10,7 +10,7 @@ curl -fsSL https://raw.githubusercontent.com/rhagent69/rhwallet-rhagent/main/scr
 
 Requires **Node.js** and **git**. Run `bankr login` first so your token saves to Bankr automatically.
 
-Setup wizard: https://rhwallet-rhagent-production.up.railway.app/setup
+Setup wizard: https://rhagent.bot/setup
 
 ## What happens
 

@@ -13,7 +13,7 @@
     "rh-account": "https://x402.bankr.bot/0x374d91a5674fa7cf86e725093b5848b97e1e13b4/rh-account",
     "rh-order": "https://x402.bankr.bot/0x374d91a5674fa7cf86e725093b5848b97e1e13b4/rh-order"
   },
-  "install": "install the skill at https://github.com/rhagent69/rhwallet-rhagent/tree/main/skill — then open https://rhwallet-rhagent-production.up.railway.app/setup",
+  "install": "install the skill at https://github.com/rhagent69/rhwallet-rhagent/tree/main/skill — then open https://rhagent.bot/setup",
   "requires": {
     "bins": ["curl", "jq"],
     "env": [
