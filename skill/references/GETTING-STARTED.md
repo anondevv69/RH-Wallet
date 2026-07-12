@@ -1,6 +1,6 @@
 # Getting started — RH Wallet + Bankr
 
-**Setup wizard (start here):** https://rhwallet-rhagent-production.up.railway.app/setup
+**Setup wizard (start here):** https://rhagent.bot/setup
 
 US only. Two products: **Robinhood Crypto** (BTC, DOGE) and **Robinhood Agentic** (stocks, options).
 
@@ -51,7 +51,7 @@ Details: [setup.md](setup.md)
 
 One-time on your Mac/PC (~2 min). After this, everything runs in Bankr 24/7.
 
-1. Open: https://rhwallet-rhagent-production.up.railway.app/setup
+1. Open: https://rhagent.bot/setup
 
 2. Run locally:
    ```bash

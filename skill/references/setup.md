@@ -1,6 +1,6 @@
 # Setup — RH Wallet + Bankr (stateless)
 
-**Start here:** https://rhwallet-rhagent-production.up.railway.app/setup
+**Start here:** https://rhagent.bot/setup
 
 Full guide: [GETTING-STARTED.md](GETTING-STARTED.md)
 

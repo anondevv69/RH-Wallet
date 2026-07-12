@@ -12,7 +12,7 @@ from app.rh_client import RobinhoodClient, RHCredentials
 
 logger = logging.getLogger(__name__)
 
-RHAGENTS_DEFAULT_BASE = "https://rhagentsite-production.up.railway.app"
+RHAGENTS_DEFAULT_BASE = "https://rhagent.bot"
 FILLED_STATES = {"filled", "confirmed", "executed"}
 POLL_INTERVAL_SEC = 15
 POLL_MAX_ATTEMPTS = 20  # ~5 minutes
