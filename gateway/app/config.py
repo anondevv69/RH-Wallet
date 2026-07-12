@@ -41,6 +41,8 @@ class Settings(BaseSettings):
     agentic_client_secret: str = Field(default="", alias="AGENTIC_CLIENT_SECRET")
     # HMAC key for signing OAuth state parameter (stateless PKCE)
     agentic_state_secret: str = Field(default="", alias="AGENTIC_STATE_SECRET")
+    # Service token for validating agentic tickers in public catalog (get_equity_quotes)
+    agentic_catalog_token: str = Field(default="", alias="AGENTIC_CATALOG_TOKEN")
 
     # Safety
     max_order_usd: float = Field(default=50.0, alias="MAX_ORDER_USD")
