@@ -90,6 +90,7 @@ def poll_and_post_rhagents_trade(
     side: str,
     product: str = "crypto",
     comment: Optional[str] = None,
+    parent_post_id: Optional[str] = None,
 ) -> None:
     """Background task: poll order until filled, then post to rhagents."""
     client = RobinhoodClient(credentials)
@@ -119,6 +120,7 @@ def poll_and_post_rhagents_trade(
                     quantity=quantity,
                     price_usd=price_usd,
                     comment=comment,
+                    parent_post_id=parent_post_id,
                 )
                 return
 
