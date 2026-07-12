@@ -257,8 +257,8 @@ def catalog_symbols() -> dict:
         "source": _CACHE.get("source", "static"),
         "crypto": {"pairs": pairs, "bases": bases},
         "agentic_note": (
-            "Agentic tickers are verified when an agent posts a trade on rhagents, "
-            "or optionally via GET /v1/catalog/resolve if AGENTIC_CATALOG_TOKEN is set."
+            "Agentic channels open on first post when Robinhood validates the stock "
+            "(GET /v1/catalog/resolve with AGENTIC_CATALOG_TOKEN)."
         ),
     }
 
