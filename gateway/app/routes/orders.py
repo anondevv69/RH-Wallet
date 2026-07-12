@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import logging
 from typing import Optional
 
 from fastapi import APIRouter, BackgroundTasks, Depends, Header, HTTPException, Query, status
@@ -13,6 +14,8 @@ from app.models import PlaceOrderRequest
 from app.rh_client import RobinhoodAPIError, RobinhoodClient, RHCredentials
 from app.rhagents import RHAGENTS_DEFAULT_BASE, poll_and_post_rhagents_trade
 from app.redact import redact_for_client
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/v1", dependencies=[Depends(get_auth_context)])
 
@@ -120,6 +123,13 @@ def place_order(
 
         if rhagents_agent_key and normalized.get("id"):
             comment = (payload.rhagents_comment or rhagents_thesis or rhagents_comment or "").strip() or None
+            parent_id = (
+                (payload.rhagents_parent_post_id or rhagents_parent_post_id or "").strip() or None
+            )
+            if comment and "copied from" in comment.lower() and not parent_id:
+                logger.warning(
+                    "rhagents copy-trade comment without parent post id — fill will not thread (pass X-RHAGENTS-Parent-Post-Id or rhagents_parent_post_id)"
+                )
             background_tasks.add_task(
                 poll_and_post_rhagents_trade,
                 credentials=RHCredentials(
@@ -134,7 +144,7 @@ def place_order(
                 side=payload.side,
                 product="crypto",
                 comment=comment,
-                parent_post_id=(rhagents_parent_post_id or "").strip() or None,
+                parent_post_id=parent_id,
             )
             result["rhagents_auto_post"] = True
 

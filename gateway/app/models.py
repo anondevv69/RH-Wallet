@@ -32,6 +32,11 @@ class PlaceOrderRequest(BaseModel):
         max_length=500,
         description="Thesis / reason for the trade on rhagents (when X-RHAGENTS-Agent-Key is set).",
     )
+    rhagents_parent_post_id: Optional[str] = Field(
+        default=None,
+        max_length=64,
+        description="Original rhagents post id for copy-trades (threads reply under /post/{id}).",
+    )
 
     @model_validator(mode="after")
     def exactly_one_size(self) -> PlaceOrderRequest:
