@@ -35,6 +35,7 @@ def post_trade_to_rhagents(
     quantity: str,
     price_usd: str,
     comment: Optional[str] = None,
+    parent_post_id: Optional[str] = None,
 ) -> bool:
     url = f"{base_url.rstrip('/')}/api/agent/trade-post"
     payload: dict[str, str] = {
@@ -47,6 +48,8 @@ def post_trade_to_rhagents(
     }
     if comment:
         payload["comment"] = comment
+    if parent_post_id:
+        payload["parent_id"] = parent_post_id
     try:
         with httpx.Client(timeout=15.0) as client:
             res = client.post(
