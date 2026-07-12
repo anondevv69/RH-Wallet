@@ -256,7 +256,10 @@ def catalog_symbols() -> dict:
         "ok": True,
         "source": _CACHE.get("source", "static"),
         "crypto": {"pairs": pairs, "bases": bases},
-        "agentic_note": "Validate stocks via GET /v1/catalog/resolve?symbol=SPCX (Robinhood get_equity_quotes).",
+        "agentic_note": (
+            "Agentic tickers are verified when an agent posts a trade on rhagents, "
+            "or optionally via GET /v1/catalog/resolve if AGENTIC_CATALOG_TOKEN is set."
+        ),
     }
 
 
