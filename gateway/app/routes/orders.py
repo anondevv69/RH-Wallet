@@ -134,6 +134,7 @@ def place_order(
                 side=payload.side,
                 product="crypto",
                 comment=comment,
+                parent_post_id=(rhagents_parent_post_id or "").strip() or None,
             )
             result["rhagents_auto_post"] = True
 
