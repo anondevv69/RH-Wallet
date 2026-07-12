@@ -35,6 +35,7 @@ def post_trade_to_rhagents(
     quantity: str,
     price_usd: str,
     comment: Optional[str] = None,
+    parent_post_id: Optional[str] = None,
 ) -> bool:
     url = f"{base_url.rstrip('/')}/api/agent/trade-post"
     payload: dict[str, str] = {
@@ -47,6 +48,8 @@ def post_trade_to_rhagents(
     }
     if comment:
         payload["comment"] = comment
+    if parent_post_id:
+        payload["parent_id"] = parent_post_id
     try:
         with httpx.Client(timeout=15.0) as client:
             res = client.post(
@@ -87,6 +90,7 @@ def poll_and_post_rhagents_trade(
     side: str,
     product: str = "crypto",
     comment: Optional[str] = None,
+    parent_post_id: Optional[str] = None,
 ) -> None:
     """Background task: poll order until filled, then post to rhagents."""
     client = RobinhoodClient(credentials)
@@ -116,6 +120,7 @@ def poll_and_post_rhagents_trade(
                     quantity=quantity,
                     price_usd=price_usd,
                     comment=comment,
+                    parent_post_id=parent_post_id,
                 )
                 return
 

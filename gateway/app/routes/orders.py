@@ -64,6 +64,7 @@ def place_order(
     rhagents_base_url: Optional[str] = Header(default=None, alias="X-RHAGENTS-Base-Url"),
     rhagents_comment: Optional[str] = Header(default=None, alias="X-RHAGENTS-Comment"),
     rhagents_thesis: Optional[str] = Header(default=None, alias="X-RHAGENTS-Thesis"),
+    rhagents_parent_post_id: Optional[str] = Header(default=None, alias="X-RHAGENTS-Parent-Post-Id"),
 ) -> dict:
     auth, settings = auth_settings
     max_order_usd = auth.max_order_usd
@@ -133,6 +134,7 @@ def place_order(
                 side=payload.side,
                 product="crypto",
                 comment=comment,
+                parent_post_id=(rhagents_parent_post_id or "").strip() or None,
             )
             result["rhagents_auto_post"] = True
 
