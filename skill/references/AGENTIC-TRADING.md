@@ -32,7 +32,7 @@ Stocks and options **must** use Bankr's `call_mcp_tool` against the **`robinhood
 ### Rules
 
 1. **Server:** `robinhood-agentic` (URL `https://rhwallet-rhagent-production.up.railway.app/v1/agentic/mcp`, header `Authorization: Bearer {{AGENTIC_TOKEN}}`).
-2. **`arguments_json` must be a JSON string**, not an object. Bankr rejects `arguments_json: {"symbol": "GME"}` — stringify it.
+2. **`arguments_json` must be a JSON string**, not an object. Bankr rejects `arguments_json: {"symbol": "NVDA"}` — stringify it.
 3. **Tool names:** exact snake_case (`get_option_chains`, not `getoptionchains`).
 4. **Skip `tools/list`** — call tools by name directly.
 
@@ -43,46 +43,46 @@ Stocks and options **must** use Bankr's `call_mcp_tool` against the **`robinhood
 {
   "server": "robinhood-agentic",
   "toolName": "get_option_chains",
-  "arguments_json": { "symbol": "GME" }
+  "arguments_json": { "symbol": "SYMBOL" }
 }
 
-// RIGHT — arguments_json as a stringified JSON object
+// RIGHT — arguments_json as a stringified JSON object (SYMBOL = any ticker)
 {
   "server": "robinhood-agentic",
   "toolName": "get_option_chains",
-  "arguments_json": "{\"symbol\": \"GME\"}"
+  "arguments_json": "{\"symbol\": \"SYMBOL\"}"
 }
 ```
 
-### Example calls (copy format exactly)
+### Example calls (copy format exactly — replace SYMBOL with any ticker)
 
-**GME option chain (this week / nearest expiry):**
+**Option chain (any stock):**
 
 ```json
 {
   "server": "robinhood-agentic",
   "toolName": "get_option_chains",
-  "arguments_json": "{\"symbol\": \"GME\"}"
+  "arguments_json": "{\"symbol\": \"SYMBOL\"}"
 }
 ```
 
-**GME stock quote:**
+**Stock quote:**
 
 ```json
 {
   "server": "robinhood-agentic",
   "toolName": "get_equity_quotes",
-  "arguments_json": "{\"symbols\": [\"GME\"]}"
+  "arguments_json": "{\"symbols\": [\"SYMBOL\"]}"
 }
 ```
 
-**Filter calls for a specific expiry and strike** (after chain returns instrument IDs):
+**Filter calls for a specific expiry** (after chain returns instrument IDs):
 
 ```json
 {
   "server": "robinhood-agentic",
   "toolName": "get_option_instruments",
-  "arguments_json": "{\"symbol\": \"GME\", \"expiration_date\": \"2026-07-17\", \"type\": \"call\"}"
+  "arguments_json": "{\"symbol\": \"SYMBOL\", \"expiration_date\": \"YYYY-MM-DD\", \"type\": \"call\"}"
 }
 ```
 
@@ -95,6 +95,8 @@ Stocks and options **must** use Bankr's `call_mcp_tool` against the **`robinhood
   "arguments_json": "{\"instrument_ids\": [\"<id-from-chain>\"]}"
 }
 ```
+
+**On @bankrbot X:** prefer hosted `agentic-mcp.sh` from [Rhagent](https://github.com/rhagent69/Rhagent) — bypasses `arguments_json` schema failures. See https://rhagent.bot/bankr.md#options--any-ticker-research--trades
 
 **Agentic buying power / portfolio (public X — one line, no account numbers):**
 
@@ -138,7 +140,7 @@ When MCP is connected, map user intent to Robinhood MCP tools. Full catalog: [AG
 | "100 most popular on Robinhood" | `get_popular_watchlists` |
 | "Run a momentum scan" | `create_scan` / `run_scan` |
 | "Buy $100 of SPCX" | `review_equity_order` → confirm → `place_equity_order` |
-| "Buy a GME call" | `get_option_chains` → `get_option_quotes` → confirm → `place_option_order` |
+| "Buy a call" / option chain for any ticker | `get_option_chains` → `get_option_instruments` → `get_option_quotes` → confirm → `place_option_order` |
 
 **Account vs market:** quotes, fundamentals, earnings, and indexes are **not** your portfolio data — but they still use your MCP session. Positions, orders, and buying power **are** account-specific.
 
@@ -151,7 +153,7 @@ When MCP is connected, map user intent to Robinhood MCP tools. Full catalog: [AG
 | Issue | Fix |
 |-------|-----|
 | `executecli` / "no resource files to stage" / `rhagent-trader` | Wrong tool — use `call_mcp_tool` on `robinhood-agentic`, not CLI or skill staging |
-| `arguments_json` expected string, received object | Stringify arguments: `"arguments_json": "{\"symbol\": \"GME\"}"` |
+| `arguments_json` expected string, received object | Stringify arguments: `"arguments_json": "{\"symbol\": \"SYMBOL\"}"` |
 | "MCP not connected" | Run connect command in [agentic-connect.md](agentic-connect.md) |
 | Allow button fails on website | Must use localhost script — not hosted OAuth |
 | Stock order fails | Check Agentic account funded |

@@ -239,7 +239,7 @@ Or install the setup app: tell Bankr `build me the rh-wallet app from https://gi
 | Crypto balance, DOGE, BTC-USD prices/buy | x402 or free gateway — [x402.md](references/x402.md) |
 | Stock quote, buy SPCX, sell GME | Agentic MCP — [AGENTIC-TRADING.md](references/AGENTIC-TRADING.md) |
 | Fundamentals, RSI/MACD, earnings, indexes, scans | Agentic MCP research tools — [AGENTIC-CAPABILITIES.md](references/AGENTIC-CAPABILITIES.md) |
-| Buy GME call, option chain | `call_mcp_tool` → `get_option_chains` → `get_option_quotes` — [AGENTIC-TRADING.md](references/AGENTIC-TRADING.md) |
+| Buy call/put, option chain (any ticker) | `call_mcp_tool` → `get_option_chains` → `get_option_quotes` — [AGENTIC-TRADING.md](references/AGENTIC-TRADING.md) |
 | "What can Agentic do?" / capabilities | Summarize from [AGENTIC-CAPABILITIES.md](references/AGENTIC-CAPABILITIES.md) |
 | Contract address `0x…` | Bankr onchain / hoodmarkets — NOT this skill |
 | rhagents post URL + "Copy this trade" | rhagents skill: `GET /api/post/{id}` → execute here with **X-RHAGENTS-Agent-Key** → gateway auto-posts fill |
@@ -250,7 +250,7 @@ Or install the setup app: tell Bankr `build me the rh-wallet app from https://gi
 |-----------|---------|
 | "What's my Robinhood crypto balance?" | x402 `rh-account` with `view: "account"` — buying power only, no account numbers |
 | "What's my Robinhood Agentic buying power?" | `call_mcp_tool` → `get_portfolio` with `arguments_json: "{}"` — buying power only, no account numbers ([RESPONSE-SAFETY.md](references/RESPONSE-SAFETY.md)) |
-| "GME options this week" / option chain | `call_mcp_tool` → `get_option_chains` with `arguments_json: "{\"symbol\": \"GME\"}"` then `get_option_quotes` — see [AGENTIC-TRADING.md](references/AGENTIC-TRADING.md) |
+| "Option chain" / "calls this week" / any `$TICKER` options | `call_mcp_tool` → `get_option_chains` with `arguments_json: "{\"symbol\": \"SYMBOL\"}"` then `get_option_quotes` — see [AGENTIC-TRADING.md](references/AGENTIC-TRADING.md) or https://rhagent.bot/bankr.md |
 | "What's in my Agentic wallet?" / portfolio on X | Agentic MCP `get_portfolio` — **one line, no account numbers, no other accounts** ([RESPONSE-SAFETY.md](references/RESPONSE-SAFETY.md)) |
 | "What crypto do I hold on Robinhood?" | x402 `rh-account` with `view: "holdings"` |
 | "Get BTC and DOGE prices from Robinhood" | x402 `rh-prices` with `symbol: "BTC-USD,DOGE-USD"` |
