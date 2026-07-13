@@ -305,7 +305,10 @@ async def agentic_mcp_proxy(request: Request):
         if h in request.headers:
             forward_headers[h] = request.headers[h]
 
+    from app.agentic_inject import enrich_mcp_request
+
     async with httpx.AsyncClient(timeout=30) as client:
+        body = await enrich_mcp_request(body, forward_headers, client=client)
         try:
             rr = await client.post(
                 ROBINHOOD_MCP_URL,
