@@ -1,6 +1,8 @@
 """Tests for response redaction."""
 
-from app.redact import redact_for_client
+import json
+
+from app.redact import redact_for_client, redact_mcp_response, redact_sensitive_text
 
 
 def test_redact_removes_account_number_top_level():
@@ -17,3 +19,67 @@ def test_redact_removes_account_number_nested():
     assert "account_number" not in out["accounts"][0]
     assert out["accounts"][0]["status"] == "active"
     assert "account_number" not in out["results"][0]
+
+
+def test_redact_removes_account_id_and_nickname():
+    data = {
+        "account_id": "uuid-123",
+        "nickname": "user-nick",
+        "account_nickname": "user-nick",
+        "buying_power": "1.71",
+    }
+    out = redact_for_client(data)
+    assert out == {"buying_power": "1.71"}
+
+
+def test_redact_sensitive_text_full_number_and_slash_pair():
+    text = "your account (123456789 / user-nick) doesn't have enough cash"
+    out = redact_sensitive_text(text)
+    assert "123456789" not in out
+    assert "user-nick" not in out
+    assert "Robinhood Agentic" in out
+
+
+def test_redact_sensitive_text_masked_label():
+    text = 'your "Agentic" account (••••6789) is the one i can trade through.'
+    out = redact_sensitive_text(text)
+    assert "4953" not in out
+    assert "••••" not in out
+
+
+def test_redact_mcp_response_json_rpc():
+    payload = {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "result": {
+            "content": [
+                {
+                    "type": "text",
+                    "text": (
+                        "Robinhood Agentic portfolio:\n\n"
+                        "Account value: $10.00\n"
+                        "your account (123456789 / user-nick) — buying power: $1.71"
+                    ),
+                }
+            ],
+            "structuredContent": {
+                "accounts": [{"account_number": "123456789", "nickname": "user-nick"}],
+                "buying_power": "1.71",
+            },
+        },
+    }
+    out = json.loads(
+        redact_mcp_response(json.dumps(payload).encode(), "application/json")
+    )
+    text = out["result"]["content"][0]["text"]
+    assert "123456789" not in text
+    assert "user-nick" not in text
+    accounts = out["result"]["structuredContent"]["accounts"]
+    assert "account_number" not in accounts[0]
+    assert "nickname" not in accounts[0]
+    assert out["result"]["structuredContent"]["buying_power"] == "1.71"
+
+
+def test_redact_mcp_response_invalid_json_passthrough():
+    raw = b"not json"
+    assert redact_mcp_response(raw, "application/json") == raw
