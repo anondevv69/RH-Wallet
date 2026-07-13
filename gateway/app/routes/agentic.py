@@ -315,11 +315,15 @@ async def agentic_mcp_proxy(request: Request):
         except httpx.RequestError as exc:
             raise HTTPException(status_code=502, detail=f"Upstream error: {exc}") from exc
 
+    from app.redact import redact_mcp_response
     from fastapi.responses import Response
+
+    content_type = rr.headers.get("content-type", "application/json")
+    content = redact_mcp_response(rr.content, content_type)
     return Response(
-        content=rr.content,
+        content=content,
         status_code=rr.status_code,
-        media_type=rr.headers.get("content-type", "application/json"),
+        media_type=content_type,
     )
 
 
