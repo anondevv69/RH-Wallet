@@ -33,6 +33,21 @@ _TIME_IN_FORCE_ALIASES = {
     "ioc": "ioc",
 }
 
+# Robinhood MCP market_hours — agents often guess wrong (24_hour, alldayhours).
+_MARKET_HOURS_ALIASES = {
+    "regular": "regular_hours",
+    "regular_hours": "regular_hours",
+    "extended": "extended_hours",
+    "extended_hours": "extended_hours",
+    "all_day_hours": "all_day_hours",
+    "alldayhours": "all_day_hours",
+    "all_day": "all_day_hours",
+    "24_hour": "all_day_hours",
+    "24-hour": "all_day_hours",
+    "24hour": "all_day_hours",
+    "overnight": "all_day_hours",
+}
+
 
 def _parse_arguments(raw: Any) -> dict[str, Any]:
     if isinstance(raw, dict):
@@ -65,6 +80,11 @@ def normalize_order_arguments(args: dict[str, Any]) -> dict[str, Any]:
     tif = out.get("time_in_force")
     if isinstance(tif, str) and tif in _TIME_IN_FORCE_ALIASES:
         out["time_in_force"] = _TIME_IN_FORCE_ALIASES[tif]
+    mh = out.get("market_hours")
+    if isinstance(mh, str):
+        key = mh.strip().lower().replace(" ", "_")
+        if key in _MARKET_HOURS_ALIASES:
+            out["market_hours"] = _MARKET_HOURS_ALIASES[key]
     return out
 
 

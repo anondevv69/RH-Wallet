@@ -49,6 +49,16 @@ def test_extract_account_number_nested():
     assert extract_account_number(payload) == "123456789"
 
 
+def test_normalize_market_hours_alldayhours():
+    args = normalize_order_arguments({"market_hours": "alldayhours"})
+    assert args["market_hours"] == "all_day_hours"
+
+
+def test_normalize_market_hours_24_hour():
+    args = normalize_order_arguments({"market_hours": "24_hour"})
+    assert args["market_hours"] == "all_day_hours"
+
+
 def test_enrich_injects_account_number():
     mock_response = MagicMock()
     mock_response.status_code = 200
