@@ -162,11 +162,12 @@ Robinhood source: [Trading with your agent](https://robinhood.com/us/en/support/
 ## How Bankr reaches these tools
 
 ```
-Bankr (AGENTIC_TOKEN in vault)
-  → MCP: robinhood-agentic
+Bankr call_mcp_tool (server: robinhood-agentic, arguments_json as string)
   → https://rhwallet-rhagent-production.up.railway.app/v1/agentic/mcp
   → Robinhood agent.robinhood.com/mcp/trading
 ```
+
+**Call format:** see [AGENTIC-TRADING.md](AGENTIC-TRADING.md) — `arguments_json` must be stringified; never use `executecli`.
 
 RH Wallet is a **stateless pass-through**. We do not store your token or account data on Railway.
 

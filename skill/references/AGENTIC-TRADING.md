@@ -25,6 +25,89 @@ Robinhood docs: [Agentic overview](https://robinhood.com/us/en/support/articles/
 
 There is **no** `RH_API_KEY` for stocks.
 
+## Bankr `call_mcp_tool` — mandatory format
+
+Stocks and options **must** use Bankr's `call_mcp_tool` against the **`robinhood-agentic`** MCP server. **Never** use `executecli` or skill file staging for market data or trades — this skill has no `scripts/` to stage; instructions load via `useskill` / `useskillfile` only.
+
+### Rules
+
+1. **Server:** `robinhood-agentic` (URL `https://rhwallet-rhagent-production.up.railway.app/v1/agentic/mcp`, header `Authorization: Bearer {{AGENTIC_TOKEN}}`).
+2. **`arguments_json` must be a JSON string**, not an object. Bankr rejects `arguments_json: {"symbol": "GME"}` — stringify it.
+3. **Tool names:** exact snake_case (`get_option_chains`, not `getoptionchains`).
+4. **Skip `tools/list`** — call tools by name directly.
+
+### Wrong vs right
+
+```json
+// WRONG — arguments_json as object (schema validation fails before MCP)
+{
+  "server": "robinhood-agentic",
+  "toolName": "get_option_chains",
+  "arguments_json": { "symbol": "GME" }
+}
+
+// RIGHT — arguments_json as a stringified JSON object
+{
+  "server": "robinhood-agentic",
+  "toolName": "get_option_chains",
+  "arguments_json": "{\"symbol\": \"GME\"}"
+}
+```
+
+### Example calls (copy format exactly)
+
+**GME option chain (this week / nearest expiry):**
+
+```json
+{
+  "server": "robinhood-agentic",
+  "toolName": "get_option_chains",
+  "arguments_json": "{\"symbol\": \"GME\"}"
+}
+```
+
+**GME stock quote:**
+
+```json
+{
+  "server": "robinhood-agentic",
+  "toolName": "get_equity_quotes",
+  "arguments_json": "{\"symbols\": [\"GME\"]}"
+}
+```
+
+**Filter calls for a specific expiry and strike** (after chain returns instrument IDs):
+
+```json
+{
+  "server": "robinhood-agentic",
+  "toolName": "get_option_instruments",
+  "arguments_json": "{\"symbol\": \"GME\", \"expiration_date\": \"2026-07-17\", \"type\": \"call\"}"
+}
+```
+
+**Quote specific option contracts** (use `instrument_id` values from chain/instruments):
+
+```json
+{
+  "server": "robinhood-agentic",
+  "toolName": "get_option_quotes",
+  "arguments_json": "{\"instrument_ids\": [\"<id-from-chain>\"]}"
+}
+```
+
+**Agentic buying power / portfolio (public X — one line, no account numbers):**
+
+```json
+{
+  "server": "robinhood-agentic",
+  "toolName": "get_portfolio",
+  "arguments_json": "{}"
+}
+```
+
+**Typical options research flow:** `get_option_chains` → `get_option_instruments` (filter expiry/type/strike) → `get_option_quotes` → summarize strikes, premiums, IV. For orders: `review_option_order` → user confirms → `place_option_order`.
+
 ## MCP tool calls — do not rely on `tools/list`
 
 Bankr may fail `tools/list` when `refresh` is serialized wrong. **Skip listing.** Call Robinhood tools **by exact name** (snake_case):
@@ -67,6 +150,8 @@ When MCP is connected, map user intent to Robinhood MCP tools. Full catalog: [AG
 
 | Issue | Fix |
 |-------|-----|
+| `executecli` / "no resource files to stage" / `rhagent-trader` | Wrong tool — use `call_mcp_tool` on `robinhood-agentic`, not CLI or skill staging |
+| `arguments_json` expected string, received object | Stringify arguments: `"arguments_json": "{\"symbol\": \"GME\"}"` |
 | "MCP not connected" | Run connect command in [agentic-connect.md](agentic-connect.md) |
 | Allow button fails on website | Must use localhost script — not hosted OAuth |
 | Stock order fails | Check Agentic account funded |
