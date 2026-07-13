@@ -20,7 +20,7 @@ _REDACTED_KEYS = frozenset(
 # Full Robinhood account numbers (typically 9–12 digits).
 _ACCT_NUM = re.compile(r"\b\d{9,12}\b")
 
-# Masked fragments: ••••6789, ****4953, (••••6789)
+# Masked fragments: ••••6789, ****6789, (••••6789)
 _MASKED = re.compile(
     r"[•*]{3,4}\s?\d{4}|"
     r"\(\s*[•*]{3,4}\s*\d{4}\s*\)|"
