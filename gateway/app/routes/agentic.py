@@ -183,15 +183,17 @@ async def _get_client_credentials(callback_url: str) -> tuple[str, Optional[str]
 # ---------------------------------------------------------------------------
 
 @router.get("/agentic/auth", response_class=HTMLResponse)
-async def agentic_auth_start(_request: Request):
+async def agentic_auth_start(request: Request):
     """Redirect users to the setup wizard (hosted OAuth fails on Allow)."""
-    return _html_setup_page()
+    for_client = (request.query_params.get("for") or "").strip().lower()
+    return _html_setup_page(for_client=for_client)
 
 
 @router.get("/agentic/setup", response_class=HTMLResponse)
-async def agentic_setup(_request: Request):
-    """Setup wizard — copy npx command, then localhost OAuth on user's machine."""
-    return _html_setup_page()
+async def agentic_setup(request: Request):
+    """Setup wizard — copy connect command, then localhost OAuth on user's machine."""
+    for_client = (request.query_params.get("for") or "").strip().lower()
+    return _html_setup_page(for_client=for_client)
 
 
 @router.get("/agentic/callback", response_class=HTMLResponse)
@@ -417,9 +419,82 @@ async function copyToken(id, btn) {{
 </body></html>"""
 
 
-def _html_setup_page() -> str:
-    bankr_cmd = "bankr login"
-    npx_cmd = "curl -fsSL https://rhagent.bot/scripts/rh-connect.sh | bash"
+def _html_setup_page(for_client: str = "") -> str:
+    """Setup wizard. ``for_client=telegram`` hides Bankr-only steps."""
+    telegram = for_client in {"telegram", "tg", "bot"}
+    connect_cmd = "curl -fsSL https://rhagent.bot/scripts/rh-connect.sh | bash"
+    if telegram:
+        trust = (
+            "<b>You do not need Bankr / bankrbot.</b> OAuth runs on your computer; "
+            "copy the printed <code>AGENTIC_TOKEN</code> and paste it into Telegram with "
+            "<code>/connect_agentic &lt;token&gt;</code>. We never store it on our servers."
+        )
+        steps = f"""
+  <div class="step"><span class="num">1</span>
+    <div><b>Copy and run in Terminal</b> (Mac/PC — needs Node.js + git):
+      <div class="token-box" id="cmd">{connect_cmd}</div>
+      <button class="copy-btn" onclick="copyId('cmd', 'Copy command')">Copy command</button>
+      <p style="color:#71717a;font-size:12px;margin-top:8px">Skip <code>bankr login</code> — that is only for Bankr users.</p>
+    </div>
+  </div>
+
+  <div class="step"><span class="num">2</span>
+    <div>Browser opens → sign in to <b>Robinhood</b> → tap <b>Allow</b>.</div>
+  </div>
+
+  <div class="step"><span class="num">3</span>
+    <div>Terminal prints <code>AGENTIC_TOKEN</code> — copy it.</div>
+  </div>
+
+  <div class="step"><span class="num">4</span>
+    <div>Back in Telegram, send:<br>
+      <code>/connect_agentic &lt;paste-token&gt;</code></div>
+  </div>"""
+        subtitle = "One-time Robinhood Agentic login for the Telegram trading bot (stocks &amp; options)."
+    else:
+        trust = (
+            "<b>We hold nothing.</b> OAuth runs on your machine. Bankr login is optional — "
+            "it only auto-saves the token into your Bankr vault. Telegram / CLI users can skip it "
+            "and copy the printed token instead."
+        )
+        steps = f"""
+  <div class="step"><span class="num">1</span>
+    <div><b>Optional (Bankr users only):</b> log into Bankr so the token auto-saves.
+      <div class="token-box" id="bankr-cmd">bankr login</div>
+      <button class="copy-btn" onclick="copyId('bankr-cmd', 'Copy command')">Copy command</button>
+      <p style="color:#71717a;font-size:12px;margin-top:8px">Skip this if you use Telegram or just want the raw token.</p>
+    </div>
+  </div>
+
+  <div class="step"><span class="num">2</span>
+    <div><b>Copy and run in Terminal</b> (Mac/PC — needs Node.js + git):
+      <div class="token-box" id="cmd">{connect_cmd}</div>
+      <button class="copy-btn" onclick="copyId('cmd', 'Copy command')">Copy command</button>
+  <p style="color:#71717a;font-size:12px;margin-top:8px">One-time — Robinhood requires localhost OAuth.</p>
+    </div>
+  </div>
+
+  <div class="step"><span class="num">3</span>
+    <div>Your browser opens → sign in to Robinhood → tap <b>Allow</b>
+      on your Agentic account.</div>
+  </div>
+
+  <div class="step"><span class="num">4</span>
+    <div><b>Bankr:</b> token saves as <code>AGENTIC_TOKEN</code> if you ran step 1.<br>
+      <b>Telegram / manual:</b> copy the printed token, then send
+      <code>/connect_agentic &lt;token&gt;</code> in the bot (or paste into Bankr Env Vars).</div>
+  </div>
+
+  <div class="step"><span class="num">5</span>
+    <div>Done. Bankr: ask <em>"What is my Robinhood Agentic buying power?"</em>
+      · Telegram: try the same after <code>/connect_agentic</code>.</div>
+  </div>"""
+        subtitle = (
+            'One-time setup for stocks &amp; options. Full guide: '
+            '<a href="/setup" style="color:#60a5fa">/setup</a> · '
+            'Telegram users: <a href="/agentic/setup?for=telegram" style="color:#60a5fa">Telegram path</a>'
+        )
+
     return f"""<!DOCTYPE html>
 <html lang="en"><head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -436,41 +511,11 @@ def _html_setup_page() -> str:
 </style></head>
 <body><div class="card">
   <h1>Connect Robinhood Agentic</h1>
-  <p>One-time setup for stocks &amp; options. Full guide (Crypto + Agentic):
-     <a href="/setup" style="color:#60a5fa">rhwallet-rhagent-production.up.railway.app/setup</a></p>
+  <p>{subtitle}</p>
 
-  <div class="trust"><b>We hold nothing.</b> RH Wallet does not store your Robinhood tokens or keys
-  on our servers. OAuth runs on your machine; credentials save only to your Bankr vault.</div>
+  <div class="trust">{trust}</div>
 
-  <div class="step"><span class="num">1</span>
-    <div><b>Copy and run in Terminal</b> (Mac/PC):
-      <div class="token-box" id="bankr-cmd">{bankr_cmd}</div>
-      <button class="copy-btn" onclick="copyId('bankr-cmd', 'Copy command')">Copy command</button>
-      <p style="color:#71717a;font-size:12px;margin-top:8px">Logs you into Bankr so the connect script can auto-save your token.</p>
-    </div>
-  </div>
-
-  <div class="step"><span class="num">2</span>
-    <div><b>Copy and run in Terminal</b>:
-      <div class="token-box" id="cmd">{npx_cmd}</div>
-      <button class="copy-btn" onclick="copyId('cmd', 'Copy command')">Copy command</button>
-  <p style="color:#71717a;font-size:12px;margin-top:8px">Requires Node.js and git. One-time — Robinhood requires localhost OAuth.</p>
-    </div>
-  </div>
-
-  <div class="step"><span class="num">3</span>
-    <div>Your browser opens → sign in to Robinhood → tap <b>Allow</b>
-      on your Agentic account.</div>
-  </div>
-
-  <div class="step"><span class="num">4</span>
-    <div>Token saves to <b>your Bankr vault</b> as <code>AGENTIC_TOKEN</code> (if you ran step 1).
-      Otherwise copy the token and add it in Bankr → Settings → Env Vars.</div>
-  </div>
-
-  <div class="step"><span class="num">5</span>
-    <div>Back in Bankr, ask: <em>"What is my Robinhood Agentic buying power?"</em></div>
-  </div>
+  {steps}
 
   <p style="color:#71717a;font-size:13px;margin-top:24px">
     <b>Zero custody:</b> we never store your token on Railway. The MCP proxy is stateless — it forwards
