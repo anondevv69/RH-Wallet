@@ -56,7 +56,7 @@ One-time on your Mac/PC (~2 min). After this, everything runs in Bankr 24/7.
 2. Run locally:
    ```bash
    bankr login
-   curl -fsSL https://raw.githubusercontent.com/rhagent69/rhwallet-rhagent/main/scripts/rh-connect.sh | bash
+   curl -fsSL https://rhagent.bot/scripts/rh-connect.sh | bash
    ```
 
 3. Browser → Robinhood → tap **Allow** on your Agentic account.
@@ -100,5 +100,5 @@ Full Agentic tool list and prompts: [AGENTIC-CAPABILITIES.md](AGENTIC-CAPABILITI
 Agentic token expires ~every 9 days. Re-run:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/rhagent69/rhwallet-rhagent/main/scripts/rh-connect.sh | bash
+curl -fsSL https://rhagent.bot/scripts/rh-connect.sh | bash
 ```

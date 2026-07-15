@@ -72,7 +72,7 @@ Quick version on your computer (~2 min, one-time):
 1. Run `bankr login` (same machine)
 2. Run in Terminal:
    ```bash
-   curl -fsSL https://raw.githubusercontent.com/rhagent69/rhwallet-rhagent/main/scripts/rh-connect.sh | bash
+   curl -fsSL https://rhagent.bot/scripts/rh-connect.sh | bash
    ```
 3. Browser opens → sign in to Robinhood → tap **Allow** on your Agentic account
 4. Come back and ask: *"What is my Robinhood Agentic buying power?"*
@@ -131,7 +131,7 @@ If `AGENTIC_TOKEN` is missing:
 2. User runs on their computer:
    ```bash
    bankr login
-   curl -fsSL https://raw.githubusercontent.com/rhagent69/rhwallet-rhagent/main/scripts/rh-connect.sh | bash
+   curl -fsSL https://rhagent.bot/scripts/rh-connect.sh | bash
    ```
 3. Browser → Robinhood → **Allow**
 4. Token auto-saves to Bankr if `bankr login` was run on that machine
@@ -176,7 +176,7 @@ Setup wizard: `https://rhagent.bot/setup` (Part C)
 One command on the user's computer:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/rhagent69/rhwallet-rhagent/main/scripts/rh-connect.sh | bash
+curl -fsSL https://rhagent.bot/scripts/rh-connect.sh | bash
 ```
 
 Browser → Robinhood → Allow. Token auto-saves to Bankr if `bankr login` was run. See [references/agentic-connect.md](references/agentic-connect.md).

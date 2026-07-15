@@ -419,7 +419,7 @@ async function copyToken(id, btn) {{
 
 def _html_setup_page() -> str:
     bankr_cmd = "bankr login"
-    npx_cmd = "curl -fsSL https://raw.githubusercontent.com/rhagent69/rhwallet-rhagent/main/scripts/rh-connect.sh | bash"
+    npx_cmd = "curl -fsSL https://rhagent.bot/scripts/rh-connect.sh | bash"
     return f"""<!DOCTYPE html>
 <html lang="en"><head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
