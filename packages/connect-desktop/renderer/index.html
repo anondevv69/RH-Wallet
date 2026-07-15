@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'" />
+  <title>RH Agentic Connect</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="card">
+    <h1>RH Agentic Connect</h1>
+    <p class="sub">Connect Robinhood stocks &amp; options to the Telegram bot — no Terminal required.</p>
+
+    <div class="trust">We never store your token on our desktop servers. OAuth runs locally on this computer; the token is handed to Telegram only when you choose.</div>
+
+    <section id="idle">
+      <button id="btn-connect" class="primary">Connect Robinhood</button>
+      <p class="hint">Your browser will open. Sign in, select your Agentic account, then tap Allow.</p>
+    </section>
+
+    <section id="busy" class="hidden">
+      <div class="spinner"></div>
+      <p id="status" class="status">Working…</p>
+    </section>
+
+    <section id="done" class="hidden">
+      <h2>Connected</h2>
+      <p id="done-msg">Next: open Telegram so the bot can save your token.</p>
+      <button id="btn-telegram" class="primary">Open Telegram</button>
+      <button id="btn-copy-cmd" class="secondary">Copy /connect_agentic command</button>
+      <p class="hint">If Telegram doesn’t open, paste the copied command into a DM with the bot.</p>
+      <button id="btn-again" class="link">Connect again</button>
+    </section>
+
+    <section id="error" class="hidden">
+      <h2 class="err">Something went wrong</h2>
+      <p id="error-msg" class="err"></p>
+      <button id="btn-retry" class="primary">Try again</button>
+    </section>
+  </main>
+  <script src="renderer.js"></script>
+</body>
+</html>

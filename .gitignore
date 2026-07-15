@@ -15,3 +15,6 @@ build/
 gateway/.pytest_cache/
 *.db
 rh_wallet.db
+packages/connect-desktop/node_modules/
+packages/connect-desktop/release/
+packages/connect/node_modules/

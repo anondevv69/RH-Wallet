@@ -1,0 +1,86 @@
+name: RH Agentic Connect release
+
+on:
+  push:
+    tags:
+      - "connect-desktop-v*"
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version label (e.g. 0.1.0) — used only for artifact naming when not tagging"
+        required: false
+        default: "0.1.0"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-latest
+            dist_script: dist:mac
+          - os: windows-latest
+            dist_script: dist:win
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install connect packages
+        working-directory: packages/connect-desktop
+        run: npm install
+
+      - name: Build
+        working-directory: packages/connect-desktop
+        run: npm run ${{ matrix.dist_script }}
+        env:
+          # Unsigned MVP — users may need right-click → Open on macOS.
+          CSC_IDENTITY_AUTO_DISCOVERY: "false"
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: connect-desktop-${{ matrix.os }}
+          path: |
+            packages/connect-desktop/release/*.dmg
+            packages/connect-desktop/release/*.zip
+            packages/connect-desktop/release/*.exe
+            packages/connect-desktop/release/*.AppImage
+          if-no-files-found: warn
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/connect-desktop-v')
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: dist-out
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist-out/**/*.dmg
+            dist-out/**/*.zip
+            dist-out/**/*.exe
+          generate_release_notes: true
+          body: |
+            **RH Agentic Connect** — one-click Robinhood Agentic OAuth (no Terminal).
+
+            1. Download for Mac or Windows
+            2. Open the app → **Connect Robinhood**
+            3. Sign in → Allow → **Open Telegram**
+
+            macOS: if Gatekeeper blocks the unsigned MVP build, right-click the app → **Open**.
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

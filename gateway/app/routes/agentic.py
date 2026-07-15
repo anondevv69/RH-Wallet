@@ -423,71 +423,76 @@ def _html_setup_page(for_client: str = "") -> str:
     """Setup wizard. ``for_client=telegram`` hides Bankr-only steps."""
     telegram = for_client in {"telegram", "tg", "bot"}
     connect_cmd = "curl -fsSL https://rhagent.bot/scripts/rh-connect.sh | bash"
+    app_releases = "https://github.com/rhagent69/rhwallet-rhagent/releases/latest"
     if telegram:
         trust = (
-            "<b>You do not need Bankr / bankrbot.</b> OAuth runs on your computer; "
-            "copy the printed <code>AGENTIC_TOKEN</code> and paste it into Telegram with "
-            "<code>/connect_agentic &lt;token&gt;</code>. We never store it on our servers."
+            "<b>You do not need Bankr / bankrbot.</b> Use the one-click desktop app "
+            "(no Terminal). OAuth runs on your computer; the app opens Telegram so the bot "
+            "can save your token. We never store it on our servers."
         )
         steps = f"""
   <div class="step"><span class="num">1</span>
-    <div><b>Copy and run in Terminal</b> (Mac/PC — needs Node.js + git):
-      <div class="token-box" id="cmd">{connect_cmd}</div>
-      <button class="copy-btn" onclick="copyId('cmd', 'Copy command')">Copy command</button>
-      <p style="color:#71717a;font-size:12px;margin-top:8px">Skip <code>bankr login</code> — that is only for Bankr users.</p>
+    <div><b>Download RH Agentic Connect</b> (Mac or Windows):
+      <p style="margin:10px 0 0"><a class="copy-btn" style="display:inline-block;text-decoration:none;color:#000"
+        href="{app_releases}" target="_blank" rel="noopener">Download app</a></p>
+      <p style="color:#71717a;font-size:12px;margin-top:10px">No Node.js or Terminal required.
+        On macOS you may need right-click → Open the first time (unsigned MVP build).</p>
     </div>
   </div>
 
   <div class="step"><span class="num">2</span>
-    <div>Browser opens → sign in to <b>Robinhood</b> → tap <b>Allow</b>.</div>
+    <div>Double-click <b>Connect Robinhood</b> → browser opens → sign in → tap <b>Allow</b>.</div>
   </div>
 
   <div class="step"><span class="num">3</span>
-    <div>Terminal prints <code>AGENTIC_TOKEN</code> — copy it.</div>
+    <div>In the app, tap <b>Open Telegram</b> — the bot saves your token automatically.</div>
   </div>
 
   <div class="step"><span class="num">4</span>
-    <div>Back in Telegram, send:<br>
-      <code>/connect_agentic &lt;paste-token&gt;</code></div>
-  </div>"""
+    <div>In Telegram, confirm Agentic shows connected (<code>/status</code>).</div>
+  </div>
+
+  <details style="margin-top:20px;color:#a1a1aa;font-size:13px">
+    <summary style="cursor:pointer;color:#f0f0f0">Advanced: Terminal / paste token</summary>
+    <div class="token-box" id="cmd" style="margin-top:12px">{connect_cmd}</div>
+    <button class="copy-btn" onclick="copyId('cmd', 'Copy command')">Copy command</button>
+    <p style="color:#71717a;font-size:12px;margin-top:8px">Or paste manually:
+      <code>/connect_agentic &lt;AGENTIC_TOKEN&gt;</code></p>
+  </details>"""
         subtitle = "One-time Robinhood Agentic login for the Telegram trading bot (stocks &amp; options)."
     else:
         trust = (
-            "<b>We hold nothing.</b> OAuth runs on your machine. Bankr login is optional — "
-            "it only auto-saves the token into your Bankr vault. Telegram / CLI users can skip it "
-            "and copy the printed token instead."
+            "<b>We hold nothing.</b> OAuth runs on your machine. Prefer the "
+            f'<a href="{app_releases}" style="color:#86efac">one-click desktop app</a> '
+            "(Telegram) or optional Bankr login below. Terminal is advanced-only."
         )
         steps = f"""
   <div class="step"><span class="num">1</span>
-    <div><b>Optional (Bankr users only):</b> log into Bankr so the token auto-saves.
-      <div class="token-box" id="bankr-cmd">bankr login</div>
-      <button class="copy-btn" onclick="copyId('bankr-cmd', 'Copy command')">Copy command</button>
-      <p style="color:#71717a;font-size:12px;margin-top:8px">Skip this if you use Telegram or just want the raw token.</p>
+    <div><b>Recommended — desktop app (Telegram):</b>
+      <p style="margin:10px 0 0"><a class="copy-btn" style="display:inline-block;text-decoration:none;color:#000"
+        href="{app_releases}" target="_blank" rel="noopener">Download RH Agentic Connect</a></p>
+      <p style="color:#71717a;font-size:12px;margin-top:10px">Double-click Connect → Robinhood Allow → Open Telegram.</p>
     </div>
   </div>
 
   <div class="step"><span class="num">2</span>
-    <div><b>Copy and run in Terminal</b> (Mac/PC — needs Node.js + git):
-      <div class="token-box" id="cmd">{connect_cmd}</div>
-      <button class="copy-btn" onclick="copyId('cmd', 'Copy command')">Copy command</button>
-  <p style="color:#71717a;font-size:12px;margin-top:8px">One-time — Robinhood requires localhost OAuth.</p>
+    <div><b>Optional (Bankr users only):</b> log into Bankr so the token auto-saves.
+      <div class="token-box" id="bankr-cmd">bankr login</div>
+      <button class="copy-btn" onclick="copyId('bankr-cmd', 'Copy command')">Copy command</button>
     </div>
   </div>
 
   <div class="step"><span class="num">3</span>
-    <div>Your browser opens → sign in to Robinhood → tap <b>Allow</b>
-      on your Agentic account.</div>
+    <div><b>Advanced — Terminal:</b>
+      <div class="token-box" id="cmd">{connect_cmd}</div>
+      <button class="copy-btn" onclick="copyId('cmd', 'Copy command')">Copy command</button>
+      <p style="color:#71717a;font-size:12px;margin-top:8px">Needs Node.js + git. Robinhood requires localhost OAuth.</p>
+    </div>
   </div>
 
   <div class="step"><span class="num">4</span>
-    <div><b>Bankr:</b> token saves as <code>AGENTIC_TOKEN</code> if you ran step 1.<br>
-      <b>Telegram / manual:</b> copy the printed token, then send
-      <code>/connect_agentic &lt;token&gt;</code> in the bot (or paste into Bankr Env Vars).</div>
-  </div>
-
-  <div class="step"><span class="num">5</span>
-    <div>Done. Bankr: ask <em>"What is my Robinhood Agentic buying power?"</em>
-      · Telegram: try the same after <code>/connect_agentic</code>.</div>
+    <div>Browser → Robinhood → <b>Allow</b>. Then Bankr env, Telegram deep link, or
+      <code>/connect_agentic &lt;token&gt;</code>.</div>
   </div>"""
         subtitle = (
             'One-time setup for stocks &amp; options. Full guide: '

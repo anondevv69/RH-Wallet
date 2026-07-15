@@ -1,8 +1,17 @@
 # Connect Robinhood Agentic (stocks & options)
 
-One-time setup for Bankr users. Robinhood requires OAuth on **your computer** (localhost). After this, trade through Bankr only.
+Robinhood requires OAuth on **your computer** (localhost). Phone browser alone cannot finish Allow.
 
-## One command
+## Telegram — one-click desktop app (recommended)
+
+Download **RH Agentic Connect** (Mac/Windows):  
+https://github.com/rhagent69/rhwallet-rhagent/releases/latest
+
+Double-click → Connect Robinhood → Allow → Open Telegram. No Terminal.
+
+Setup page: https://rhwallet-rhagent-production.up.railway.app/agentic/setup?for=telegram
+
+## Bankr — one command
 
 ```bash
 curl -fsSL https://rhagent.bot/scripts/rh-connect.sh | bash

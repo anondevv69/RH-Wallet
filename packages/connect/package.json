@@ -1,14 +1,20 @@
 {
   "name": "@rhwallet/connect",
-  "version": "0.1.0",
-  "description": "One-time Robinhood Agentic OAuth for Bankr — localhost PKCE, auto-save to Bankr env",
+  "version": "0.2.0",
+  "description": "One-time Robinhood Agentic OAuth — localhost PKCE for Bankr + Telegram handoff",
+  "main": "lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./oauth": "./lib/oauth.js",
+    "./telegramHandoff": "./lib/telegramHandoff.js"
+  },
   "bin": {
     "rhwallet-connect": "bin/cli.js",
     "rh-wallet-connect": "bin/cli.js"
   },
   "files": ["bin", "lib"],
   "engines": { "node": ">=18" },
-  "keywords": ["robinhood", "bankr", "agentic", "oauth", "mcp"],
+  "keywords": ["robinhood", "bankr", "agentic", "oauth", "mcp", "telegram"],
   "license": "MIT",
   "repository": {
     "type": "git",
