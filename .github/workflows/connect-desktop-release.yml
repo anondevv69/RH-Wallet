@@ -1,3 +1,6 @@
+# Note: if GitHub Actions is disabled for the org/user, build locally:
+#   cd packages/connect-desktop && npm ci && npm run dist
+#   gh release create connect-desktop-vX.Y.Z release/*.dmg release/*.exe ...
 name: RH Agentic Connect release
 
 on:
