@@ -5,7 +5,7 @@ One-time setup for Bankr users. Robinhood requires OAuth on **your computer** (l
 ## One command
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/rhagent69/rhwallet-rhagent/main/scripts/rh-connect.sh | bash
+curl -fsSL https://rhagent.bot/scripts/rh-connect.sh | bash
 ```
 
 Requires **Node.js** and **git**. Run `bankr login` first so your token saves to Bankr automatically.

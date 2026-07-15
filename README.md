@@ -20,7 +20,7 @@ Robinhood **Crypto** + **Agentic** (stocks/options) for [Bankr](https://docs.ban
 3. **Agentic** (stocks/options): one local command (~2 min):
    ```bash
    bankr login
-   curl -fsSL https://raw.githubusercontent.com/rhagent69/rhwallet-rhagent/main/scripts/rh-connect.sh | bash
+   curl -fsSL https://rhagent.bot/scripts/rh-connect.sh | bash
    ```
 
 4. **Ask Bankr:** *"What is my Robinhood Agentic buying power?"*
