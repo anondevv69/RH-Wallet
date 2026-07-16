@@ -101,3 +101,72 @@ def test_enrich_injects_account_number():
     assert args["account_number"] == "987654321"
     assert args["time_in_force"] == "gfd"
     assert "account_number" not in json.dumps(req)
+
+
+def test_enrich_injects_for_get_portfolio():
+    mock_response = MagicMock()
+    mock_response.status_code = 200
+    mock_response.json.return_value = {
+        "jsonrpc": "2.0",
+        "id": 0,
+        "result": {
+            "structuredContent": {
+                "accounts": [{"account_number": "111222333", "nickname": "Agentic"}],
+            }
+        },
+    }
+    mock_client = AsyncMock()
+    mock_client.post = AsyncMock(return_value=mock_response)
+
+    req = {
+        "jsonrpc": "2.0",
+        "id": 3,
+        "method": "tools/call",
+        "params": {"name": "get_portfolio", "arguments": {}},
+    }
+    out = asyncio.run(
+        enrich_mcp_request(
+            json.dumps(req).encode(),
+            {"Authorization": "Bearer t"},
+            client=mock_client,
+        )
+    )
+    args = json.loads(out)["params"]["arguments"]
+    assert args["account_number"] == "111222333"
+    # Discovery must use get_accounts, not get_portfolio (chicken/egg on v15).
+    assert mock_client.post.call_args.kwargs["json"]["params"]["name"] == "get_accounts"
+
+
+def test_enrich_replaces_redacted_account_placeholder():
+    mock_response = MagicMock()
+    mock_response.status_code = 200
+    mock_response.json.return_value = {
+        "jsonrpc": "2.0",
+        "id": 0,
+        "result": {"structuredContent": {"account_number": "555666777"}},
+    }
+    mock_client = AsyncMock()
+    mock_client.post = AsyncMock(return_value=mock_response)
+
+    req = {
+        "jsonrpc": "2.0",
+        "id": 4,
+        "method": "tools/call",
+        "params": {
+            "name": "review_equity_order",
+            "arguments": {
+                "symbol": "BAC",
+                "side": "sell",
+                "account_number": "Robinhood Agentic",
+            },
+        },
+    }
+    out = asyncio.run(
+        enrich_mcp_request(
+            json.dumps(req).encode(),
+            {"Authorization": "Bearer t"},
+            client=mock_client,
+        )
+    )
+    args = json.loads(out)["params"]["arguments"]
+    assert args["account_number"] == "555666777"

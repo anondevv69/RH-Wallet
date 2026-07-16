@@ -1,9 +1,15 @@
-"""Inject Agentic account_number on order MCP calls — agents never see it."""
+"""Inject Agentic account_number on MCP calls — agents never see it.
+
+Robinhood MCP (v15+) requires `account_number` on portfolio/positions/orders/trades
+as well as place/review/cancel. The gateway redacts account numbers from responses,
+so agents cannot discover them — we resolve + inject server-side instead.
+"""
 
 from __future__ import annotations
 
 import json
 import logging
+import re
 from typing import Any, Optional
 
 import httpx
@@ -12,14 +18,40 @@ logger = logging.getLogger(__name__)
 
 ROBINHOOD_MCP_URL = "https://agent.robinhood.com/mcp/trading"
 
+# Do NOT include get_accounts — that remains the discovery tool (no account_number needed).
 _TOOLS_NEEDING_ACCOUNT = frozenset(
     {
+        # Portfolio / positions / history (required since MCP schema v15)
+        "get_portfolio",
+        "get_positions",
+        "get_equity_positions",
+        "get_option_positions",
+        "get_orders",
+        "get_equity_orders",
+        "get_option_orders",
+        "get_trades",
+        "get_trade_history",
+        "get_pnl_trade_history",
+        "get_realized_pnl",
+        # Orders
         "place_equity_order",
         "review_equity_order",
         "cancel_equity_order",
         "place_option_order",
         "review_option_order",
         "cancel_option_order",
+    }
+)
+
+# Values agents sometimes pass after reading redacted get_accounts responses.
+_REDACTED_ACCOUNT_PLACEHOLDERS = frozenset(
+    {
+        "robinhood agentic",
+        "agentic",
+        "redacted",
+        "[redacted]",
+        "••••",
+        "****",
     }
 )
 
@@ -105,12 +137,39 @@ def extract_account_number(data: Any) -> Optional[str]:
     return None
 
 
+def is_usable_account_number(value: Any) -> bool:
+    """True if value looks like a real Robinhood account number (not a redaction label)."""
+    if not isinstance(value, str):
+        return False
+    cleaned = value.strip()
+    if not cleaned:
+        return False
+    lower = cleaned.lower()
+    if lower in _REDACTED_ACCOUNT_PLACEHOLDERS:
+        return False
+    if "robinhood" in lower and "agentic" in lower:
+        return False
+    if re.fullmatch(r"[•*xX]+", cleaned):
+        return False
+    # Real RH account numbers are numeric (often 9–12 digits).
+    if re.fullmatch(r"\d{6,20}", cleaned):
+        return True
+    # Allow alphanumeric account ids if Robinhood ever returns them — reject labels.
+    if re.search(r"[a-zA-Z]", cleaned) and not re.search(r"\d", cleaned):
+        return False
+    return bool(re.search(r"\d", cleaned))
+
+
 async def lookup_agentic_account_number(
     client: httpx.AsyncClient,
     headers: dict[str, str],
 ) -> Optional[str]:
-    """Resolve Agentic account_number via upstream MCP (never returned to the agent)."""
-    for tool in ("get_portfolio", "get_accounts"):
+    """Resolve Agentic account_number via upstream MCP (never returned to the agent).
+
+    Prefer get_accounts — get_portfolio/positions now require account_number upstream,
+    so they cannot be used for discovery.
+    """
+    for tool in ("get_accounts",):
         payload = {
             "jsonrpc": "2.0",
             "id": 0,
@@ -125,7 +184,7 @@ async def lookup_agentic_account_number(
         except (httpx.RequestError, json.JSONDecodeError, ValueError):
             continue
         account = extract_account_number(body)
-        if account:
+        if account and is_usable_account_number(account):
             return account
     return None
 
@@ -160,7 +219,8 @@ async def enrich_mcp_request(
     if tool_name in _TOOLS_NEEDING_ACCOUNT:
         args = normalize_order_arguments(args)
         changed = True
-        if not args.get("account_number"):
+        existing = args.get("account_number")
+        if not is_usable_account_number(existing):
             account = await lookup_agentic_account_number(client, headers)
             if account:
                 args["account_number"] = account
