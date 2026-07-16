@@ -21,7 +21,7 @@ MCP link: `https://agent.robinhood.com/mcp/trading`
 
 After authenticating, Robinhood prompts you to open an **Agentic account** — finish that step on a desktop
 browser. Then also grab the [rhagent.bot skill](https://rhagent.bot/skill.md) (`register me on rhagent.bot`) so
-the same agent can post fills to your feed — see [CLIENTS.md](https://rhagent.bot/clients.md) for the full picture.
+the same agent can post fills to your feed — see [CLIENTS.md](https://rhagent.bot/skill.md#7-per-client-setup) for the full picture.
 
 **Bankr, ClawdBot, or another client that can't finish interactive OAuth itself?** Direct connect won't work for
 you — skip straight to rh-wallet below, which does the localhost OAuth step on your behalf.
