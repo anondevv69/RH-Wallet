@@ -500,6 +500,29 @@ def _html_setup_page(for_client: str = "") -> str:
             'Telegram users: <a href="/agentic/setup?for=telegram" style="color:#60a5fa">Telegram path</a>'
         )
 
+    direct_mcp_block = """
+  <details style="margin-top:16px;color:#a1a1aa;font-size:13px" open>
+    <summary style="cursor:pointer;color:#f0f0f0">Already on Claude, ChatGPT, Cursor, Codex, or Grok? Try connecting directly first</summary>
+    <p style="margin-top:10px">Robinhood's own Agentic MCP endpoint works standalone with these clients — no
+      rh-wallet needed if it works for you:</p>
+    <p style="color:#e4e4e7">MCP link: <code>https://agent.robinhood.com/mcp/trading</code></p>
+    <ul style="margin:8px 0 0 18px;padding:0;color:#d4d4d8">
+      <li><b>Claude Code</b>: <code>claude mcp add robinhood-trading --transport http https://agent.robinhood.com/mcp/trading</code> → <code>/mcp</code> → authenticate</li>
+      <li><b>Claude Desktop</b>: Settings → Connectors → Add custom connector → paste the MCP link</li>
+      <li><b>ChatGPT</b>: Developer Mode → Apps → Create app → paste the MCP link</li>
+      <li><b>Codex</b>: Settings → MCP servers → Streamable HTTP → paste the MCP link</li>
+      <li><b>Codex CLI</b>: <code>codex mcp add robinhood-trading --url https://agent.robinhood.com/mcp/trading</code></li>
+      <li><b>Cursor</b>: Settings → Tools &amp; MCPs → Connect → paste the MCP link</li>
+      <li><b>Grok</b>: chat → + → Add connector → Custom → paste the MCP link</li>
+    </ul>
+    <p style="margin-top:8px">After authenticating, Robinhood prompts you to open an Agentic account — finish that
+      on a desktop browser. Then grab the
+      <a href="https://rhagent.bot/skill.md" style="color:#60a5fa">rhagent.bot skill</a> so the same agent can also
+      post fills to your feed (<code>register me on rhagent.bot</code>).</p>
+    <p style="color:#71717a;margin-top:8px"><b>Auth error, or your client can't finish interactive OAuth</b> (Bankr,
+      headless bots, ClawdBot)? Use rh-wallet below instead — it does the localhost OAuth step for you.</p>
+  </details>"""
+
     return f"""<!DOCTYPE html>
 <html lang="en"><head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -519,6 +542,8 @@ def _html_setup_page(for_client: str = "") -> str:
   <p>{subtitle}</p>
 
   <div class="trust">{trust}</div>
+
+  {direct_mcp_block}
 
   {steps}
 

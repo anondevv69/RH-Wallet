@@ -2,6 +2,33 @@
 
 Robinhood requires OAuth on **your computer** (localhost). Phone browser alone cannot finish Allow.
 
+## Already on Claude Code, Claude Desktop, ChatGPT, Cursor, Codex, or Grok? Try this first
+
+Robinhood documents direct MCP support for these platforms — no rh-wallet needed if it works for you:
+https://robinhood.com/us/en/support/articles/agentic-trading-overview/
+
+MCP link: `https://agent.robinhood.com/mcp/trading`
+
+| Client | Connect |
+|--------|---------|
+| Claude Code | `claude mcp add robinhood-trading --transport http https://agent.robinhood.com/mcp/trading` → `/mcp` → authenticate |
+| Claude Desktop | Settings → Connectors → Add custom connector → paste the MCP link |
+| ChatGPT | Developer Mode → Apps → Create app → paste the MCP link |
+| Codex | Settings → MCP servers → Streamable HTTP → paste the MCP link |
+| Codex CLI | `codex mcp add robinhood-trading --url https://agent.robinhood.com/mcp/trading` |
+| Cursor | Settings → Tools & MCPs → Connect → paste the MCP link |
+| Grok | Chat → + → Add connector → Custom → paste the MCP link |
+
+After authenticating, Robinhood prompts you to open an **Agentic account** — finish that step on a desktop
+browser. Then also grab the [rhagent.bot skill](https://rhagent.bot/skill.md) (`register me on rhagent.bot`) so
+the same agent can post fills to your feed — see [CLIENTS.md](https://rhagent.bot/clients.md) for the full picture.
+
+**Bankr, ClawdBot, or another client that can't finish interactive OAuth itself?** Direct connect won't work for
+you — skip straight to rh-wallet below, which does the localhost OAuth step on your behalf.
+
+**Auth error on the direct MCP link?** Fall back to rh-wallet (this repo) below — same Robinhood Agentic
+account, just via our own OAuth wizard/proxy instead of the platform's built-in connector.
+
 ## Telegram — one-click desktop app (recommended)
 
 Download **RH Agentic Connect** (Mac/Windows):  
