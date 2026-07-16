@@ -7,9 +7,11 @@ so agents cannot discover them — we resolve + inject server-side instead.
 
 from __future__ import annotations
 
+import hashlib
 import json
 import logging
 import re
+import time
 from typing import Any, Optional
 
 import httpx
@@ -18,25 +20,38 @@ logger = logging.getLogger(__name__)
 
 ROBINHOOD_MCP_URL = "https://agent.robinhood.com/mcp/trading"
 
+# account_number rarely changes mid-session — cache per-token to avoid an extra
+# upstream get_accounts round-trip on every portfolio/positions/orders call.
+_ACCOUNT_CACHE_TTL_S = 10 * 60
+_account_cache: dict[str, tuple[str, float]] = {}
+
+
+def _cache_key(headers: dict[str, str]) -> Optional[str]:
+    auth = headers.get("Authorization", "")
+    if not auth:
+        return None
+    # Hash rather than store the raw bearer token in memory.
+    return hashlib.sha256(auth.encode()).hexdigest()
+
 # Do NOT include get_accounts — that remains the discovery tool (no account_number needed).
+# Tool names must match Robinhood's actual MCP catalog exactly — see
+# skill/references/AGENTIC-CAPABILITIES.md. There is no generic get_positions/get_orders/
+# get_trades; Robinhood splits everything by equity vs option.
 _TOOLS_NEEDING_ACCOUNT = frozenset(
     {
-        # Portfolio / positions / history (required since MCP schema v15)
+        # Portfolio / P&L (required since MCP schema v15)
         "get_portfolio",
-        "get_positions",
-        "get_equity_positions",
-        "get_option_positions",
-        "get_orders",
-        "get_equity_orders",
-        "get_option_orders",
-        "get_trades",
-        "get_trade_history",
-        "get_pnl_trade_history",
         "get_realized_pnl",
-        # Orders
+        "get_pnl_trade_history",
+        # Equity positions / orders
+        "get_equity_positions",
+        "get_equity_orders",
         "place_equity_order",
         "review_equity_order",
         "cancel_equity_order",
+        # Option positions / orders
+        "get_option_positions",
+        "get_option_orders",
         "place_option_order",
         "review_option_order",
         "cancel_option_order",
@@ -167,8 +182,15 @@ async def lookup_agentic_account_number(
     """Resolve Agentic account_number via upstream MCP (never returned to the agent).
 
     Prefer get_accounts — get_portfolio/positions now require account_number upstream,
-    so they cannot be used for discovery.
+    so they cannot be used for discovery. Cached briefly per-token since this adds an
+    extra upstream round-trip on every account-scoped call otherwise.
     """
+    cache_key = _cache_key(headers)
+    if cache_key:
+        cached = _account_cache.get(cache_key)
+        if cached and cached[1] > time.monotonic():
+            return cached[0]
+
     for tool in ("get_accounts",):
         payload = {
             "jsonrpc": "2.0",
@@ -185,6 +207,8 @@ async def lookup_agentic_account_number(
             continue
         account = extract_account_number(body)
         if account and is_usable_account_number(account):
+            if cache_key:
+                _account_cache[cache_key] = (account, time.monotonic() + _ACCOUNT_CACHE_TTL_S)
             return account
     return None
 

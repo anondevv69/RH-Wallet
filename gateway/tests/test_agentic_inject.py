@@ -4,12 +4,22 @@ import asyncio
 import json
 from unittest.mock import AsyncMock, MagicMock
 
+import pytest
+
 from app.agentic_inject import (
+    _account_cache,
     enrich_mcp_request,
     extract_account_number,
     normalize_order_arguments,
     parse_tool_call,
 )
+
+
+@pytest.fixture(autouse=True)
+def _clear_account_cache():
+    _account_cache.clear()
+    yield
+    _account_cache.clear()
 
 
 def test_parse_tool_call():
@@ -170,3 +180,31 @@ def test_enrich_replaces_redacted_account_placeholder():
     )
     args = json.loads(out)["params"]["arguments"]
     assert args["account_number"] == "555666777"
+
+
+def test_enrich_caches_account_number_per_token():
+    mock_response = MagicMock()
+    mock_response.status_code = 200
+    mock_response.json.return_value = {
+        "jsonrpc": "2.0",
+        "id": 0,
+        "result": {"structuredContent": {"account_number": "444555666"}},
+    }
+    mock_client = AsyncMock()
+    mock_client.post = AsyncMock(return_value=mock_response)
+    headers = {"Authorization": "Bearer cache-test-token"}
+
+    req = {
+        "jsonrpc": "2.0",
+        "id": 5,
+        "method": "tools/call",
+        "params": {"name": "get_portfolio", "arguments": {}},
+    }
+
+    out1 = asyncio.run(enrich_mcp_request(json.dumps(req).encode(), headers, client=mock_client))
+    out2 = asyncio.run(enrich_mcp_request(json.dumps(req).encode(), headers, client=mock_client))
+
+    assert json.loads(out1)["params"]["arguments"]["account_number"] == "444555666"
+    assert json.loads(out2)["params"]["arguments"]["account_number"] == "444555666"
+    # Second call should hit the cache, not call upstream again.
+    assert mock_client.post.await_count == 1
