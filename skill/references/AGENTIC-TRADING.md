@@ -99,7 +99,7 @@ Stocks and options **must** use Bankr's `call_mcp_tool` against the **`robinhood
 }
 ```
 
-**On @bankrbot X:** prefer hosted `agentic-mcp.sh` from [Rhagent](https://github.com/rhagent69/Rhagent) — bypasses `arguments_json` schema failures. See https://rhagent.bot/bankr.md#options--any-ticker-research--trades
+**On @bankrbot X:** prefer hosted `agentic-mcp.sh` from [Rhagent](https://github.com/rhagent69/Rhagent) — bypasses `arguments_json` schema failures. See https://rhagent.bot/skill.md#options-any-ticker-research--trades
 
 **Agentic buying power / portfolio (public X — one line, no account numbers):**
 

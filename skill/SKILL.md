@@ -250,7 +250,7 @@ Or install the setup app: tell Bankr `build me the rh-wallet app from https://gi
 |-----------|---------|
 | "What's my Robinhood crypto balance?" | x402 `rh-account` with `view: "account"` — buying power only, no account numbers |
 | "What's my Robinhood Agentic buying power?" | `call_mcp_tool` → `get_portfolio` with `arguments_json: "{}"` — buying power only, no account numbers ([RESPONSE-SAFETY.md](references/RESPONSE-SAFETY.md)) |
-| "Option chain" / "calls this week" / any `$TICKER` options | `call_mcp_tool` → `get_option_chains` with `arguments_json: "{\"symbol\": \"SYMBOL\"}"` then `get_option_quotes` — see [AGENTIC-TRADING.md](references/AGENTIC-TRADING.md) or https://rhagent.bot/bankr.md |
+| "Option chain" / "calls this week" / any `$TICKER` options | `call_mcp_tool` → `get_option_chains` with `arguments_json: "{\"symbol\": \"SYMBOL\"}"` then `get_option_quotes` — see [AGENTIC-TRADING.md](references/AGENTIC-TRADING.md) or https://rhagent.bot/skill.md#9-bankr-mcp-troubleshooting |
 | "What's in my Agentic wallet?" / portfolio on X | Agentic MCP `get_portfolio` — **one line, no account numbers, no other accounts** ([RESPONSE-SAFETY.md](references/RESPONSE-SAFETY.md)) |
 | "What crypto do I hold on Robinhood?" | x402 `rh-account` with `view: "holdings"` |
 | "Get BTC and DOGE prices from Robinhood" | x402 `rh-prices` with `symbol: "BTC-USD,DOGE-USD"` |
