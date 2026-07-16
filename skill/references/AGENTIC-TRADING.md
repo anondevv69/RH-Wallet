@@ -2,7 +2,10 @@
 
 Robinhood's official agent product for **equities and options** — separate from **Robinhood Crypto** (rh-wallet).
 
-**Bankr users:** do not connect `https://agent.robinhood.com/mcp/trading` directly. Use the RH Wallet proxy + one-time localhost OAuth — [agentic-connect.md](agentic-connect.md).
+**Bankr users:** do not connect `https://agent.robinhood.com/mcp/trading` directly — Bankr can't complete
+Robinhood's interactive localhost OAuth itself. Use the RH Wallet proxy + one-time localhost OAuth instead —
+[agentic-connect.md](agentic-connect.md). (Claude Code/Desktop, ChatGPT, Cursor, Codex, and Grok *can* connect
+directly — see the top of that same doc.)
 
 Robinhood docs: [Agentic overview](https://robinhood.com/us/en/support/articles/agentic-trading-overview/)
 
