@@ -1,0 +1,10 @@
+{
+  "name": "@rhwallet/partner",
+  "version": "0.1.0",
+  "description": "Bankr Partner API — wallet provisioning for RH-Wallet integrations",
+  "main": "lib/bankr-partner.js",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  }
+}

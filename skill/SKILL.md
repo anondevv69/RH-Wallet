@@ -108,6 +108,14 @@ Then walk through each part. Full reference: [references/GETTING-STARTED.md](ref
    ```
 2. User says: `set up rh-wallet`
 
+**Bankr wallet:** RH agents auto-provision a Bankr EVM wallet on signup (Telegram, Discord, rhagent.bot).
+No manual wallet setup for most users. Credentials (`AGENTIC_TOKEN`, `RH_API_KEY`, etc.) save to Bankr env automatically.
+
+**Already use Bankr in Terminal?** Link your existing wallet instead of creating a new one:
+- Telegram/Discord: `/connect_bankr bk_usr_…` (from `~/.bankr/config.json` after `bankr login`)
+- rhagent.bot: `POST /api/agent/link-bankr` with your `bankr_api_key`
+- Do **not** pass `bk_ptr_*` partner keys — those are server-only.
+
 ---
 
 ### Part B — Robinhood Crypto (BTC, DOGE, ETH)

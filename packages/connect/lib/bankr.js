@@ -88,6 +88,16 @@ async function saveToBankr({ accessToken, refreshToken, apiKey, setupMcp }) {
   return { mcpJob };
 }
 
+/** True if key is a Bankr user wallet API key (existing terminal user). */
+function isWalletApiKey(key) {
+  return typeof key === "string" && key.startsWith("bk_usr_");
+}
+
+/** True if key is a Bankr partner provisioning key (server-only). */
+function isPartnerApiKey(key) {
+  return typeof key === "string" && key.startsWith("bk_ptr_");
+}
+
 function copyToClipboard(text) {
   try {
     const { execSync } = require("child_process");
@@ -108,8 +118,13 @@ function copyToClipboard(text) {
 module.exports = {
   loadBankrApiKey,
   saveToBankr,
+  setEnvVars,
+  setEnvVar,
   listEnvKeys,
+  setupMcpViaAgent,
   copyToClipboard,
+  isWalletApiKey,
+  isPartnerApiKey,
   PROXY_MCP_URL,
   BANKR_API_URL,
 };
