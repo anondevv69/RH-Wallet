@@ -29,14 +29,19 @@ you — skip straight to rh-wallet below, which does the localhost OAuth step on
 **Auth error on the direct MCP link?** Fall back to rh-wallet (this repo) below — same Robinhood Agentic
 account, just via our own OAuth wizard/proxy instead of the platform's built-in connector.
 
-## Telegram — one-click desktop app (recommended)
+## Telegram — Terminal on your computer (recommended)
 
-Download **RH Agentic Connect** (Mac/Windows):  
-https://github.com/rhagent69/rhwallet-rhagent/releases/latest
+Desktop app downloads are temporarily unavailable. Use the setup page + one Terminal command:
 
-Double-click → Connect Robinhood → Allow → Open Telegram. No Terminal.
+Setup page: https://rhagent.bot/agentic/setup?for=telegram
 
-Setup page: https://rhwallet-rhagent-production.up.railway.app/agentic/setup?for=telegram
+```bash
+RH_CONNECT_FOR=telegram curl -fsSL https://rhagent.bot/scripts/rh-connect.sh | bash
+```
+
+Browser opens → Robinhood login → **Allow** → paste `/connect_agentic <token>` in Telegram (or tap Open Telegram if shown).
+
+Requires **Node.js** and **git** on Mac or Windows.
 
 ## Bankr — one command
 

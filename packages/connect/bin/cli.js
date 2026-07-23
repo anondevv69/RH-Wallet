@@ -8,21 +8,24 @@ const {
   copyToClipboard,
   PROXY_MCP_URL,
 } = require("../lib/bankr");
+const { stageTelegramHandoff } = require("../lib/telegramHandoff");
 
 function parseArgs(argv) {
-  const opts = { setupMcp: true, noBankr: false, bankrApiKey: null };
+  const opts = { setupMcp: true, noBankr: false, bankrApiKey: null, forTelegram: false };
   for (let i = 2; i < argv.length; i++) {
     const a = argv[i];
     if (a === "--no-bankr") opts.noBankr = true;
     else if (a === "--no-mcp") opts.setupMcp = false;
+    else if (a === "--for-telegram") opts.forTelegram = true;
     else if (a === "--bankr-api-key" && argv[i + 1]) {
       opts.bankrApiKey = argv[++i];
     } else if (a === "--help" || a === "-h") {
       console.log(`
-RH Wallet Connect — Robinhood Agentic OAuth for Bankr
+RH Wallet Connect — Robinhood Agentic OAuth for Bankr / Telegram
 
 Usage:
   npx @rhwallet/connect
+  npx @rhwallet/connect --for-telegram     Stage token + Open Telegram deep link
   npx @rhwallet/connect --no-mcp          Skip auto MCP server setup
   npx @rhwallet/connect --no-bankr        Print token only (no Bankr save)
 
@@ -46,6 +49,26 @@ async function main() {
   });
 
   console.log("\n✓ OAuth complete");
+
+  if (opts.forTelegram) {
+    try {
+      const handoff = await stageTelegramHandoff({
+        accessToken: tokens.accessToken,
+        refreshToken: tokens.refreshToken,
+      });
+      console.log("\n✓ Telegram handoff ready — open this link on your phone or computer:");
+      console.log(handoff.deepLink);
+      console.log("\nOr paste in Telegram:");
+      console.log(`  /connect_agentic ${tokens.accessToken}`);
+      console.log("");
+      return;
+    } catch (err) {
+      console.error("⚠ Telegram handoff failed:", err.message);
+      console.log("  Paste manually in Telegram:");
+      console.log(`  /connect_agentic ${tokens.accessToken}\n`);
+      return;
+    }
+  }
 
   const apiKey = opts.noBankr ? null : loadBankrApiKey(opts.bankrApiKey);
 

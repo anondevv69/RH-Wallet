@@ -8,7 +8,7 @@ One-time Robinhood Agentic OAuth for Bankr users.
 curl -fsSL https://rhagent.bot/scripts/rh-connect.sh | bash
 ```
 
-Setup wizard: https://rhwallet-rhagent-production.up.railway.app/agentic/setup
+Setup wizard: https://rhagent.bot/agentic/setup
 
 ## Manual
 
