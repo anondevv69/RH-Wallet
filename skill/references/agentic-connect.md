@@ -36,7 +36,7 @@ Desktop app downloads are temporarily unavailable. Use the setup page + one Term
 Setup page: https://rhagent.bot/agentic/setup?for=telegram
 
 ```bash
-RH_CONNECT_FOR=telegram curl -fsSL https://rhagent.bot/scripts/rh-connect.sh | bash
+curl -fsSL https://rhagent.bot/scripts/rh-connect.sh | RH_CONNECT_FOR=telegram bash
 ```
 
 Browser opens → Robinhood login → **Allow** → paste `/connect_agentic <token>` in Telegram (or tap Open Telegram if shown).

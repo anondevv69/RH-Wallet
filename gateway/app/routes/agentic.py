@@ -422,7 +422,7 @@ async function copyToken(id, btn) {{
 def _html_setup_page(for_client: str = "") -> str:
     """Setup wizard. ``for_client=telegram`` hides Bankr-only steps."""
     telegram = for_client in {"telegram", "tg", "bot"}
-    connect_cmd = "RH_CONNECT_FOR=telegram curl -fsSL https://rhagent.bot/scripts/rh-connect.sh | bash"
+    connect_cmd = "curl -fsSL https://rhagent.bot/scripts/rh-connect.sh | RH_CONNECT_FOR=telegram bash"
     setup_self = "/agentic/setup?for=telegram" if telegram else "/agentic/setup"
     if telegram:
         trust = (
