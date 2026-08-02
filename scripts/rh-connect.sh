@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
-# Deprecated entrypoint — rhwallet-rhagent is private, so raw.githubusercontent.com 404s.
-# Canonical script lives in the public Rhagent repo / on rhagent.bot.
+# Deprecated entrypoint kept only for old bookmarked raw.githubusercontent.com links
+# against the public rhwallet-rhagent mirror. Always use the canonical URL directly —
+# it is hosted on rhagent.bot and lives in the public Rhagent repo (skill/connect/bin/cli.js).
 # Usage: curl -fsSL https://rhagent.bot/scripts/rh-connect.sh | bash
 
 set -euo pipefail
